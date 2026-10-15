@@ -18,7 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -95,10 +95,9 @@ fun LibraryScreen(
                     color = materials.mutedInk
                 )
             }
-            itemsIndexed(libraryCategories, key = { _, category -> category.key }) { index, category ->
+            items(libraryCategories, key = { category -> category.key }) { category ->
                 CategoryShelf(
                     category = category,
-                    number = "0${index + 1}",
                     items = library.itemsFor(category.storedCategory),
                     onClick = { onOpenCategory(category) }
                 )
@@ -120,7 +119,6 @@ fun LibraryScreen(
 @Composable
 private fun CategoryShelf(
     category: LibraryCategory,
-    number: String,
     items: List<LibraryItem>,
     onClick: () -> Unit
 ) {
@@ -149,12 +147,6 @@ private fun CategoryShelf(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(
-                number,
-                Modifier.border(1.dp, materials.mutedInk.copy(alpha = .4f)).padding(horizontal = 7.dp, vertical = 5.dp),
-                style = MaterialTheme.typography.labelMedium,
-                color = materials.mutedInk
-            )
             Column(Modifier.weight(1f)) {
                 Text(category.title, style = MaterialTheme.typography.titleLarge)
                 Text("$count ${if (count == 1) "título" else "títulos"}", style = MaterialTheme.typography.bodySmall, color = materials.mutedInk)

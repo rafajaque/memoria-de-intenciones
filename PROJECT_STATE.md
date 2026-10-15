@@ -28,6 +28,7 @@ La base Room subió de versión 1 a 2 mediante una migración que añade `durati
 
 ### Contenido real — 2026-10-15
 
+- Refinamiento visual posterior: se retiraron los números locales delante de Películas, Series, Libros y Videojuegos; se conserva la referencia general `01 — 04` en el encabezado de la colección.
 - Prueba roja: `compileDebugAndroidTestKotlin` falló inicialmente porque no existían `LibraryRepository.add(...)` ni `durationMinutes`.
 - `connectedDebugAndroidTest`: 3 pruebas instrumentadas aprobadas en `memoria-api36`, incluida la nueva prueba de repositorio que normaliza título y nota, guarda duración y filtra por categoría.
 - `assembleDebug lintDebug`: `BUILD SUCCESSFUL`. Lint conserva advertencias de configuración preexistentes, sin errores.
