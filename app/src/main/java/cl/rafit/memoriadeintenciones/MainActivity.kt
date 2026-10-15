@@ -3,6 +3,7 @@ package cl.rafit.memoriadeintenciones
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.core.view.WindowCompat
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -24,6 +25,7 @@ private val ComponentActivity.preferencesDataStore by preferencesDataStore(name 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
         setContent {
             val preferences = remember { ThemePreferences(preferencesDataStore) }
             val scope = rememberCoroutineScope()

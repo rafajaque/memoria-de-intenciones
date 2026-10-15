@@ -5,13 +5,13 @@
 - Fecha: 2026-10-15
 - Proyecto Android: esqueleto base creado
 - Repositorio Git: inicializado
-- Rama actual: `feat/proyecto-base`
-- Último commit: `d48d25c docs: registrar prueba en emulador Android`
+- Rama actual: `feat/biblioteca-visual`
+- Último commit: pendiente de commit de la mejora visual
 - Remoto: `https://github.com/rafajaque/memoria-de-intenciones.git`
 
 ## Último cambio comprobado
 
-Se implementó la navegación entre biblioteca y ajustes, seis temas visuales y persistencia local del tema con DataStore.
+Se implementó la navegación entre biblioteca y ajustes, seis temas visuales, persistencia local del tema con DataStore y la primera mejora visual de la biblioteca digital.
 
 ## Archivos actuales
 
@@ -34,6 +34,7 @@ Se implementó la navegación entre biblioteca y ajustes, seis temas visuales y 
 - Se creó el AVD `memoria-api36` con imagen Android 36 estándar; ADB lo detectó como `emulator-5554`.
 - La APK debug se instaló con éxito y `MainActivity` quedó en primer plano en el emulador.
 - Android Studio 2026.2.1.8 está instalado y el proceso fue iniciado apuntando al proyecto.
+- La pantalla principal se verificó visualmente en el AVD mediante una captura después de instalar la APK actualizada.
 
 ## Decisiones vigentes
 
@@ -49,4 +50,4 @@ Se implementó la navegación entre biblioteca y ajustes, seis temas visuales y 
 
 ## Siguiente acción exacta
 
-Crear pruebas de UI para navegación y selección de tema, o iniciar la siguiente microtarea funcional.
+Crear pruebas de UI para navegación y selección de tema, o conectar una primera estantería con datos reales.
