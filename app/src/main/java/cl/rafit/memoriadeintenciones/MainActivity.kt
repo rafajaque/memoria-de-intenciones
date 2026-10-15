@@ -18,6 +18,8 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.navigation.NavType
 import kotlinx.coroutines.launch
 
 private val ComponentActivity.preferencesDataStore by preferencesDataStore(name = "preferences")
@@ -50,6 +52,9 @@ class MainActivity : ComponentActivity() {
 private object Destinations {
     const val LIBRARY = "library"
     const val SETTINGS = "settings"
+    const val SHELF = "shelf/{categoryKey}"
+
+    fun shelf(categoryKey: String) = "shelf/$categoryKey"
 }
 
 @Composable
@@ -61,12 +66,24 @@ private fun MemoriaNavigation(
 
     NavHost(navController = navController, startDestination = Destinations.LIBRARY) {
         composable(Destinations.LIBRARY) {
-            LibraryScreen(onOpenSettings = { navController.navigate(Destinations.SETTINGS) })
+            LibraryScreen(
+                onOpenSettings = { navController.navigate(Destinations.SETTINGS) },
+                onOpenCategory = { category -> navController.navigate(Destinations.shelf(category.key)) }
+            )
         }
         composable(Destinations.SETTINGS) {
             SettingsScreen(
                 selectedTheme = selectedTheme,
                 onThemeSelected = onThemeSelected,
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(
+            route = Destinations.SHELF,
+            arguments = listOf(navArgument("categoryKey") { type = NavType.StringType })
+        ) { backStackEntry ->
+            ShelfScreen(
+                categoryKey = backStackEntry.arguments?.getString("categoryKey").orEmpty(),
                 onBack = { navController.popBackStack() }
             )
         }

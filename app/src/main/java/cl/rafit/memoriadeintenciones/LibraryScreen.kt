@@ -30,7 +30,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
-private data class LibraryCategory(
+data class LibraryCategory(
+    val key: String,
     val title: String,
     val subtitle: String,
     val count: String,
@@ -39,14 +40,17 @@ private data class LibraryCategory(
 )
 
 private val demoCategories = listOf(
-    LibraryCategory("Películas", "Historias para ver", "0 títulos", "▣", Color(0xFFB8614C)),
-    LibraryCategory("Series", "Capítulos pendientes", "0 títulos", "▤", Color(0xFF467A70)),
-    LibraryCategory("Libros", "Lecturas por descubrir", "0 títulos", "▥", Color(0xFFB78945)),
-    LibraryCategory("Videojuegos", "Aventuras guardadas", "0 títulos", "◈", Color(0xFF6572A4))
+    LibraryCategory("movies", "Películas", "Historias para ver", "0 títulos", "▣", Color(0xFFB8614C)),
+    LibraryCategory("series", "Series", "Capítulos pendientes", "0 títulos", "▤", Color(0xFF467A70)),
+    LibraryCategory("books", "Libros", "Lecturas por descubrir", "0 títulos", "▥", Color(0xFFB78945)),
+    LibraryCategory("games", "Videojuegos", "Aventuras guardadas", "0 títulos", "◈", Color(0xFF6572A4))
 )
 
 @Composable
-fun LibraryScreen(onOpenSettings: () -> Unit) {
+fun LibraryScreen(
+    onOpenSettings: () -> Unit,
+    onOpenCategory: (LibraryCategory) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -124,7 +128,7 @@ fun LibraryScreen(onOpenSettings: () -> Unit) {
         }
 
         demoCategories.forEach { category ->
-            CategoryShelf(category)
+            CategoryShelf(category, onClick = { onOpenCategory(category) })
         }
 
         Text(
@@ -137,7 +141,7 @@ fun LibraryScreen(onOpenSettings: () -> Unit) {
 }
 
 @Composable
-private fun CategoryShelf(category: LibraryCategory) {
+private fun CategoryShelf(category: LibraryCategory, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -172,7 +176,7 @@ private fun CategoryShelf(category: LibraryCategory) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(category.count, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
             }
-            Button(onClick = {}, enabled = false) { Text("Abrir") }
+            Button(onClick = onClick) { Text("Abrir") }
         }
     }
 }

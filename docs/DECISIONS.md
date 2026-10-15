@@ -60,3 +60,10 @@
 - **Motivo:** acercar la experiencia a una biblioteca real sin introducir imágenes externas ni dependencias adicionales en esta etapa.
 - **Implementación:** tarjetas con lomos de color para Películas, Series, Libros y Videojuegos; el contenido continúa siendo explícitamente de demostración.
 - **Consecuencia:** la siguiente iteración puede conectar cada estantería con datos reales sin rehacer la jerarquía visual principal.
+
+## 2026-10-15 — Vistas navegables por estantería
+
+- **Decisión:** cada categoría tendrá una ruta y una pantalla propia antes de conectar el almacenamiento real.
+- **Motivo:** validar la navegación y la jerarquía de la biblioteca sin inventar contenido persistente.
+- **Implementación:** las cuatro tarjetas abren `ShelfScreen` con estado vacío contextual y navegación de regreso.
+- **Consecuencia:** el modelo de datos podrá incorporarse por categoría sin cambiar las rutas principales.

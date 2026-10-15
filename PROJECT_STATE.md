@@ -6,12 +6,12 @@
 - Proyecto Android: esqueleto base creado
 - Repositorio Git: inicializado
 - Rama actual: `feat/biblioteca-visual`
-- Último commit: pendiente de commit de la mejora visual
+- Último commit: pendiente de commit de las estanterías navegables
 - Remoto: `https://github.com/rafajaque/memoria-de-intenciones.git`
 
 ## Último cambio comprobado
 
-Se implementó la navegación entre biblioteca y ajustes, seis temas visuales, persistencia local del tema con DataStore y la primera mejora visual de la biblioteca digital.
+Se implementó la navegación entre biblioteca y ajustes, seis temas visuales, persistencia local del tema con DataStore, la primera mejora visual de la biblioteca digital y vistas propias para cada estantería.
 
 ## Archivos actuales
 
@@ -35,6 +35,7 @@ Se implementó la navegación entre biblioteca y ajustes, seis temas visuales, p
 - La APK debug se instaló con éxito y `MainActivity` quedó en primer plano en el emulador.
 - Android Studio 2026.2.1.8 está instalado y el proceso fue iniciado apuntando al proyecto.
 - La pantalla principal se verificó visualmente en el AVD mediante una captura después de instalar la APK actualizada.
+- Se verificó con ADB que Películas abre su propia vista y que el botón Atrás devuelve a la biblioteca.
 
 ## Decisiones vigentes
 
