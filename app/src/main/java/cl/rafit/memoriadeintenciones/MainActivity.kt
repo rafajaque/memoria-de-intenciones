@@ -2,27 +2,34 @@ package cl.rafit.memoriadeintenciones
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.compose.setContent
-import androidx.core.view.WindowCompat
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.core.view.WindowCompat
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import androidx.navigation.NavType
+import cl.rafit.memoriadeintenciones.data.RoomLibraryRepository
+import cl.rafit.memoriadeintenciones.data.local.MemoriaDatabase
+import cl.rafit.memoriadeintenciones.ui.LibraryUiState
+import cl.rafit.memoriadeintenciones.ui.LibraryViewModel
 import kotlinx.coroutines.launch
 
 private val ComponentActivity.preferencesDataStore by preferencesDataStore(name = "preferences")
@@ -33,6 +40,13 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightNavigationBars = true
+
+        val database = MemoriaDatabase.getInstance(applicationContext)
+        val libraryViewModel = ViewModelProvider(
+            this,
+            LibraryViewModelFactory(RoomLibraryRepository(database.libraryItemDao()))
+        )[LibraryViewModel::class.java]
+
         setContent {
             val preferences = remember { ThemePreferences(preferencesDataStore) }
             val scope = rememberCoroutineScope()
@@ -43,6 +57,7 @@ class MainActivity : ComponentActivity() {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     Box(Modifier.safeDrawingPadding()) {
                         MemoriaNavigation(
+                            viewModel = libraryViewModel,
                             selectedTheme = selectedTheme,
                             onThemeSelected = { theme ->
                                 selectedTheme = theme
@@ -56,24 +71,39 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+private class LibraryViewModelFactory(
+    private val repository: RoomLibraryRepository
+) : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        require(modelClass.isAssignableFrom(LibraryViewModel::class.java))
+        return LibraryViewModel(repository) as T
+    }
+}
+
 private object Destinations {
     const val LIBRARY = "library"
     const val SETTINGS = "settings"
     const val SHELF = "shelf/{categoryKey}"
+    const val ADD_ITEM = "add/{categoryKey}"
 
     fun shelf(categoryKey: String) = "shelf/$categoryKey"
+    fun addItem(categoryKey: String) = "add/$categoryKey"
 }
 
 @Composable
 private fun MemoriaNavigation(
+    viewModel: LibraryViewModel,
     selectedTheme: AppTheme,
     onThemeSelected: (AppTheme) -> Unit
 ) {
     val navController = rememberNavController()
+    val library by viewModel.uiState.collectAsState()
 
     NavHost(navController = navController, startDestination = Destinations.LIBRARY) {
         composable(Destinations.LIBRARY) {
             LibraryScreen(
+                library = library,
                 onOpenSettings = { navController.navigate(Destinations.SETTINGS) },
                 onOpenCategory = { category -> navController.navigate(Destinations.shelf(category.key)) }
             )
@@ -89,10 +119,29 @@ private fun MemoriaNavigation(
             route = Destinations.SHELF,
             arguments = listOf(navArgument("categoryKey") { type = NavType.StringType })
         ) { backStackEntry ->
+            val key = backStackEntry.arguments?.getString("categoryKey").orEmpty()
             ShelfScreen(
-                categoryKey = backStackEntry.arguments?.getString("categoryKey").orEmpty(),
+                categoryKey = key,
+                items = libraryCategoryForKey(key)?.let { category ->
+                    library.itemsFor(category.storedCategory)
+                }.orEmpty(),
+                onAddItem = { navController.navigate(Destinations.addItem(key)) },
                 onBack = { navController.popBackStack() }
             )
+        }
+        composable(
+            route = Destinations.ADD_ITEM,
+            arguments = listOf(navArgument("categoryKey") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val category = libraryCategoryForKey(backStackEntry.arguments?.getString("categoryKey").orEmpty())
+            if (category != null) {
+                AddItemScreen(
+                    category = category,
+                    onSave = viewModel::add,
+                    onBack = { navController.popBackStack() },
+                    onSaved = { navController.popBackStack() }
+                )
+            }
         }
     }
 }

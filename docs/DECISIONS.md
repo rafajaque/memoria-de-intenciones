@@ -86,3 +86,12 @@
 - **Compatibilidad:** se mantienen los seis temas y sus identificadores guardados en DataStore, incluidos Celeste cielo y Azul marino. El tema modifica también madera y papel, no solo el acento.
 - **Accesibilidad:** contenido desplazable, márgenes de barras del sistema, títulos semánticos, filas de tema seleccionables y decoración excluida del árbol accesible. Se revisa el tamaño de texto al 150 %.
 - **Límite:** los libros dibujados son decorativos, identificados como tales en la pantalla. Las estanterías interiores siguen vacías hasta integrar Room con la UI; no se simulan registros del usuario.
+
+## 2026-10-15 — Alta y consulta de títulos locales
+
+- **Clasificación:** MVP.
+- **Decisión:** agregar títulos desde la estantería correspondiente y precargar su categoría, en vez de ofrecer un selector que pueda guardar el registro en otra estantería por error.
+- **Campos:** título obligatorio; estado, duración aproximada en minutos y nota personal opcionales. El repositorio normaliza espacios y rechaza títulos vacíos o duraciones no positivas.
+- **Flujo:** `LibraryViewModel` comparte una sola observación de Room con biblioteca, estanterías y formulario. Los contadores y listas se derivan de esa colección; no se guardan contadores estáticos.
+- **Persistencia:** elevar Room a versión 2 y migrar de 1 a 2 con una columna nullable `durationMinutes`, preservando los registros de instalaciones existentes.
+- **Límite:** no se implementan edición, eliminación, imágenes de portada ni catálogos remotos. Las portadas decorativas solo se muestran en estanterías sin contenido real.

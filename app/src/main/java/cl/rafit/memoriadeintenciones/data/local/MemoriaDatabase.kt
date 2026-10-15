@@ -4,10 +4,12 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [LibraryItemEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class MemoriaDatabase : RoomDatabase() {
@@ -23,7 +25,13 @@ abstract class MemoriaDatabase : RoomDatabase() {
                     context.applicationContext,
                     MemoriaDatabase::class.java,
                     "memoria_de_intenciones.db"
-                ).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2).build().also { instance = it }
             }
+
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE library_items ADD COLUMN durationMinutes INTEGER")
+            }
+        }
     }
 }

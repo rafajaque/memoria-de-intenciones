@@ -12,6 +12,7 @@ data class LibraryItemEntity(
     val title: String,
     val category: String,
     val status: String,
+    val durationMinutes: Int? = null,
     val notes: String?,
     val createdAt: Long,
     val updatedAt: Long
@@ -22,6 +23,7 @@ fun LibraryItemEntity.toDomain(): LibraryItem = LibraryItem(
     title = title,
     category = LibraryCategory.valueOf(category),
     status = LibraryStatus.valueOf(status),
+    durationMinutes = durationMinutes,
     notes = notes,
     createdAt = createdAt,
     updatedAt = updatedAt
@@ -32,6 +34,7 @@ fun LibraryItem.toEntity(): LibraryItemEntity = LibraryItemEntity(
     title = title,
     category = category.name,
     status = status.name,
+    durationMinutes = durationMinutes,
     notes = notes,
     createdAt = createdAt,
     updatedAt = updatedAt

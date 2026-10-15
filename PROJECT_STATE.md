@@ -3,27 +3,37 @@
 ## Estado actual
 
 - Fecha: 2026-10-15
-- Proyecto Android: biblioteca visual navegable; integración de registros con la UI pendiente
+- Proyecto Android: biblioteca navegable con alta y consulta local de títulos
 - Repositorio Git: inicializado
-- Rama actual: `feat/estanteria-artesanal`
-- Base de esta iteración: `3201aa4` — persistencia local con Room
-- Último cambio comprobado: rediseño de biblioteca artesanal (MVP)
+- Rama actual: `feat/contenido-real`
+- Base de esta iteración: `97c517a` — identidad artesanal de la biblioteca
+- Último cambio comprobado: alta y lectura de títulos locales (MVP)
 - Remoto: `https://github.com/rafajaque/memoria-de-intenciones.git`
 
 ## Último cambio comprobado
 
-Se rediseñaron biblioteca, estanterías vacías y ajustes con madera, encuadernaciones, papel, fichas de catálogo y tipografía editorial. Las ilustraciones se dibujan con Canvas y no representan registros guardados. Se mantienen las cuatro categorías, los seis temas (incluidos Celeste cielo y Azul marino), las rutas existentes y la preferencia local con DataStore.
+Se implementó el alta de títulos desde las cuatro estanterías. El formulario guarda título, categoría preseleccionada, estado, duración opcional y nota opcional en Room. La biblioteca y cada estantería observan la misma fuente de datos: calculan contadores reales y reemplazan las ilustraciones decorativas por lomos y fichas del contenido guardado.
 
-La infraestructura Room del microhito anterior continúa disponible, pero todavía no alimenta las pantallas ni los contadores. Esta iteración es exclusivamente visual y no añade dependencias.
+La base Room subió de versión 1 a 2 mediante una migración que añade `durationMinutes` sin borrar registros existentes. No se añadieron dependencias.
 
 ## Ubicación del trabajo
 
 - Pantallas y materiales: `app/src/main/java/cl/rafit/memoriadeintenciones/`.
 - Decoración reutilizable: `app/src/main/java/cl/rafit/memoriadeintenciones/ui/LibraryDecor.kt`.
+- Alta de contenido: `app/src/main/java/cl/rafit/memoriadeintenciones/AddItemScreen.kt`.
 - Persistencia y pruebas existentes: `app/src/main/java/cl/rafit/memoriadeintenciones/data/` y `app/src/androidTest/`.
 - Decisiones: `docs/DECISIONS.md`.
 
 ## Verificación realizada
+
+### Contenido real — 2026-10-15
+
+- Prueba roja: `compileDebugAndroidTestKotlin` falló inicialmente porque no existían `LibraryRepository.add(...)` ni `durationMinutes`.
+- `connectedDebugAndroidTest`: 3 pruebas instrumentadas aprobadas en `memoria-api36`, incluida la nueva prueba de repositorio que normaliza título y nota, guarda duración y filtra por categoría.
+- `assembleDebug lintDebug`: `BUILD SUCCESSFUL`. Lint conserva advertencias de configuración preexistentes, sin errores.
+- Recorrido ADB en la APK: desde Películas se agregó `DunePrueba`, se comprobó la ficha, el contador `1 título guardado` y la biblioteca principal con `1 título`; al relanzar la aplicación el título seguía disponible.
+- Captura local ignorada: `app/build/library-with-content.png`.
+- La comprobación cubre alta y lectura. La migración 1→2 se incluye en el binario; falta una prueba automática específica de actualización desde un archivo de base de datos v1.
 
 ### Rediseño artesanal — 2026-10-15
 
@@ -66,11 +76,11 @@ La infraestructura Room del microhito anterior continúa disponible, pero todav�
 
 ## Notas
 
-- Hay dos pruebas instrumentadas de Room; la revisión visual actual usa ADB y capturas, no una suite automatizada de pruebas Compose.
+- Hay tres pruebas instrumentadas de Room y una revisión ADB del flujo de alta; todavía no existe una suite automatizada de pruebas Compose.
 - Pendientes de configuración anteriores al rediseño: icono de aplicación y reglas explícitas de extracción/respaldo para Android 12+. No se modificaron en esta tarea visual.
 - Las actualizaciones de SDK y dependencias deben planificarse por separado; no se cambian versiones solo para silenciar advertencias.
 - Android Studio se verificó ejecutándose con el proyecto como argumento; los archivos temporales de arranques anteriores no afectan la ejecución actual.
 
 ## Siguiente acción exacta
 
-Crear el formulario MVP para agregar un `LibraryItem` y conectar la primera estantería con datos reales.
+Agregar edición y eliminación de títulos con confirmación, y luego incorporar portadas o búsqueda local/externa.

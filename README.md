@@ -10,7 +10,7 @@ Aplicación Android nativa, privada y local-first para:
 
 La aplicación incluye cuatro estanterías navegables, una identidad visual de biblioteca artesanal y seis ambientes: Madera cálida, Bosque, Universo, Papel antiguo, Celeste cielo y Azul marino. La elección se guarda con DataStore.
 
-La infraestructura Room está implementada y tiene pruebas instrumentadas. Aún falta conectar los registros a las pantallas y crear el formulario de alta: las ilustraciones son decorativas y los contadores siguen en cero.
+La biblioteca permite agregar títulos desde cada estantería con estado, duración aproximada y nota opcional. Los registros se guardan en Room, actualizan el contador y sustituyen la ilustración decorativa por lomos y fichas reales. Aún faltan edición, eliminación, portadas y búsqueda externa.
 
 El estado de la rama de trabajo y las comprobaciones recientes se registran en `PROJECT_STATE.md`.
 
