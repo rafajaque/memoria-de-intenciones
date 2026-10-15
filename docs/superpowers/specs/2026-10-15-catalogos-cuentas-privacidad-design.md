@@ -2,16 +2,23 @@
 
 **Fecha:** 2026-10-15
 
-**Estado:** diseño aprobado; pendiente de plan de implementación
-**Clasificación:** arquitectura para distribución; el contenido local existente sigue siendo MVP
+**Estado:** arquitectura futura aprobada; excluida del MVP de título
+
+**Clasificación:** referencia para distribución posterior; no autoriza implementar infraestructura remota en el proyecto académico actual
 
 ## Propósito y alcance
 
-La aplicación se distribuirá inicialmente solo en Chile para personas mayores de 18 años. Mantendrá la biblioteca, notas y portadas descargadas en el dispositivo. Incorporará cuentas de correo y contraseña, búsqueda automática de metadatos y portadas, y telemetría o informes de error únicamente con consentimiento independiente.
+Este documento conserva el diseño para una futura distribución en Chile a personas mayores de 18 años. Describe una versión con cuentas de correo y contraseña, búsqueda de metadatos y portadas, y telemetría o informes de error únicamente con consentimiento independiente.
 
-La finalidad de la cuenta no es sincronizar la biblioteca en esta fase: protege las consultas a catálogos, permite gestionar consentimiento y habilita soporte técnico limitado.
+La finalidad futura de la cuenta no es sincronizar la biblioteca: protege las consultas a catálogos, permite gestionar consentimiento y habilita soporte técnico limitado.
 
 Quedan fuera de esta fase: sincronizar títulos o notas, perfiles infantiles, inicio de sesión social, pagos, recomendaciones basadas en datos remotos y analítica de comportamiento.
+
+## Deslinde del MVP de título
+
+El MVP académico conserva el enfoque local-first: no crea cuentas, no solicita correo, no usa Cloudflare Worker/D1, no recopila telemetría y no envía títulos, notas, capturas ni identificadores personales a un servidor propio. La biblioteca y las portadas descargadas permanecen en el dispositivo.
+
+Si durante el MVP se habilita una consulta de catálogo, solo podrá enviar los términos mínimos de búsqueda y la categoría al proveedor correspondiente, sin asociarlos a una cuenta ni conservar un historial remoto. Las credenciales de desarrollo se mantendrán en `local.properties`, fuera de Git; esta solución se documentará como no apta para una distribución pública. La arquitectura descrita en el resto de este documento es el requisito previo para distribuir ese flujo de forma segura.
 
 ## Decisiones aprobadas
 

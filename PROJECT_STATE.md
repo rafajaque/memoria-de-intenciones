@@ -92,4 +92,4 @@ La base Room subió de versión 1 a 2 mediante una migración que añade `durati
 
 ## Siguiente acción exacta
 
-Revisar y aprobar la especificación de catálogos, cuentas y privacidad en `docs/superpowers/specs/2026-10-15-catalogos-cuentas-privacidad-design.md`; después se elaborará un plan por microhitos antes de implementar o desplegar infraestructura.
+Definir el índice de la memoria, su metodología de evaluación y una carta Gantt con fechas reales. Mantener el MVP local-first; la especificación de cuentas y Cloudflare queda como arquitectura futura en `docs/superpowers/specs/2026-10-15-catalogos-cuentas-privacidad-design.md`.

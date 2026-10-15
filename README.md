@@ -38,7 +38,7 @@ En Windows, con JDK 17 y Android SDK configurados:
 
 ## Privacidad
 
-El MVP será local-first: los datos del usuario permanecerán en el dispositivo. Las capturas importadas se copiarán al almacenamiento privado de la aplicación y no se subirán a servidores.
+El MVP será local-first: la biblioteca, notas, portadas descargadas y capturas importadas permanecen en el dispositivo y no se suben a servidores propios. No hay cuentas ni telemetría en esta fase. Las consultas futuras de catálogo, si se habilitan para el MVP, enviarán únicamente los términos mínimos necesarios al proveedor y no se asociarán a una identidad ni a un historial remoto.
 
 ## Documentación
 
