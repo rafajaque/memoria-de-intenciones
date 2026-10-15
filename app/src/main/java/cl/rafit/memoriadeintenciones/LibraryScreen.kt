@@ -1,10 +1,12 @@
 package cl.rafit.memoriadeintenciones
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,154 +14,130 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
+import cl.rafit.memoriadeintenciones.ui.BookplateMark
+import cl.rafit.memoriadeintenciones.ui.LibraryPaper
+import cl.rafit.memoriadeintenciones.ui.ShelfIllustration
 
 @Composable
 fun LibraryScreen(
     onOpenSettings: () -> Unit,
     onOpenCategory: (LibraryCategory) -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 20.dp, vertical = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(18.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+    val materials = LocalLibraryMaterials.current
+    LibraryPaper(Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(start = 22.dp, end = 22.dp, top = 12.dp, bottom = 28.dp),
+            verticalArrangement = Arrangement.spacedBy(22.dp)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
+            item {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    BookplateMark(Modifier.size(32.dp))
+                    Text(
+                        "MEMORIA\nDE INTENCIONES",
+                        modifier = Modifier.weight(1f).padding(start = 10.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = materials.mutedInk
+                    )
+                    TextButton(onClick = onOpenSettings) { Text("Ajustes") }
+                }
+                HorizontalDivider(Modifier.padding(top = 10.dp), color = materials.ink.copy(alpha = .25f))
+                Spacer(Modifier.height(22.dp))
                 Text(
                     "Mi biblioteca",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.SemiBold
+                    modifier = Modifier.semantics { heading() },
+                    style = MaterialTheme.typography.headlineLarge
                 )
                 Text(
-                    "Tu sala personal de historias",
+                    "Historias que esperan su momento.",
+                    modifier = Modifier.padding(top = 6.dp),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    fontStyle = FontStyle.Italic,
+                    color = materials.mutedInk
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("TUS ESTANTERÍAS", style = MaterialTheme.typography.labelSmall)
+                    Text("01 — 04", style = MaterialTheme.typography.labelSmall, color = materials.mutedInk)
+                }
+                Text(
+                    "Estantes ilustrados · Aún sin títulos",
+                    modifier = Modifier.padding(top = 5.dp),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = materials.mutedInk
                 )
             }
-            OutlinedButton(onClick = onOpenSettings) { Text("Ajustes") }
-        }
-
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-            shape = RoundedCornerShape(24.dp)
-        ) {
-            Row(
-                modifier = Modifier.padding(20.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        "Un lugar para volver",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Text(
-                        "Guarda aquí las historias que quieres recordar, descubrir o terminar.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
-                Spacer(modifier = Modifier.width(14.dp))
-                Box(
-                    modifier = Modifier
-                        .size(58.dp)
-                        .clip(RoundedCornerShape(18.dp))
-                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.72f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("✦", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary)
-                }
+            itemsIndexed(libraryCategories, key = { _, category -> category.key }) { index, category ->
+                CategoryShelf(category, number = "0${index + 1}", onClick = { onOpenCategory(category) })
+            }
+            item {
+                HorizontalDivider(color = materials.ink.copy(alpha = .2f))
+                Text(
+                    "Cada historia tiene su lugar.",
+                    modifier = Modifier.fillMaxWidth().padding(top = 18.dp),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontStyle = FontStyle.Italic,
+                    color = materials.mutedInk
+                )
             }
         }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column {
-                Text("Tus estanterías", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-                Text("Organiza tus próximos descubrimientos", style = MaterialTheme.typography.bodySmall)
-            }
-            Text("0 guardados", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-        }
-
-        libraryCategories.forEach { category ->
-            CategoryShelf(category, onClick = { onOpenCategory(category) })
-        }
-
-        Text(
-            "Contenido de demostración: todavía no hay datos reales.",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 2.dp, bottom = 8.dp)
-        )
     }
 }
 
 @Composable
-private fun CategoryShelf(category: LibraryCategory, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier
+private fun CategoryShelf(category: LibraryCategory, number: String, onClick: () -> Unit) {
+    val materials = LocalLibraryMaterials.current
+    val shape = RoundedCornerShape(3.dp)
+    Column(
+        Modifier
             .fillMaxWidth()
-            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(18.dp)),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(18.dp)
+            .shadow(3.dp, shape)
+            .clip(shape)
+            .background(materials.paper)
+            .clickable(role = Role.Button, onClickLabel = "Abrir estantería de ${category.title}", onClick = onClick)
     ) {
+        ShelfIllustration(category.key, Modifier.fillMaxWidth())
         Row(
-            modifier = Modifier.padding(14.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(lerp(materials.paper, Color.White, .28f))
+                .border(BorderStroke(1.dp, materials.ink.copy(alpha = .14f)))
+                .padding(horizontal = 14.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .width(48.dp)
-                    .height(74.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(category.accent),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    category.symbol,
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = androidx.compose.ui.graphics.Color.White,
-                    fontWeight = FontWeight.Bold
-                )
+            Text(
+                number,
+                Modifier.border(1.dp, materials.mutedInk.copy(alpha = .4f)).padding(horizontal = 7.dp, vertical = 5.dp),
+                style = MaterialTheme.typography.labelMedium,
+                color = materials.mutedInk
+            )
+            Column(Modifier.weight(1f)) {
+                Text(category.title, style = MaterialTheme.typography.titleLarge)
+                Text(category.count, style = MaterialTheme.typography.bodySmall, color = materials.mutedInk)
             }
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(category.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(category.subtitle, style = MaterialTheme.typography.bodyMedium)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(category.count, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-            }
-            Button(onClick = onClick) { Text("Abrir") }
+            Text("→", style = MaterialTheme.typography.titleLarge, color = materials.accent)
         }
     }
 }

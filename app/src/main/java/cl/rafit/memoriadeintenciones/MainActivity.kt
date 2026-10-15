@@ -2,9 +2,12 @@ package cl.rafit.memoriadeintenciones
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.compose.setContent
 import androidx.core.view.WindowCompat
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,7 +30,9 @@ private val ComponentActivity.preferencesDataStore by preferencesDataStore(name 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightNavigationBars = true
         setContent {
             val preferences = remember { ThemePreferences(preferencesDataStore) }
             val scope = rememberCoroutineScope()
@@ -36,13 +41,15 @@ class MainActivity : ComponentActivity() {
 
             MemoriaTheme(theme = selectedTheme) {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    MemoriaNavigation(
-                        selectedTheme = selectedTheme,
-                        onThemeSelected = { theme ->
-                            selectedTheme = theme
-                            scope.launch { preferences.saveTheme(theme) }
-                        }
-                    )
+                    Box(Modifier.safeDrawingPadding()) {
+                        MemoriaNavigation(
+                            selectedTheme = selectedTheme,
+                            onThemeSelected = { theme ->
+                                selectedTheme = theme
+                                scope.launch { preferences.saveTheme(theme) }
+                            }
+                        )
+                    }
                 }
             }
         }

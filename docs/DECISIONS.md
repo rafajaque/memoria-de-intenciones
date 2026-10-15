@@ -76,3 +76,13 @@
 - **Motivo:** la biblioteca necesita conservar elementos en el dispositivo y observar cambios mediante `Flow`, sin introducir backend ni sincronización.
 - **Implementación:** entidad `LibraryItemEntity`, DAO, `MemoriaDatabase`, repositorio `RoomLibraryRepository` y `LibraryViewModel`; categorías y estados se almacenan como valores controlados.
 - **Verificación:** `connectedDebugAndroidTest` ejecutó 2 pruebas en el AVD y terminó con `BUILD SUCCESSFUL`.
+
+## 2026-10-15 — Identidad de biblioteca artesanal
+
+- **Clasificación:** mejora visual del MVP; sin nuevas funciones de datos.
+- **Decisión:** sustituir la composición genérica de tarjetas por estantes ilustrados con profundidad, madera, encuadernaciones, papel y fichas de catálogo. Usar titulares serif y etiquetas monoespaciadas.
+- **Motivo:** el usuario solicitó una identidad más cercana a una biblioteca real antes de continuar las funciones del MVP.
+- **Implementación:** ilustraciones nativas con Canvas y materiales centralizados. Las cuatro categorías comparten un lenguaje visual, pero tienen composiciones distintas. No se añaden dependencias, imágenes remotas ni permisos.
+- **Compatibilidad:** se mantienen los seis temas y sus identificadores guardados en DataStore, incluidos Celeste cielo y Azul marino. El tema modifica también madera y papel, no solo el acento.
+- **Accesibilidad:** contenido desplazable, márgenes de barras del sistema, títulos semánticos, filas de tema seleccionables y decoración excluida del árbol accesible. Se revisa el tamaño de texto al 150 %.
+- **Límite:** los libros dibujados son decorativos, identificados como tales en la pantalla. Las estanterías interiores siguen vacías hasta integrar Room con la UI; no se simulan registros del usuario.

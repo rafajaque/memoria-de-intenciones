@@ -8,7 +8,11 @@ Aplicación Android nativa, privada y local-first para:
 
 ## Estado
 
-Existe un proyecto Android base en la rama `feat/proyecto-base`. Incluye una pantalla Compose mínima y genera un APK debug.
+La aplicación incluye cuatro estanterías navegables, una identidad visual de biblioteca artesanal y seis ambientes: Madera cálida, Bosque, Universo, Papel antiguo, Celeste cielo y Azul marino. La elección se guarda con DataStore.
+
+La infraestructura Room está implementada y tiene pruebas instrumentadas. Aún falta conectar los registros a las pantallas y crear el formulario de alta: las ilustraciones son decorativas y los contadores siguen en cero.
+
+El estado de la rama de trabajo y las comprobaciones recientes se registran en `PROJECT_STATE.md`.
 
 ## Stack previsto
 
@@ -27,6 +31,9 @@ En Windows, con JDK 17 y Android SDK configurados:
 
 ```powershell
 .\gradlew.bat assembleDebug
+.\gradlew.bat lintDebug
+# Con un emulador Android iniciado:
+.\gradlew.bat connectedDebugAndroidTest
 ```
 
 ## Privacidad

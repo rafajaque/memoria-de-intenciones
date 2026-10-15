@@ -1,43 +1,87 @@
 package cl.rafit.memoriadeintenciones
 
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
+import androidx.compose.material3.Typography
 import androidx.compose.material3.lightColorScheme
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
-enum class AppTheme(val label: String) {
-    MADERA("Madera cálida"), BOSQUE("Bosque"), UNIVERSO("Universo"),
-    PAPEL("Papel antiguo"), CELESTE("Celeste cielo"), MARINO("Azul marino")
+enum class AppTheme(val label: String, val description: String) {
+    MADERA("Madera cálida", "Nogal, lino y detalles de latón"),
+    BOSQUE("Bosque", "Madera verde y papel de herbario"),
+    UNIVERSO("Universo", "Índigo, tinta y reflejos dorados"),
+    PAPEL("Papel antiguo", "Roble claro y páginas de marfil"),
+    CELESTE("Celeste cielo", "Madera azul y luz de mañana"),
+    MARINO("Azul marino", "Azul profundo y encuadernaciones clásicas")
 }
 
-private data class ThemePalette(
-    val primary: Color, val onPrimary: Color, val primaryContainer: Color,
-    val onPrimaryContainer: Color, val secondary: Color, val background: Color,
-    val surface: Color, val onSurface: Color
+// MVP: materiales compartidos por la biblioteca y sus seis ambientes.
+data class LibraryMaterials(
+    val paper: Color,
+    val ink: Color,
+    val mutedInk: Color,
+    val wood: Color,
+    val woodLight: Color,
+    val recess: Color,
+    val brass: Color,
+    val accent: Color
 )
 
-private val palettes = mapOf(
-    AppTheme.MADERA to ThemePalette(Color(0xFF7A4E2D), Color.White, Color(0xFFFFDCC2), Color(0xFF2B1608), Color(0xFF745944), Color(0xFFFFF8F3), Color(0xFFFFF8F3), Color(0xFF211A16)),
-    AppTheme.BOSQUE to ThemePalette(Color(0xFF386A45), Color.White, Color(0xFFB9F0C2), Color(0xFF00210B), Color(0xFF526650), Color(0xFFF7FBF4), Color(0xFFF7FBF4), Color(0xFF181D18)),
-    AppTheme.UNIVERSO to ThemePalette(Color(0xFF5B5D92), Color.White, Color(0xFFE1E0FF), Color(0xFF17174A), Color(0xFF5F5E72), Color(0xFFFAF8FF), Color(0xFFFAF8FF), Color(0xFF1B1B21)),
-    AppTheme.PAPEL to ThemePalette(Color(0xFF765A2F), Color.White, Color(0xFFFFDEA6), Color(0xFF281900), Color(0xFF6C5D43), Color(0xFFFFF9EE), Color(0xFFFFF9EE), Color(0xFF201B13)),
-    AppTheme.CELESTE to ThemePalette(Color(0xFF146C8E), Color.White, Color(0xFFB9EAFD), Color(0xFF001F2A), Color(0xFF4E626B), Color(0xFFF5FBFE), Color(0xFFF5FBFE), Color(0xFF171D1F)),
-    AppTheme.MARINO to ThemePalette(Color(0xFF405A92), Color.White, Color(0xFFD8E2FF), Color(0xFF001A41), Color(0xFF59616F), Color(0xFFF9F9FF), Color(0xFFF9F9FF), Color(0xFF1A1B20))
+fun libraryMaterials(theme: AppTheme): LibraryMaterials = when (theme) {
+    AppTheme.MADERA -> LibraryMaterials(Color(0xFFF3ECDD), Color(0xFF302B24), Color(0xFF716352), Color(0xFF795039), Color(0xFFB28A5E), Color(0xFF32261F), Color(0xFFD4B879), Color(0xFF674330))
+    AppTheme.BOSQUE -> LibraryMaterials(Color(0xFFEEF0E5), Color(0xFF25382D), Color(0xFF596957), Color(0xFF365244), Color(0xFF6D8670), Color(0xFF1D3029), Color(0xFFD0BD83), Color(0xFF365442))
+    AppTheme.UNIVERSO -> LibraryMaterials(Color(0xFFF0ECF5), Color(0xFF302E46), Color(0xFF676079), Color(0xFF44425C), Color(0xFF78748C), Color(0xFF202033), Color(0xFFD3BDA0), Color(0xFF514B75))
+    AppTheme.PAPEL -> LibraryMaterials(Color(0xFFF7EED8), Color(0xFF3E3325), Color(0xFF74624B), Color(0xFFA17D50), Color(0xFFD0AC76), Color(0xFF51402C), Color(0xFFE4CD93), Color(0xFF71532C))
+    AppTheme.CELESTE -> LibraryMaterials(Color(0xFFEDF4F4), Color(0xFF243D4B), Color(0xFF536D77), Color(0xFF5B8698), Color(0xFF99BFCC), Color(0xFF2D4C5C), Color(0xFFE0C894), Color(0xFF30647C))
+    AppTheme.MARINO -> LibraryMaterials(Color(0xFFEBEEF2), Color(0xFF1F304B), Color(0xFF56657A), Color(0xFF243D60), Color(0xFF5A7596), Color(0xFF15253E), Color(0xFFD6BC84), Color(0xFF29476F))
+}
+
+val LocalLibraryMaterials = staticCompositionLocalOf { libraryMaterials(AppTheme.MADERA) }
+
+private val editorialTypography = Typography(
+    headlineLarge = TextStyle(fontFamily = FontFamily.Serif, fontSize = 38.sp, lineHeight = 44.sp, letterSpacing = (-1).sp),
+    headlineMedium = TextStyle(fontFamily = FontFamily.Serif, fontSize = 32.sp, lineHeight = 38.sp),
+    titleLarge = TextStyle(fontFamily = FontFamily.Serif, fontSize = 25.sp, lineHeight = 30.sp),
+    titleMedium = TextStyle(fontFamily = FontFamily.Serif, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium),
+    labelSmall = TextStyle(fontFamily = FontFamily.Monospace, fontSize = 10.sp, lineHeight = 16.sp, letterSpacing = 1.5.sp),
+    labelMedium = TextStyle(fontFamily = FontFamily.Monospace, fontSize = 11.sp, lineHeight = 16.sp, letterSpacing = 1.sp)
 )
 
 @Composable
 fun MemoriaTheme(theme: AppTheme, content: @Composable () -> Unit) {
-    val palette = palettes.getValue(theme)
-    val colors: ColorScheme = lightColorScheme(
-        primary = palette.primary,
-        onPrimary = palette.onPrimary,
-        primaryContainer = palette.primaryContainer,
-        onPrimaryContainer = palette.onPrimaryContainer,
-        secondary = palette.secondary,
-        background = palette.background,
-        surface = palette.surface,
-        onSurface = palette.onSurface
+    val materials = libraryMaterials(theme)
+    val colors = lightColorScheme(
+        primary = materials.accent,
+        onPrimary = Color.White,
+        primaryContainer = lerp(materials.paper, materials.woodLight, 0.25f),
+        onPrimaryContainer = materials.ink,
+        secondary = materials.mutedInk,
+        onSecondary = Color.White,
+        background = materials.paper,
+        onBackground = materials.ink,
+        surface = materials.paper,
+        onSurface = materials.ink,
+        surfaceVariant = lerp(materials.paper, materials.woodLight, 0.15f),
+        onSurfaceVariant = materials.mutedInk,
+        outline = materials.mutedInk,
+        outlineVariant = materials.ink.copy(alpha = 0.18f)
     )
-    MaterialTheme(colorScheme = colors, content = content)
+    CompositionLocalProvider(LocalLibraryMaterials provides materials) {
+        MaterialTheme(
+            colorScheme = colors,
+            typography = editorialTypography,
+            shapes = Shapes(small = RoundedCornerShape(4.dp), medium = RoundedCornerShape(6.dp), large = RoundedCornerShape(8.dp)),
+            content = content
+        )
+    }
 }
