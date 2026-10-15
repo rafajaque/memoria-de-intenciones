@@ -121,3 +121,10 @@
 - **Metodología:** OCR sobre capturas autorizadas y anonimizadas; ranking local probado con casos controlados; MovieLens únicamente como análisis offline; usabilidad SUS con muestra de 5 a 8 participantes; inspección de tráfico y rendimiento.
 - **Rigor:** reportar solo resultados reales y especificar versión, conjunto, procedimiento y métrica. Cuentas, Cloudflare y telemetría permanecen como trabajo futuro.
 - **Referencia:** `docs/superpowers/specs/2026-10-15-memoria-y-evaluacion-design.md`.
+
+## 2026-10-15 — Ejecución por microhitos
+
+- **Clasificación:** planificación operativa del MVP.
+- **Decisión:** ejecutar primero un hito documental de protocolo y luego un spike acotado de Share Sheet + OCR local antes de comprometer el resto del flujo. Cada hito requiere evidencia y reevaluación de alcance.
+- **Motivo:** la captura compartida y OCR son el principal riesgo técnico y evaluativo del título; validarlos temprano evita construir sobre una premisa no comprobada.
+- **Referencia:** `docs/superpowers/plans/2026-10-15-plan-mvp-y-evaluacion.md`.

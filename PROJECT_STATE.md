@@ -92,4 +92,4 @@ La base Room subió de versión 1 a 2 mediante una migración que añade `durati
 
 ## Siguiente acción exacta
 
-Revisar y aprobar el diseño académico en `docs/superpowers/specs/2026-10-15-memoria-y-evaluacion-design.md`; después se elaborará un plan por microhitos. El primero validará Share Sheet + OCR local con capturas autorizadas.
+Ejecutar el Hito 0 del plan `docs/superpowers/plans/2026-10-15-plan-mvp-y-evaluacion.md`: crear protocolos de evidencia, consentimiento y conjunto de capturas autorizadas antes de tocar el flujo OCR.
