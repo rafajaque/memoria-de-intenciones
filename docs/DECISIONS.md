@@ -128,3 +128,10 @@
 - **Decisión:** ejecutar primero un hito documental de protocolo y luego un spike acotado de Share Sheet + OCR local antes de comprometer el resto del flujo. Cada hito requiere evidencia y reevaluación de alcance.
 - **Motivo:** la captura compartida y OCR son el principal riesgo técnico y evaluativo del título; validarlos temprano evita construir sobre una premisa no comprobada.
 - **Referencia:** `docs/superpowers/plans/2026-10-15-plan-mvp-y-evaluacion.md`.
+
+## 2026-10-15 — Protocolo previo a evaluación
+
+- **Clasificación:** MVP documental.
+- **Decisión:** preparar protocolos y plantillas sin datos reales antes de incorporar OCR o reclutar participantes. Las capturas, consentimientos firmados y resultados se mantienen fuera de Git.
+- **Motivo:** preservar privacidad, definir la verdad de referencia antes de medir y evitar resultados no reproducibles o datos personales versionados.
+- **Referencia:** `docs/evaluation/`.

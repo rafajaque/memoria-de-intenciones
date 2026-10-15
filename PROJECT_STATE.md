@@ -92,4 +92,4 @@ La base Room subió de versión 1 a 2 mediante una migración que añade `durati
 
 ## Siguiente acción exacta
 
-Ejecutar el Hito 0 del plan `docs/superpowers/plans/2026-10-15-plan-mvp-y-evaluacion.md`: crear protocolos de evidencia, consentimiento y conjunto de capturas autorizadas antes de tocar el flujo OCR.
+Revisar los protocolos creados en `docs/evaluation/` con el profesor guía o institución. Después, iniciar en una tarea separada el Hito 1: spike de Share Sheet + OCR local con cinco capturas autorizadas, sin enviarlas a red.
