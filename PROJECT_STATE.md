@@ -34,6 +34,9 @@ Se implementó la navegación entre biblioteca y ajustes, seis temas visuales y 
 - `gradlew.bat assembleDebug` terminó con `BUILD SUCCESSFUL`.
 - APK generado en `app/build/outputs/apk/debug/app-debug.apk`.
 - Se verificó `git diff --check` sin errores de formato.
+- Android Studio 2026.2.1.8 quedó instalado.
+- Se creó el AVD `memoria-api36` con imagen Android 36 estándar.
+- La APK debug se instaló con ADB y `MainActivity` quedó en primer plano en `emulator-5554`.
 
 ## Decisiones vigentes
 
@@ -46,7 +49,7 @@ Se implementó la navegación entre biblioteca y ajustes, seis temas visuales y 
 
 - Android Studio no quedó registrado por `winget`; la instalación del SDK por herramientas de línea de comandos sí quedó verificada.
 - No hay pruebas automatizadas todavía.
-- La prueba manual con dispositivo/emulador queda pendiente: el daemon de ADB no pudo iniciar.
+- La ventana de Android Studio no permanece abierta durante el arranque en este entorno; la ejecución verificada se hizo contra el AVD mediante ADB.
 
 ## Siguiente acción exacta
 
