@@ -2,6 +2,7 @@ package cl.rafit.memoriadeintenciones
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontStyle
@@ -37,6 +39,7 @@ fun ShelfScreen(
     categoryKey: String,
     items: List<LibraryItem>,
     onAddItem: () -> Unit,
+    onOpenItem: (LibraryItem) -> Unit,
     onBack: () -> Unit
 ) {
     val category = libraryCategoryForKey(categoryKey)
@@ -98,7 +101,9 @@ fun ShelfScreen(
                         color = materials.mutedInk
                     )
                 }
-                items(items, key = { it.id }) { item -> LibraryItemCard(item) }
+                items(items, key = { it.id }) { item ->
+                    LibraryItemCard(item = item, onClick = { onOpenItem(item) })
+                }
             }
             item { Spacer(Modifier.size(4.dp)) }
         }
@@ -106,9 +111,17 @@ fun ShelfScreen(
 }
 
 @Composable
-private fun LibraryItemCard(item: LibraryItem) {
+private fun LibraryItemCard(item: LibraryItem, onClick: () -> Unit) {
     val materials = LocalLibraryMaterials.current
-    CatalogueSlip(Modifier.fillMaxWidth()) {
+    CatalogueSlip(
+        Modifier
+            .fillMaxWidth()
+            .clickable(
+                role = Role.Button,
+                onClickLabel = "Editar ${item.title}",
+                onClick = onClick
+            )
+    ) {
         Column(verticalArrangement = Arrangement.spacedBy(7.dp)) {
             Text(item.title, style = MaterialTheme.typography.titleLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
             Text(statusLabel(item.status), style = MaterialTheme.typography.labelSmall, color = materials.accent)

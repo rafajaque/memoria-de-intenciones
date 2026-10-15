@@ -95,3 +95,11 @@
 - **Flujo:** `LibraryViewModel` comparte una sola observación de Room con biblioteca, estanterías y formulario. Los contadores y listas se derivan de esa colección; no se guardan contadores estáticos.
 - **Persistencia:** elevar Room a versión 2 y migrar de 1 a 2 con una columna nullable `durationMinutes`, preservando los registros de instalaciones existentes.
 - **Límite:** no se implementan edición, eliminación, imágenes de portada ni catálogos remotos. Las portadas decorativas solo se muestran en estanterías sin contenido real.
+
+## 2026-10-15 — Edición y eliminación confirmada de títulos
+
+- **Clasificación:** MVP.
+- **Decisión:** reutilizar el formulario de alta como ficha de edición, abierta al tocar una ficha del estante. La categoría permanece inmutable en esta pantalla para evitar mover un título por accidente; se conservan también `id` y fecha de creación.
+- **Eliminación:** solicitar confirmación explícita que nombra el título y volver al estante al confirmar. Cancelar conserva la ficha sin cambios. No se incorpora deshacer en esta iteración.
+- **Motivo:** mantiene el flujo breve, evita una segunda pantalla y reduce operaciones irreversibles accidentales sin añadir dependencias ni complejidad de sincronización.
+- **Verificación:** prueba instrumentada de repositorio para invariantes de edición y borrado; build debug y recorrido ADB de creación, edición y apertura/cancelación del diálogo.

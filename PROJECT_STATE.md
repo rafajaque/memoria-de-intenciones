@@ -3,16 +3,16 @@
 ## Estado actual
 
 - Fecha: 2026-10-15
-- Proyecto Android: biblioteca navegable con alta y consulta local de títulos
+- Proyecto Android: biblioteca navegable con gestión local de títulos
 - Repositorio Git: inicializado
 - Rama actual: `feat/contenido-real`
 - Base de esta iteración: `97c517a` — identidad artesanal de la biblioteca
-- Último cambio comprobado: alta y lectura de títulos locales (MVP)
+- Último cambio comprobado: edición y eliminación confirmada de títulos locales (MVP)
 - Remoto: `https://github.com/rafajaque/memoria-de-intenciones.git`
 
 ## Último cambio comprobado
 
-Se implementó el alta de títulos desde las cuatro estanterías. El formulario guarda título, categoría preseleccionada, estado, duración opcional y nota opcional en Room. La biblioteca y cada estantería observan la misma fuente de datos: calculan contadores reales y reemplazan las ilustraciones decorativas por lomos y fichas del contenido guardado.
+Se implementó la gestión de títulos desde las cuatro estanterías. El formulario guarda y edita título, estado, duración opcional y nota opcional en Room; al editar se conservan identidad, categoría y fecha de creación. Las fichas de cada estante abren el formulario precargado. Eliminar exige una confirmación que nombra el título y, tras aceptarla, vuelve al estante actualizado.
 
 La base Room subió de versión 1 a 2 mediante una migración que añade `durationMinutes` sin borrar registros existentes. No se añadieron dependencias.
 
@@ -20,11 +20,19 @@ La base Room subió de versión 1 a 2 mediante una migración que añade `durati
 
 - Pantallas y materiales: `app/src/main/java/cl/rafit/memoriadeintenciones/`.
 - Decoración reutilizable: `app/src/main/java/cl/rafit/memoriadeintenciones/ui/LibraryDecor.kt`.
-- Alta de contenido: `app/src/main/java/cl/rafit/memoriadeintenciones/AddItemScreen.kt`.
+- Alta, edición y eliminación de contenido: `app/src/main/java/cl/rafit/memoriadeintenciones/AddItemScreen.kt`.
 - Persistencia y pruebas existentes: `app/src/main/java/cl/rafit/memoriadeintenciones/data/` y `app/src/androidTest/`.
 - Decisiones: `docs/DECISIONS.md`.
 
 ## Verificación realizada
+
+### Edición y eliminación confirmada — 2026-10-15
+
+- Prueba roja: `compileDebugAndroidTestKotlin` falló antes de añadir `LibraryRepository.edit(...)`, porque la operación aún no existía.
+- `assembleDebug`: `BUILD SUCCESSFUL` después de integrar la ruta de edición, el formulario precargado y la confirmación.
+- `connectedDebugAndroidTest`: 4 pruebas instrumentadas aprobadas en `memoria-api36`; la nueva prueba verifica que editar conserva `id`, categoría y fecha de creación, y que eliminar retira el título observado.
+- Recorrido ADB: se creó `DuneEditar`, se abrió su ficha, se cambió de `PENDIENTE` a `TERMINADO` y el estante mostró el estado actualizado. También se abrió el diálogo de eliminación, que incluye el título, y se ejerció la ruta Cancelar. El AVD se desconectó durante la confirmación final, por lo que esa última comprobación visual queda respaldada por la prueba instrumentada, no por un segundo recorrido manual.
+- No se añadieron dependencias. La eliminación no tiene deshacer en este MVP.
 
 ### Contenido real — 2026-10-15
 
@@ -84,4 +92,4 @@ La base Room subió de versión 1 a 2 mediante una migración que añade `durati
 
 ## Siguiente acción exacta
 
-Agregar edición y eliminación de títulos con confirmación, y luego incorporar portadas o búsqueda local/externa.
+Incorporar portadas o búsqueda local/externa, comenzando por decidir si las portadas serán elegidas manualmente o consultadas desde un catálogo con términos verificados.

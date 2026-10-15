@@ -47,5 +47,22 @@ class LibraryViewModel(
 
     suspend fun update(item: LibraryItem) = repository.update(item)
 
-    suspend fun delete(id: Long) = repository.delete(id)
+    suspend fun edit(
+        item: LibraryItem,
+        title: String,
+        status: LibraryStatus,
+        durationMinutes: Int?,
+        notes: String?
+    ): Result<Unit> = runCatching {
+        repository.edit(
+            item = item,
+            title = title,
+            status = status,
+            durationMinutes = durationMinutes,
+            notes = notes,
+            now = System.currentTimeMillis()
+        )
+    }
+
+    suspend fun delete(id: Long): Result<Unit> = runCatching { repository.delete(id) }
 }

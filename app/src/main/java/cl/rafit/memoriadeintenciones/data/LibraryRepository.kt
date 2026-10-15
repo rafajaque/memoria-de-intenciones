@@ -21,6 +21,14 @@ interface LibraryRepository {
         now: Long
     ): Long
     suspend fun insert(item: LibraryItem): Long
+    suspend fun edit(
+        item: LibraryItem,
+        title: String,
+        status: LibraryStatus,
+        durationMinutes: Int?,
+        notes: String?,
+        now: Long
+    )
     suspend fun update(item: LibraryItem)
     suspend fun delete(id: Long)
 }
@@ -61,6 +69,28 @@ class RoomLibraryRepository(
     override suspend fun insert(item: LibraryItem): Long {
         require(item.title.isNotBlank()) { "El título no puede estar vacío" }
         return dao.insert(item.toEntity())
+    }
+
+    override suspend fun edit(
+        item: LibraryItem,
+        title: String,
+        status: LibraryStatus,
+        durationMinutes: Int?,
+        notes: String?,
+        now: Long
+    ) {
+        val normalizedTitle = title.trim()
+        require(normalizedTitle.isNotEmpty()) { "El título no puede estar vacío" }
+        require(durationMinutes == null || durationMinutes > 0) { "La duración debe ser mayor que cero" }
+        update(
+            item.copy(
+                title = normalizedTitle,
+                status = status,
+                durationMinutes = durationMinutes,
+                notes = notes?.trim()?.takeIf { it.isNotEmpty() },
+                updatedAt = now
+            )
+        )
     }
 
     override suspend fun update(item: LibraryItem) {

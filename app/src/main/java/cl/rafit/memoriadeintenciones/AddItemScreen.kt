@@ -15,6 +15,7 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +35,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cl.rafit.memoriadeintenciones.domain.LibraryCategory as StoredCategory
+import cl.rafit.memoriadeintenciones.domain.LibraryItem
 import cl.rafit.memoriadeintenciones.domain.LibraryStatus
 import cl.rafit.memoriadeintenciones.ui.LibraryPaper
 import kotlinx.coroutines.launch
@@ -41,22 +43,55 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddItemScreen(
     category: LibraryCategory,
+    existingItem: LibraryItem? = null,
     onSave: suspend (String, StoredCategory, LibraryStatus, Int?, String?) -> Result<Long>,
+    onUpdate: suspend (LibraryItem, String, LibraryStatus, Int?, String?) -> Result<Unit>,
+    onDelete: suspend (Long) -> Result<Unit>,
     onBack: () -> Unit,
     onSaved: () -> Unit
 ) {
     val materials = LocalLibraryMaterials.current
     val scope = rememberCoroutineScope()
-    var title by remember { mutableStateOf("") }
-    var status by remember { mutableStateOf(LibraryStatus.TO_CONSUME) }
-    var duration by remember { mutableStateOf("") }
-    var notes by remember { mutableStateOf("") }
-    var attemptedSave by remember { mutableStateOf(false) }
-    var saving by remember { mutableStateOf(false) }
-    var formError by remember { mutableStateOf<String?>(null) }
+    val editing = existingItem != null
+    var title by remember(existingItem?.id) { mutableStateOf(existingItem?.title.orEmpty()) }
+    var status by remember(existingItem?.id) { mutableStateOf(existingItem?.status ?: LibraryStatus.TO_CONSUME) }
+    var duration by remember(existingItem?.id) { mutableStateOf(existingItem?.durationMinutes?.toString().orEmpty()) }
+    var notes by remember(existingItem?.id) { mutableStateOf(existingItem?.notes.orEmpty()) }
+    var attemptedSave by remember(existingItem?.id) { mutableStateOf(false) }
+    var saving by remember(existingItem?.id) { mutableStateOf(false) }
+    var formError by remember(existingItem?.id) { mutableStateOf<String?>(null) }
+    var showDeleteConfirmation by remember(existingItem?.id) { mutableStateOf(false) }
     val titleError = attemptedSave && title.isBlank()
     val parsedDuration = duration.toIntOrNull()
     val durationError = attemptedSave && duration.isNotBlank() && (parsedDuration == null || parsedDuration <= 0)
+
+    if (showDeleteConfirmation && existingItem != null) {
+        AlertDialog(
+            onDismissRequest = { if (!saving) showDeleteConfirmation = false },
+            title = { Text("¿Eliminar título?") },
+            text = { Text("“${existingItem.title}” se quitará de ${category.title}. Esta acción no se puede deshacer.") },
+            confirmButton = {
+                TextButton(
+                    enabled = !saving,
+                    onClick = {
+                        saving = true
+                        scope.launch {
+                            onDelete(existingItem.id)
+                                .onSuccess { onSaved() }
+                                .onFailure { error ->
+                                    saving = false
+                                    showDeleteConfirmation = false
+                                    formError = error.message ?: "No se pudo eliminar el título."
+                                }
+                        }
+                    }
+                ) { Text("Eliminar", color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirmation = false }, enabled = !saving) { Text("Cancelar") }
+            }
+        )
+    }
 
     LibraryPaper(Modifier.fillMaxSize()) {
         LazyColumn(
@@ -68,14 +103,14 @@ fun AddItemScreen(
                 TextButton(onClick = onBack, enabled = !saving) { Text("←  Volver a ${category.title}") }
                 HorizontalDivider(color = materials.ink.copy(alpha = .2f))
                 Text(
-                    "NUEVA HISTORIA",
+                    if (editing) "FICHA DE LA HISTORIA" else "NUEVA HISTORIA",
                     modifier = Modifier.padding(top = 24.dp, bottom = 8.dp),
                     style = MaterialTheme.typography.labelSmall,
                     color = materials.mutedInk
                 )
-                Text("Agregar título", style = MaterialTheme.typography.headlineLarge)
+                Text(if (editing) "Editar título" else "Agregar título", style = MaterialTheme.typography.headlineLarge)
                 Text(
-                    "Quedará guardado en ${category.title} en este dispositivo.",
+                    if (editing) "Actualizarás la ficha en ${category.title}." else "Quedará guardado en ${category.title} en este dispositivo.",
                     modifier = Modifier.padding(top = 8.dp),
                     style = MaterialTheme.typography.bodyMedium,
                     color = materials.mutedInk
@@ -95,10 +130,7 @@ fun AddItemScreen(
             item {
                 Text("ESTADO", style = MaterialTheme.typography.labelSmall, color = materials.mutedInk)
                 Column(
-                    Modifier
-                        .fillMaxWidth()
-                        .selectableGroup()
-                        .padding(top = 6.dp),
+                    Modifier.fillMaxWidth().selectableGroup().padding(top = 6.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     LibraryStatus.entries.forEach { option ->
@@ -107,11 +139,7 @@ fun AddItemScreen(
                                 .fillMaxWidth()
                                 .background(materials.paper, RoundedCornerShape(3.dp))
                                 .border(1.dp, materials.ink.copy(alpha = .14f), RoundedCornerShape(3.dp))
-                                .selectable(
-                                    selected = status == option,
-                                    role = Role.RadioButton,
-                                    onClick = { status = option }
-                                )
+                                .selectable(status == option, role = Role.RadioButton) { status = option }
                                 .padding(horizontal = 10.dp, vertical = 5.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -124,10 +152,7 @@ fun AddItemScreen(
             item {
                 OutlinedTextField(
                     value = duration,
-                    onValueChange = { value ->
-                        duration = value.filter(Char::isDigit)
-                        formError = null
-                    },
+                    onValueChange = { value -> duration = value.filter(Char::isDigit); formError = null },
                     modifier = Modifier.fillMaxWidth(),
                     label = { Text("Duración aproximada en minutos (opcional)") },
                     singleLine = true,
@@ -147,29 +172,33 @@ fun AddItemScreen(
                 )
             }
             item {
-                formError?.let { message ->
-                    Text(message, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
-                }
+                formError?.let { message -> Text(message, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
                 Button(
                     onClick = {
                         attemptedSave = true
-                        if (title.isBlank() || (duration.isNotBlank() && (parsedDuration == null || parsedDuration <= 0))) {
-                            return@Button
-                        }
+                        if (title.isBlank() || (duration.isNotBlank() && (parsedDuration == null || parsedDuration <= 0))) return@Button
                         saving = true
                         scope.launch {
-                            onSave(title, category.storedCategory, status, parsedDuration, notes)
-                                .onSuccess { onSaved() }
-                                .onFailure { error ->
-                                    saving = false
-                                    formError = error.message ?: "No se pudo guardar el título."
-                                }
+                            val result = if (existingItem == null) {
+                                onSave(title, category.storedCategory, status, parsedDuration, notes).map { }
+                            } else {
+                                onUpdate(existingItem, title, status, parsedDuration, notes)
+                            }
+                            result.onSuccess { onSaved() }.onFailure { error ->
+                                saving = false
+                                formError = error.message ?: "No se pudo guardar el título."
+                            }
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = !saving
-                ) {
-                    Text(if (saving) "Guardando…" else "Guardar en ${category.title}")
+                ) { Text(if (saving) "Guardando…" else if (editing) "Guardar cambios" else "Guardar en ${category.title}") }
+                if (editing) {
+                    TextButton(
+                        onClick = { showDeleteConfirmation = true },
+                        enabled = !saving,
+                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                    ) { Text("Eliminar título", color = MaterialTheme.colorScheme.error) }
                 }
             }
             item { androidx.compose.foundation.layout.Spacer(Modifier.size(4.dp)) }

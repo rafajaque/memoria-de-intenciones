@@ -57,4 +57,39 @@ class RoomLibraryRepositoryTest {
         assertEquals(42L, movie.updatedAt)
         assertEquals(emptyList<Any>(), repository.observeByCategory(LibraryCategory.BOOK).first())
     }
+
+    @Test
+    fun editPreservesIdentityThenDeleteRemovesTheTitle() = runBlocking {
+        repository.add(
+            title = "La llegada",
+            category = LibraryCategory.MOVIE,
+            status = LibraryStatus.TO_CONSUME,
+            durationMinutes = 116,
+            notes = null,
+            now = 10L
+        )
+        val original = repository.observeAll().first().single()
+
+        repository.edit(
+            item = original,
+            title = "  La llegada (vista)  ",
+            status = LibraryStatus.COMPLETED,
+            durationMinutes = null,
+            notes = "  Volver a verla  ",
+            now = 20L
+        )
+
+        val edited = repository.observeAll().first().single()
+        assertEquals(original.id, edited.id)
+        assertEquals("La llegada (vista)", edited.title)
+        assertEquals(LibraryCategory.MOVIE, edited.category)
+        assertEquals(LibraryStatus.COMPLETED, edited.status)
+        assertNull(edited.durationMinutes)
+        assertEquals("Volver a verla", edited.notes)
+        assertEquals(10L, edited.createdAt)
+        assertEquals(20L, edited.updatedAt)
+
+        repository.delete(edited.id)
+        assertEquals(emptyList<Any>(), repository.observeAll().first())
+    }
 }

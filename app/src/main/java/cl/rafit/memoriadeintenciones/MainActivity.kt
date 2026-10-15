@@ -86,9 +86,11 @@ private object Destinations {
     const val SETTINGS = "settings"
     const val SHELF = "shelf/{categoryKey}"
     const val ADD_ITEM = "add/{categoryKey}"
+    const val EDIT_ITEM = "edit/{itemId}"
 
     fun shelf(categoryKey: String) = "shelf/$categoryKey"
     fun addItem(categoryKey: String) = "add/$categoryKey"
+    fun editItem(itemId: Long) = "edit/$itemId"
 }
 
 @Composable
@@ -126,6 +128,7 @@ private fun MemoriaNavigation(
                     library.itemsFor(category.storedCategory)
                 }.orEmpty(),
                 onAddItem = { navController.navigate(Destinations.addItem(key)) },
+                onOpenItem = { item -> navController.navigate(Destinations.editItem(item.id)) },
                 onBack = { navController.popBackStack() }
             )
         }
@@ -137,7 +140,31 @@ private fun MemoriaNavigation(
             if (category != null) {
                 AddItemScreen(
                     category = category,
+                    existingItem = null,
                     onSave = viewModel::add,
+                    onUpdate = viewModel::edit,
+                    onDelete = viewModel::delete,
+                    onBack = { navController.popBackStack() },
+                    onSaved = { navController.popBackStack() }
+                )
+            }
+        }
+        composable(
+            route = Destinations.EDIT_ITEM,
+            arguments = listOf(navArgument("itemId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val itemId = backStackEntry.arguments?.getLong("itemId")
+            val item = itemId?.let { id -> library.items.firstOrNull { it.id == id } }
+            val category = item?.let { record ->
+                libraryCategories.firstOrNull { it.storedCategory == record.category }
+            }
+            if (item != null && category != null) {
+                AddItemScreen(
+                    category = category,
+                    existingItem = item,
+                    onSave = viewModel::add,
+                    onUpdate = viewModel::edit,
+                    onDelete = viewModel::delete,
                     onBack = { navController.popBackStack() },
                     onSaved = { navController.popBackStack() }
                 )
