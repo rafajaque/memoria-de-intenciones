@@ -6,12 +6,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -28,19 +30,42 @@ fun SettingsScreen(
     onBack: () -> Unit
 ) {
     LazyColumn(
-        modifier = Modifier.padding(24.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp, vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         item {
             Text("Ajustes", style = MaterialTheme.typography.headlineMedium)
-            Text("Elige el ambiente visual de tu biblioteca.", modifier = Modifier.padding(top = 8.dp, bottom = 12.dp))
+            Text(
+                "Elige el ambiente visual de tu biblioteca.",
+                modifier = Modifier.padding(top = 8.dp, bottom = 12.dp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
         items(AppTheme.entries) { theme ->
-            Card(modifier = Modifier.fillMaxWidth().clickable { onThemeSelected(theme) }) {
+            val selected = selectedTheme == theme
+            Card(
+                modifier = Modifier.fillMaxWidth().clickable { onThemeSelected(theme) },
+                colors = CardDefaults.cardColors(
+                    containerColor = if (selected) {
+                        MaterialTheme.colorScheme.primaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.surface
+                    }
+                )
+            ) {
                 Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                    RadioButton(selected = selectedTheme == theme, onClick = { onThemeSelected(theme) })
+                    RadioButton(selected = selected, onClick = { onThemeSelected(theme) })
                     ColorSwatch(theme)
-                    Text(theme.label, modifier = Modifier.padding(start = 12.dp))
+                    Column(modifier = Modifier.padding(start = 12.dp)) {
+                        Text(theme.label, style = MaterialTheme.typography.titleMedium)
+                        Text(
+                            if (selected) "Tema activo" else "Usar este ambiente",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
         }

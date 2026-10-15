@@ -52,4 +52,19 @@
 - **Motivo:** Navigation 2.10.2 y Compose más recientes requieren `compileSdk 37`, que no está instalado; estas versiones permiten verificar el proyecto con API 36.
 - **Decisión visual:** conservar Madera cálida, Bosque, Universo y Papel antiguo, y añadir Celeste cielo y Azul marino.
 - **Implementación:** tokens de color centralizados en `Theme.kt`; el nombre del tema se guarda localmente con DataStore.
-- **Verificación:** `gradlew.bat assembleDebug` terminó con `BUILD SUCCESSFUL`. La prueba en dispositivo queda pendiente porque ADB no pudo iniciar su daemon.
+- **Verificación:** `gradlew.bat assembleDebug` terminó con `BUILD SUCCESSFUL`; la APK se instaló y se abrió en el AVD `emulator-5554`.
+
+## 2026-10-15 — Biblioteca digital con lenguaje de estantería
+
+- **Decisión:** representar la pantalla principal como una biblioteca personal digital, con un resumen destacado y estanterías por categoría.
+- **Motivo:** acercar la experiencia a una biblioteca real sin introducir imágenes externas ni dependencias adicionales en esta etapa.
+- **Implementación:** tarjetas con lomos de color para Películas, Series, Libros y Videojuegos; el contenido continúa siendo explícitamente de demostración.
+- **Consecuencia:** la siguiente iteración puede conectar cada estantería con datos reales sin rehacer la jerarquía visual principal.
+
+## 2026-10-15 — Vistas navegables por estantería
+
+- **Clasificación:** MVP.
+- **Decisión:** cada categoría tendrá una ruta y una pantalla propia antes de conectar el almacenamiento real.
+- **Motivo:** validar la navegación y la jerarquía de la biblioteca sin inventar contenido persistente.
+- **Implementación:** las cuatro tarjetas abren `ShelfScreen` con estado vacío contextual y navegación de regreso.
+- **Consecuencia:** el modelo de datos podrá incorporarse por categoría sin cambiar las rutas principales.
