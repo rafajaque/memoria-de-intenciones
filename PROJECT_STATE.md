@@ -6,11 +6,12 @@
 - Proyecto Android: esqueleto base creado
 - Repositorio Git: inicializado
 - Rama actual: `feat/proyecto-base`
-- Commits: ninguno
+- Último commit: `c2fa200 chore: crear proyecto Android base`
+- Remoto: `https://github.com/rafajaque/memoria-de-intenciones.git`
 
 ## Último cambio comprobado
 
-Se creó el proyecto Android base con Kotlin integrado por AGP, Compose, manifest, actividad inicial y Gradle Wrapper.
+Se creó el proyecto Android base con Kotlin integrado por AGP, Compose, manifest, actividad inicial y Gradle Wrapper; se publicó como respaldo privado en GitHub.
 
 ## Archivos actuales
 
