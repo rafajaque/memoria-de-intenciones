@@ -5,13 +5,13 @@
 - Fecha: 2026-10-15
 - Proyecto Android: esqueleto base creado
 - Repositorio Git: inicializado
-- Rama actual: `main`
-- Último cambio comprobado: `7cbf0c9 merge: integrar biblioteca visual`
+- Rama actual: `feat/persistencia-room`
+- Último cambio comprobado: pendiente de commit del microhito Room
 - Remoto: `https://github.com/rafajaque/memoria-de-intenciones.git`
 
 ## Último cambio comprobado
 
-Se implementó la navegación entre biblioteca y ajustes, seis temas visuales, persistencia local del tema con DataStore, la primera mejora visual de la biblioteca digital y vistas propias para cada estantería.
+Se implementó la navegación entre biblioteca y ajustes, seis temas visuales, persistencia local del tema con DataStore, la primera mejora visual de la biblioteca digital, vistas propias para cada estantería y la capa inicial de persistencia Room.
 
 ## Archivos actuales
 
@@ -37,6 +37,8 @@ Se implementó la navegación entre biblioteca y ajustes, seis temas visuales, p
 - La pantalla principal se verificó visualmente en el AVD mediante una captura después de instalar la APK actualizada.
 - Se verificó con ADB que Películas abre su propia vista y que el botón Atrás devuelve a la biblioteca.
 - La navegación por estanterías está clasificada como funcionalidad MVP; el contenido real queda para la siguiente microtarea.
+- Room 2.8.5 con KSP 2.3.10 está configurado; la entidad, DAO, base, repositorio y ViewModel están preparados para la UI.
+- `connectedDebugAndroidTest` pasó 2 pruebas instrumentadas de inserción, filtrado, actualización y eliminación en una base Room en memoria.
 
 ## Decisiones vigentes
 
@@ -52,4 +54,4 @@ Se implementó la navegación entre biblioteca y ajustes, seis temas visuales, p
 
 ## Siguiente acción exacta
 
-Crear pruebas de UI para navegación y selección de tema, o conectar una primera estantería con datos reales.
+Crear el formulario MVP para agregar un `LibraryItem` y conectar la primera estantería con datos reales.

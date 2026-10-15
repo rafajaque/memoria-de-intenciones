@@ -68,3 +68,11 @@
 - **Motivo:** validar la navegación y la jerarquía de la biblioteca sin inventar contenido persistente.
 - **Implementación:** las cuatro tarjetas abren `ShelfScreen` con estado vacío contextual y navegación de regreso.
 - **Consecuencia:** el modelo de datos podrá incorporarse por categoría sin cambiar las rutas principales.
+
+## 2026-10-15 — Persistencia local con Room
+
+- **Clasificación:** MVP.
+- **Decisión:** usar Room 2.8.5 como fuente de verdad local, con KSP 2.3.10 para generar el código del compilador.
+- **Motivo:** la biblioteca necesita conservar elementos en el dispositivo y observar cambios mediante `Flow`, sin introducir backend ni sincronización.
+- **Implementación:** entidad `LibraryItemEntity`, DAO, `MemoriaDatabase`, repositorio `RoomLibraryRepository` y `LibraryViewModel`; categorías y estados se almacenan como valores controlados.
+- **Verificación:** `connectedDebugAndroidTest` ejecutó 2 pruebas en el AVD y terminó con `BUILD SUCCESSFUL`.

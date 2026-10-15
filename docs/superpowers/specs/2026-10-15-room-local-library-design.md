@@ -2,7 +2,7 @@
 
 ## Estado
 
-Propuesta aprobada conversacionalmente para revisión escrita antes de implementar.
+Implementado en la rama `feat/persistencia-room`; la verificación instrumentada pasó en el AVD configurado.
 
 ## Objetivo
 
