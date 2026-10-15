@@ -6,12 +6,12 @@
 - Proyecto Android: esqueleto base creado
 - Repositorio Git: inicializado
 - Rama actual: `feat/proyecto-base`
-- Último commit: pendiente de crear para la microtarea de biblioteca y temas
+- Último commit: `d7edbb9 feat: agregar biblioteca, ajustes y temas`
 - Remoto: `https://github.com/rafajaque/memoria-de-intenciones.git`
 
 ## Último cambio comprobado
 
-Se implementó la navegación entre biblioteca y ajustes, seis temas visuales y persistencia local del tema con DataStore; pendiente de commit.
+Se implementó la navegación entre biblioteca y ajustes, seis temas visuales y persistencia local del tema con DataStore.
 
 ## Archivos actuales
 
