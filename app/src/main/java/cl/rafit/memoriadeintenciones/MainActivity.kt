@@ -3,48 +3,70 @@ package cl.rafit.memoriadeintenciones
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.datastore.preferences.preferencesDataStore
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.launch
+
+private val ComponentActivity.preferencesDataStore by preferencesDataStore(name = "preferences")
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MemoriaDeIntencionesApp()
+            val preferences = remember { ThemePreferences(preferencesDataStore) }
+            val scope = rememberCoroutineScope()
+            var selectedTheme by remember { mutableStateOf(AppTheme.MADERA) }
+            LaunchedEffect(preferences) { selectedTheme = preferences.readTheme() }
+
+            MemoriaTheme(theme = selectedTheme) {
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    MemoriaNavigation(
+                        selectedTheme = selectedTheme,
+                        onThemeSelected = { theme ->
+                            selectedTheme = theme
+                            scope.launch { preferences.saveTheme(theme) }
+                        }
+                    )
+                }
+            }
         }
     }
 }
 
+private object Destinations {
+    const val LIBRARY = "library"
+    const val SETTINGS = "settings"
+}
+
 @Composable
-private fun MemoriaDeIntencionesApp() {
-    MaterialTheme {
-        Surface(modifier = Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = "Memoria de Intenciones",
-                    style = MaterialTheme.typography.headlineMedium
-                )
-                Text(
-                    text = "Proyecto base creado",
-                    modifier = Modifier.padding(top = 8.dp),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
+private fun MemoriaNavigation(
+    selectedTheme: AppTheme,
+    onThemeSelected: (AppTheme) -> Unit
+) {
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = Destinations.LIBRARY) {
+        composable(Destinations.LIBRARY) {
+            LibraryScreen(onOpenSettings = { navController.navigate(Destinations.SETTINGS) })
+        }
+        composable(Destinations.SETTINGS) {
+            SettingsScreen(
+                selectedTheme = selectedTheme,
+                onThemeSelected = onThemeSelected,
+                onBack = { navController.popBackStack() }
+            )
         }
     }
 }

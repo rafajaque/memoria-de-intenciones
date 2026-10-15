@@ -6,12 +6,12 @@
 - Proyecto Android: esqueleto base creado
 - Repositorio Git: inicializado
 - Rama actual: `feat/proyecto-base`
-- Último commit: `c2fa200 chore: crear proyecto Android base`
+- Último commit: pendiente de crear para la microtarea de biblioteca y temas
 - Remoto: `https://github.com/rafajaque/memoria-de-intenciones.git`
 
 ## Último cambio comprobado
 
-Se creó el proyecto Android base con Kotlin integrado por AGP, Compose, manifest, actividad inicial y Gradle Wrapper; se publicó como respaldo privado en GitHub.
+Se implementó la navegación entre biblioteca y ajustes, seis temas visuales y persistencia local del tema con DataStore; pendiente de commit.
 
 ## Archivos actuales
 
@@ -33,6 +33,7 @@ Se creó el proyecto Android base con Kotlin integrado por AGP, Compose, manifes
 - Se configuraron las variables de usuario `JAVA_HOME` y `ANDROID_SDK_ROOT`.
 - `gradlew.bat assembleDebug` terminó con `BUILD SUCCESSFUL`.
 - APK generado en `app/build/outputs/apk/debug/app-debug.apk`.
+- Se verificó `git diff --check` sin errores de formato.
 
 ## Decisiones vigentes
 
@@ -45,7 +46,8 @@ Se creó el proyecto Android base con Kotlin integrado por AGP, Compose, manifes
 
 - Android Studio no quedó registrado por `winget`; la instalación del SDK por herramientas de línea de comandos sí quedó verificada.
 - No hay pruebas automatizadas todavía.
+- La prueba manual con dispositivo/emulador queda pendiente: el daemon de ADB no pudo iniciar.
 
 ## Siguiente acción exacta
 
-Crear la primera pantalla navegable de «Mi biblioteca» y su pantalla de ajustes en una microtarea separada.
+Crear pruebas de UI para navegación y selección de tema, o preparar un emulador antes de la siguiente microtarea.

@@ -45,3 +45,11 @@
 - **Comando:** `gradlew.bat assembleDebug`
 - **Resultado:** `BUILD SUCCESSFUL`.
 - **Artefacto:** `app/build/outputs/apk/debug/app-debug.apk`.
+
+## 2026-10-15 — Navegación, temas y preferencias
+
+- **Decisión:** usar Navigation Compose 2.9.6 y DataStore Preferences 1.2.1.
+- **Motivo:** Navigation 2.10.2 y Compose más recientes requieren `compileSdk 37`, que no está instalado; estas versiones permiten verificar el proyecto con API 36.
+- **Decisión visual:** conservar Madera cálida, Bosque, Universo y Papel antiguo, y añadir Celeste cielo y Azul marino.
+- **Implementación:** tokens de color centralizados en `Theme.kt`; el nombre del tema se guarda localmente con DataStore.
+- **Verificación:** `gradlew.bat assembleDebug` terminó con `BUILD SUCCESSFUL`. La prueba en dispositivo queda pendiente porque ADB no pudo iniciar su daemon.
