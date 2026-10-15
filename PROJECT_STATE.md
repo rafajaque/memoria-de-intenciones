@@ -5,8 +5,8 @@
 - Fecha: 2026-10-15
 - Proyecto Android: esqueleto base creado
 - Repositorio Git: inicializado
-- Rama actual: `feat/biblioteca-visual`
-- Último cambio comprobado: `e4dcc28 feat: navegar por estanterias`
+- Rama actual: `main`
+- Último cambio comprobado: `7cbf0c9 merge: integrar biblioteca visual`
 - Remoto: `https://github.com/rafajaque/memoria-de-intenciones.git`
 
 ## Último cambio comprobado
