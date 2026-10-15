@@ -113,3 +113,11 @@
 - **Cumplimiento:** orientar el diseño a ISO/IEC 27001:2022, ISO/IEC 27701:2025 y Ley 21.719; revisar jurídicamente proveedores, transferencias, textos y operación antes de publicar.
 - **Referencia:** `docs/superpowers/specs/2026-10-15-catalogos-cuentas-privacidad-design.md`.
 - **Límite del título:** no crear cuentas, no recolectar correo ni telemetría y no desplegar Cloudflare. Si se habilitan consultas de catálogo, solo se enviarán términos mínimos de búsqueda sin identidad ni historial remoto; las claves de desarrollo quedarán fuera de Git y se documentará que no son una solución de distribución.
+
+## 2026-10-15 — Evaluación y entrega del título
+
+- **Clasificación:** planificación académica del MVP.
+- **Decisión:** separar una versión de evaluación, etiquetada al cierre de noviembre, de una versión final de diciembre. Las métricas se obtienen sobre la primera; la segunda corrige defectos y mejora la entrega sin cambiar los flujos medidos.
+- **Metodología:** OCR sobre capturas autorizadas y anonimizadas; ranking local probado con casos controlados; MovieLens únicamente como análisis offline; usabilidad SUS con muestra de 5 a 8 participantes; inspección de tráfico y rendimiento.
+- **Rigor:** reportar solo resultados reales y especificar versión, conjunto, procedimiento y métrica. Cuentas, Cloudflare y telemetría permanecen como trabajo futuro.
+- **Referencia:** `docs/superpowers/specs/2026-10-15-memoria-y-evaluacion-design.md`.
