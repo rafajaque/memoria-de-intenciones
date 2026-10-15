@@ -26,25 +26,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-
-data class LibraryCategory(
-    val key: String,
-    val title: String,
-    val subtitle: String,
-    val count: String,
-    val symbol: String,
-    val accent: Color
-)
-
-private val demoCategories = listOf(
-    LibraryCategory("movies", "Películas", "Historias para ver", "0 títulos", "▣", Color(0xFFB8614C)),
-    LibraryCategory("series", "Series", "Capítulos pendientes", "0 títulos", "▤", Color(0xFF467A70)),
-    LibraryCategory("books", "Libros", "Lecturas por descubrir", "0 títulos", "▥", Color(0xFFB78945)),
-    LibraryCategory("games", "Videojuegos", "Aventuras guardadas", "0 títulos", "◈", Color(0xFF6572A4))
-)
 
 @Composable
 fun LibraryScreen(
@@ -127,7 +110,7 @@ fun LibraryScreen(
             Text("0 guardados", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
         }
 
-        demoCategories.forEach { category ->
+        libraryCategories.forEach { category ->
             CategoryShelf(category, onClick = { onOpenCategory(category) })
         }
 
@@ -164,7 +147,7 @@ private fun CategoryShelf(category: LibraryCategory, onClick: () -> Unit) {
                 Text(
                     category.symbol,
                     style = MaterialTheme.typography.headlineSmall,
-                    color = Color.White,
+                    color = androidx.compose.ui.graphics.Color.White,
                     fontWeight = FontWeight.Bold
                 )
             }

@@ -19,19 +19,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
-private val shelfDetails = mapOf(
-    "movies" to ("Películas" to "Historias para ver"),
-    "series" to ("Series" to "Capítulos pendientes"),
-    "books" to ("Libros" to "Lecturas por descubrir"),
-    "games" to ("Videojuegos" to "Aventuras guardadas")
-)
-
 @Composable
 fun ShelfScreen(
     categoryKey: String,
     onBack: () -> Unit
 ) {
-    val details = shelfDetails[categoryKey] ?: ("Estantería" to "Contenido guardado")
+    val category = libraryCategories.firstOrNull { it.key == categoryKey }
+    val title = category?.title ?: "Estantería"
+    val subtitle = category?.subtitle ?: "Contenido guardado"
 
     Column(
         modifier = Modifier
@@ -42,12 +37,12 @@ fun ShelfScreen(
         Row(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    details.first,
+                    title,
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    details.second,
+                    subtitle,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

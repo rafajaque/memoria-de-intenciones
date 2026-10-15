@@ -63,6 +63,7 @@
 
 ## 2026-10-15 — Vistas navegables por estantería
 
+- **Clasificación:** MVP.
 - **Decisión:** cada categoría tendrá una ruta y una pantalla propia antes de conectar el almacenamiento real.
 - **Motivo:** validar la navegación y la jerarquía de la biblioteca sin inventar contenido persistente.
 - **Implementación:** las cuatro tarjetas abren `ShelfScreen` con estado vacío contextual y navegación de regreso.

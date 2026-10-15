@@ -6,7 +6,7 @@
 - Proyecto Android: esqueleto base creado
 - Repositorio Git: inicializado
 - Rama actual: `feat/biblioteca-visual`
-- Último commit: pendiente de commit de las estanterías navegables
+- Último cambio comprobado: `e4dcc28 feat: navegar por estanterias`
 - Remoto: `https://github.com/rafajaque/memoria-de-intenciones.git`
 
 ## Último cambio comprobado
@@ -36,6 +36,7 @@ Se implementó la navegación entre biblioteca y ajustes, seis temas visuales, p
 - Android Studio 2026.2.1.8 está instalado y el proceso fue iniciado apuntando al proyecto.
 - La pantalla principal se verificó visualmente en el AVD mediante una captura después de instalar la APK actualizada.
 - Se verificó con ADB que Películas abre su propia vista y que el botón Atrás devuelve a la biblioteca.
+- La navegación por estanterías está clasificada como funcionalidad MVP; el contenido real queda para la siguiente microtarea.
 
 ## Decisiones vigentes
 
