@@ -42,10 +42,10 @@ Se implementó la navegación entre biblioteca y ajustes, seis temas visuales y 
 - `main` será la rama estable.
 - Las funciones se implementarán en microtareas verificables.
 
-## Bloqueos
+## Notas
 
 - No hay pruebas automatizadas todavía.
-- El IDE tuvo archivos temporales de bloqueo de intentos previos de arranque; se verificó el proceso activo y se evitó eliminar archivos mientras el IDE estuviera ejecutándose.
+- Android Studio se verificó ejecutándose con el proyecto como argumento; los archivos temporales de arranques anteriores no afectan la ejecución actual.
 
 ## Siguiente acción exacta
 
