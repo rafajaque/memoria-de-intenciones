@@ -103,3 +103,12 @@
 - **Eliminación:** solicitar confirmación explícita que nombra el título y volver al estante al confirmar. Cancelar conserva la ficha sin cambios. No se incorpora deshacer en esta iteración.
 - **Motivo:** mantiene el flujo breve, evita una segunda pantalla y reduce operaciones irreversibles accidentales sin añadir dependencias ni complejidad de sincronización.
 - **Verificación:** prueba instrumentada de repositorio para invariantes de edición y borrado; build debug y recorrido ADB de creación, edición y apertura/cancelación del diálogo.
+
+## 2026-10-15 — Distribución con catálogos y cuentas
+
+- **Clasificación:** arquitectura futura; no implementada aún.
+- **Decisión:** preparar una capa Cloudflare Worker para autenticar cuentas, proteger las claves de catálogos y normalizar resultados. La biblioteca, notas y portadas descargadas permanecen en el dispositivo hasta que se apruebe una sincronización separada.
+- **Cuentas y privacidad:** correo y contraseña con verificación, recuperación y sesiones revocables. El lanzamiento inicial se limita a Chile y a mayores de 18 años. Telemetría y errores son opcionales, separados de la cuenta y revocables.
+- **Catálogos:** TMDB para películas/series, Google Books con Open Library de respaldo para libros, e IGDB para videojuegos por plataforma.
+- **Cumplimiento:** orientar el diseño a ISO/IEC 27001:2022, ISO/IEC 27701:2025 y Ley 21.719; revisar jurídicamente proveedores, transferencias, textos y operación antes de publicar.
+- **Referencia:** `docs/superpowers/specs/2026-10-15-catalogos-cuentas-privacidad-design.md`.
