@@ -6,7 +6,7 @@
 - Proyecto Android: esqueleto base creado
 - Repositorio Git: inicializado
 - Rama actual: `feat/proyecto-base`
-- Último commit: `d7edbb9 feat: agregar biblioteca, ajustes y temas`
+- Último commit: `d48d25c docs: registrar prueba en emulador Android`
 - Remoto: `https://github.com/rafajaque/memoria-de-intenciones.git`
 
 ## Último cambio comprobado
@@ -24,19 +24,16 @@ Se implementó la navegación entre biblioteca y ajustes, seis temas visuales y 
 ## Verificación realizada
 
 - La carpeta de trabajo estaba vacía antes de inicializar Git.
-- `git init -b main` terminó correctamente.
+- `git init -b main` terminó correctamente y el remoto privado está configurado.
 - Se verificó que `local.properties`, `build/`, `.idea/` y `google-services.json` quedan ignorados.
-- El entorno solo expone Java 8 (`1.8.0_401`).
-- No se detectaron comandos `gradle` ni `adb`, variables `ANDROID_HOME`/`ANDROID_SDK_ROOT`, Android Studio ni Android SDK en las rutas habituales.
-- Se instaló Microsoft OpenJDK 17.0.20.1.
-- Se instaló el Android SDK con Platform Tools 37.0.1, plataforma Android 36 y Build Tools 36.0.0.
-- Se configuraron las variables de usuario `JAVA_HOME` y `ANDROID_SDK_ROOT`.
-- `gradlew.bat assembleDebug` terminó con `BUILD SUCCESSFUL`.
-- APK generado en `app/build/outputs/apk/debug/app-debug.apk`.
-- Se verificó `git diff --check` sin errores de formato.
-- Android Studio 2026.2.1.8 quedó instalado.
-- Se creó el AVD `memoria-api36` con imagen Android 36 estándar.
-- La APK debug se instaló con ADB y `MainActivity` quedó en primer plano en `emulator-5554`.
+- Microsoft OpenJDK 17.0.20.1 está instalado y `JAVA_HOME` queda configurado de forma persistente.
+- Android SDK configurado en `C:\Users\rafit\AppData\Local\Android\Sdk` con Platform Tools 37.0.1, plataforma Android 36, Build Tools 36.0.0 y Emulator 37.2.12.
+- `ANDROID_SDK_ROOT` y `ANDROID_HOME` quedan configurados de forma persistente; `PATH` incluye Java, Platform Tools y `sdkmanager`.
+- El Gradle Wrapper usa Gradle 9.4.1 y `gradlew.bat assembleDebug` terminó con `BUILD SUCCESSFUL`.
+- APK generado y verificado en `app/build/outputs/apk/debug/app-debug.apk`.
+- Se creó el AVD `memoria-api36` con imagen Android 36 estándar; ADB lo detectó como `emulator-5554`.
+- La APK debug se instaló con éxito y `MainActivity` quedó en primer plano en el emulador.
+- Android Studio 2026.2.1.8 está instalado y el proceso fue iniciado apuntando al proyecto.
 
 ## Decisiones vigentes
 
@@ -47,10 +44,9 @@ Se implementó la navegación entre biblioteca y ajustes, seis temas visuales y 
 
 ## Bloqueos
 
-- Android Studio no quedó registrado por `winget`; la instalación del SDK por herramientas de línea de comandos sí quedó verificada.
 - No hay pruebas automatizadas todavía.
-- La ventana de Android Studio no permanece abierta durante el arranque en este entorno; la ejecución verificada se hizo contra el AVD mediante ADB.
+- El IDE tuvo archivos temporales de bloqueo de intentos previos de arranque; se verificó el proceso activo y se evitó eliminar archivos mientras el IDE estuviera ejecutándose.
 
 ## Siguiente acción exacta
 
-Crear pruebas de UI para navegación y selección de tema, o preparar un emulador antes de la siguiente microtarea.
+Crear pruebas de UI para navegación y selección de tema, o iniciar la siguiente microtarea funcional.
