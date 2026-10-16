@@ -179,6 +179,9 @@ La base Room subió de versión 1 a 2 mediante una migración que añade `durati
 - La interfaz usa primero la copia local, luego la URL remota y finalmente el placeholder. Al reemplazar o eliminar un libro se intenta limpiar la copia local anterior.
 - Se añadieron pruebas instrumentadas para descarga válida, rechazo de HTTP/imagen inválida y eliminación. Verificación de compilación principal y `git diff --check` sin errores; falta el recorrido manual en Redmi.
 - Verificación manual en Redmi 12 5G: un libro con portada se guardó, la portada permaneció visible al reabrir la aplicación y no se observaron problemas.
+- Ajuste posterior aprobado: las experiencias de libros usan fechas de inicio y término seleccionadas con calendario; las demás categorías conservan duración. El soporte/plataforma se selecciona desde una lista controlada por categoría.
+- Room pasa de versión 5 a 6 con `startedAt` y `finishedAt` nullable en `item_experiences`. La validación rechaza un término anterior al inicio.
+- `compileDebugKotlin` terminó con `BUILD SUCCESSFUL`; `assembleDebug`, lint y compilación de tests fueron ejecutados sin errores de código visibles. Falta verificar manualmente los selectores en Redmi.
 
 ### Experiencias personales — 2026-10-16
 

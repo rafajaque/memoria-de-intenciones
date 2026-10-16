@@ -137,11 +137,13 @@ class RoomLibraryRepositoryTest {
         )
         val item = repository.observeAll().first().single()
 
-        repository.saveExperience(item.id, ItemExperience(platform = "Kindle", rating = 4, comment = "  Me gustó  "))
+        repository.saveExperience(item.id, ItemExperience(platform = "Kindle", rating = 4, comment = "  Me gustó  ", startedAt = 100L, finishedAt = 200L))
         val saved = repository.observeAll().first().single().experience
         assertEquals("Kindle", saved?.platform)
         assertEquals(4, saved?.rating)
         assertEquals("Me gustó", saved?.comment)
+        assertEquals(100L, saved?.startedAt)
+        assertEquals(200L, saved?.finishedAt)
 
         repository.saveExperience(item.id, ItemExperience(platform = "Papel", rating = 5, comment = "Excelente", createdAt = saved!!.createdAt))
         assertEquals("Papel", repository.observeAll().first().single().experience?.platform)

@@ -17,12 +17,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
@@ -45,6 +50,9 @@ import cl.rafit.memoriadeintenciones.data.catalog.BookCatalogRateLimitedExceptio
 import cl.rafit.memoriadeintenciones.ui.LibraryPaper
 import cl.rafit.memoriadeintenciones.ui.BookCover
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun AddItemScreen(
@@ -85,6 +93,11 @@ fun AddItemScreen(
     var experiencePlatform by remember(existingItem?.id) { mutableStateOf(existingItem?.experience?.platform.orEmpty()) }
     var experienceRating by remember(existingItem?.id) { mutableStateOf(existingItem?.experience?.rating) }
     var experienceComment by remember(existingItem?.id) { mutableStateOf(existingItem?.experience?.comment.orEmpty()) }
+    var experienceStartedAt by remember(existingItem?.id) { mutableStateOf(existingItem?.experience?.startedAt) }
+    var experienceFinishedAt by remember(existingItem?.id) { mutableStateOf(existingItem?.experience?.finishedAt) }
+    var showPlatformOptions by remember(existingItem?.id) { mutableStateOf(false) }
+    var showStartDatePicker by remember(existingItem?.id) { mutableStateOf(false) }
+    var showFinishedDatePicker by remember(existingItem?.id) { mutableStateOf(false) }
     var showDeleteConfirmation by remember(existingItem?.id) { mutableStateOf(false) }
     val titleError = attemptedSave && title.isBlank()
     val parsedDuration = duration.toIntOrNull()
@@ -214,13 +227,21 @@ fun AddItemScreen(
                 item {
                     Text("EXPERIENCIA", style = MaterialTheme.typography.labelSmall, color = materials.mutedInk)
                     Text("Opcional: registra cómo fue esta historia.", style = MaterialTheme.typography.bodySmall, color = materials.mutedInk)
-                    OutlinedTextField(
-                        value = experiencePlatform,
-                        onValueChange = { experiencePlatform = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text("Plataforma o soporte") },
-                        singleLine = true
+                    Text(
+                        if (category.storedCategory == StoredCategory.BOOK) "Formato o soporte" else "Plataforma o soporte",
+                        style = MaterialTheme.typography.bodyMedium
                     )
+                    OutlinedButton(onClick = { showPlatformOptions = true }, modifier = Modifier.fillMaxWidth()) {
+                        Text(experiencePlatform.ifBlank { "Seleccionar" })
+                    }
+                    if (category.storedCategory == StoredCategory.BOOK) {
+                        OutlinedButton(onClick = { showStartDatePicker = true }, modifier = Modifier.fillMaxWidth()) {
+                            Text("Inicio: ${formatExperienceDate(experienceStartedAt) ?: "Seleccionar fecha"}")
+                        }
+                        OutlinedButton(onClick = { showFinishedDatePicker = true }, modifier = Modifier.fillMaxWidth()) {
+                            Text("Término: ${formatExperienceDate(experienceFinishedAt) ?: "Seleccionar fecha"}")
+                        }
+                    }
                     Text("Valoración", style = MaterialTheme.typography.bodyMedium)
                     Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
                         (1..5).forEach { value ->
@@ -343,16 +364,24 @@ fun AddItemScreen(
                             }
                             result.onSuccess {
                                 if (existingItem != null && status == LibraryStatus.COMPLETED && onSaveExperience != null) {
-                                    val experience = ItemExperience(
-                                        platform = experiencePlatform,
-                                        rating = experienceRating,
-                                        comment = experienceComment,
-                                        createdAt = existingItem.experience?.createdAt ?: 0L
-                                    )
-                                    onSaveExperience(existingItem.id, experience).onFailure { error ->
+                                    val hasExperience = experiencePlatform.isNotBlank() || experienceRating != null ||
+                                        experienceComment.isNotBlank() || experienceStartedAt != null || experienceFinishedAt != null
+                                    val experienceResult = if (hasExperience) {
+                                        onSaveExperience(existingItem.id, ItemExperience(
+                                            platform = experiencePlatform,
+                                            rating = experienceRating,
+                                            comment = experienceComment,
+                                            startedAt = experienceStartedAt,
+                                            finishedAt = experienceFinishedAt,
+                                            createdAt = existingItem.experience?.createdAt ?: 0L
+                                        ))
+                                    } else if (existingItem.experience != null && onDeleteExperience != null) {
+                                        onDeleteExperience(existingItem.id)
+                                    } else null
+                                    experienceResult?.onFailure { error ->
                                         saving = false
                                         formError = error.message ?: "No se pudo guardar la experiencia."
-                                    }.onSuccess { onSaved() }
+                                    }?.onSuccess { onSaved() } ?: onSaved()
                                 } else onSaved()
                             }.onFailure { error ->
                                 saving = false
@@ -373,5 +402,70 @@ fun AddItemScreen(
             }
             item { androidx.compose.foundation.layout.Spacer(Modifier.size(4.dp)) }
         }
+    }
+
+    if (showPlatformOptions) {
+        AlertDialog(
+            onDismissRequest = { showPlatformOptions = false },
+            title = { Text("Selecciona el soporte") },
+            text = {
+                Column {
+                    experienceOptions(category.storedCategory).forEach { option ->
+                        TextButton(
+                            onClick = { experiencePlatform = option; showPlatformOptions = false },
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text(option) }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { showPlatformOptions = false }) { Text("Cancelar") } }
+        )
+    }
+
+    if (showStartDatePicker) {
+        ExperienceDatePickerDialog(
+            initialDate = experienceStartedAt,
+            onDismiss = { showStartDatePicker = false },
+            onDateSelected = { experienceStartedAt = it; showStartDatePicker = false },
+            label = "Fecha de inicio"
+        )
+    }
+
+    if (showFinishedDatePicker) {
+        ExperienceDatePickerDialog(
+            initialDate = experienceFinishedAt,
+            onDismiss = { showFinishedDatePicker = false },
+            onDateSelected = { experienceFinishedAt = it; showFinishedDatePicker = false },
+            label = "Fecha de término"
+        )
+    }
+}
+
+private fun experienceOptions(category: StoredCategory): List<String> = when (category) {
+    StoredCategory.BOOK -> listOf("Papel", "Kindle / e-reader", "EPUB / PDF", "Audiolibro", "Biblioteca / préstamo", "Otro")
+    StoredCategory.MOVIE -> listOf("Cine", "Streaming", "TV", "Blu-ray / DVD", "Otro")
+    StoredCategory.SERIES -> listOf("Streaming", "TV", "Blu-ray / DVD", "Otro")
+    StoredCategory.GAME -> listOf("PC", "PlayStation", "Xbox", "Nintendo Switch", "Móvil", "Otro")
+}
+
+private fun formatExperienceDate(millis: Long?): String? = millis?.let {
+    Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun ExperienceDatePickerDialog(
+    initialDate: Long?,
+    onDismiss: () -> Unit,
+    onDateSelected: (Long?) -> Unit,
+    label: String
+) {
+    val state = rememberDatePickerState(initialSelectedDateMillis = initialDate)
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = { TextButton(onClick = { onDateSelected(state.selectedDateMillis) }) { Text("Aceptar") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancelar") } }
+    ) {
+        DatePicker(title = { Text(label) }, state = state)
     }
 }

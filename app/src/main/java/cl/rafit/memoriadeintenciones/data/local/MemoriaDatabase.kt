@@ -9,7 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [LibraryItemEntity::class, ExperienceEntity::class],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 abstract class MemoriaDatabase : RoomDatabase() {
@@ -26,7 +26,7 @@ abstract class MemoriaDatabase : RoomDatabase() {
                     context.applicationContext,
                     MemoriaDatabase::class.java,
                     "memoria_de_intenciones.db"
-                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6).build().also { instance = it }
             }
 
         val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -57,6 +57,13 @@ abstract class MemoriaDatabase : RoomDatabase() {
         val MIGRATION_4_5 = object : Migration(4, 5) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("CREATE TABLE IF NOT EXISTS item_experiences (itemId INTEGER NOT NULL, platform TEXT, rating INTEGER, comment TEXT, createdAt INTEGER NOT NULL, updatedAt INTEGER NOT NULL, PRIMARY KEY(itemId))")
+            }
+        }
+
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE item_experiences ADD COLUMN startedAt INTEGER")
+                db.execSQL("ALTER TABLE item_experiences ADD COLUMN finishedAt INTEGER")
             }
         }
     }

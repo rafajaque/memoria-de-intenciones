@@ -130,6 +130,9 @@ class RoomLibraryRepository(
 
     override suspend fun saveExperience(itemId: Long, experience: ItemExperience) {
         require(experience.rating == null || experience.rating in 1..5) { "La valoración debe estar entre 1 y 5" }
+        require(experience.startedAt == null || experience.finishedAt == null || experience.finishedAt >= experience.startedAt) {
+            "La fecha de término no puede ser anterior al inicio"
+        }
         val now = System.currentTimeMillis()
         require(experienceDao != null) { "Las experiencias no están disponibles" }
         experienceDao.upsert(experience.copy(

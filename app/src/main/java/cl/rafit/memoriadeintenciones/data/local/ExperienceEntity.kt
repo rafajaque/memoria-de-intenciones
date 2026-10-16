@@ -10,10 +10,12 @@ data class ExperienceEntity(
     val platform: String?,
     val rating: Int?,
     val comment: String?,
+    val startedAt: Long?,
+    val finishedAt: Long?,
     val createdAt: Long,
     val updatedAt: Long
 )
 
-fun ExperienceEntity.toDomain() = ItemExperience(platform, rating, comment, createdAt, updatedAt)
+fun ExperienceEntity.toDomain() = ItemExperience(platform, rating, comment, startedAt, finishedAt, createdAt, updatedAt)
 
-fun ItemExperience.toEntity(itemId: Long) = ExperienceEntity(itemId, platform, rating, comment, createdAt, updatedAt)
+fun ItemExperience.toEntity(itemId: Long) = ExperienceEntity(itemId, platform, rating, comment, startedAt, finishedAt, createdAt, updatedAt)

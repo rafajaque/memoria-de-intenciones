@@ -241,6 +241,13 @@
 - **Persistencia:** Room 4→5 crea `item_experiences` con `itemId` como clave primaria. Al eliminar el título se elimina su experiencia.
 - **Límite:** una sola experiencia por título en el MVP; no hay recomendaciones, sincronización, cuentas ni publicación remota.
 
+## 2026-10-16 — Fechas y listas controladas en experiencias
+
+- **Decisión:** para Libros registrar fecha de inicio y fecha de término mediante calendario, en lugar de pedir minutos de lectura. Películas, series y videojuegos mantienen la duración aproximada del título.
+- **Soporte:** reemplazar texto libre por listas específicas: formatos de libro, medios de película/serie y plataformas de videojuego, con opción `Otro`.
+- **Validación:** el término no puede ser anterior al inicio; ambas fechas son opcionales porque una persona puede no querer registrar el recorrido completo.
+- **Persistencia:** Room 5→6 añade dos columnas nullable en `item_experiences`; las experiencias existentes no pierden información.
+
 ## 2026-10-16 — Autocompletado editable desde Google Books
 
 - **Clasificación:** MVP; integración de UI y consulta, sin guardado automático.
