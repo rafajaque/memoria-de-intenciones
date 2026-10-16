@@ -33,7 +33,8 @@
 - Se inspeccionó la imagen real `Desktop/Memoria de intenciones/ISBN/www-001006524304570-01.avif`: contiene el ISBN `978-84-663-7497-2` y su código de barras. El original no se modificó.
 - El AVD se configuró con una copia PNG de prueba mediante `-camera-back imagefile:<ruta>` y la vista de cámara mostró la portada, pero el encuadre quedó ampliado sobre el texto y dejó el código de barras fuera de pantalla. No se afirma detección ni consulta real todavía.
 - Se añadió el fixture centrado `app/src/androidTest/assets/isbn-9788466374972.png` y el procedimiento reproducible en `docs/evaluation/recorrido-isbn-avd.md`; el original AVIF permanece intacto.
-- Bloqueo actual: la instancia administrada del AVD conservó el fotograma anterior y debe cerrarse completamente antes de arrancar con el fixture centrado. El flujo de permisos, navegación y salida manual sí está comprobado.
+- El AVD se reinició con una copia sin espacios y el EAN-13 quedó completo, centrado y legible en la vista de cámara. ML Kit no devolvió una lectura después de 6 segundos; no se afirma todavía detección ni consulta Google Books.
+- Bloqueo actual: aislar si CameraX entrega a `ImageAnalysis` los mismos fotogramas que `PreviewView` o si el formato/rotación de la entrada virtual impide a ML Kit reconocerlo. El flujo de permisos, navegación y salida manual sí está comprobado.
 - El alta de Libros incluye el acceso al escáner ISBN. CameraX analiza EAN-13 en vivo con ML Kit, valida localmente y retorna el código leído al formulario; no persiste imágenes. Aún falta convertir la respuesta de Google Books en campos editables y guardarla como `BookMetadata`.
 
 ### Autocompletado Google Books — Fase 4 parcial, 2026-10-16
