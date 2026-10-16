@@ -2,7 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
+
+val googleBooksApiKey = providers.gradleProperty("GOOGLE_BOOKS_API_KEY").orNull.orEmpty()
 
 android {
     namespace = "cl.rafit.memoriadeintenciones"
@@ -10,6 +13,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     defaultConfig {
@@ -48,6 +52,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     // MVP OCR local: modelo latino empaquetado (~4 MB por arquitectura), sin descarga ni red.
     implementation(libs.mlkit.text.recognition)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.kotlinx.serialization)
+    implementation(libs.kotlinx.serialization.json)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)

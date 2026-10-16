@@ -152,3 +152,9 @@
 - **Decisión:** el OCR entrega una propuesta local editable, no un título automático. La persona revisa título y categoría y debe pulsar `Confirmar y guardar`; `Descartar captura` no persiste nada.
 - **Motivo:** el OCR de portadas puede devolver texto parcial o erróneo, como la variante `FUEGO SNGRE` observada durante la prueba manual.
 - **Límite:** la heurística usa líneas cortas del final del texto y parte en Libros; no infiere metadatos, no consulta catálogos y no garantiza exactitud.
+
+## 2026-10-15 — Contrato inicial de Google Books
+
+- **Clasificación:** preparación MVP; sin UI ni consulta activada todavía.
+- **Decisión:** normalizar resultados públicos con Retrofit y Kotlin serialization, con máximo de cinco resultados previsto en el servicio.
+- **Seguridad:** no se añade clave al repositorio; la búsqueda pública no incorpora cuenta, captura, nota ni historial.

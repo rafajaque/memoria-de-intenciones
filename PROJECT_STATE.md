@@ -16,6 +16,8 @@ Se implementó el spike técnico de Share Sheet + OCR local. La aplicación reci
 
 El resultado OCR ahora puede abrir una confirmación explícita: propone un título editable, permite escoger categoría y sólo guarda en Room tras pulsar `Confirmar y guardar`. Descartar conserva la biblioteca sin cambios. La propuesta es una heurística local de líneas cortas; no sustituye la revisión humana ni llama catálogos.
 
+Se añadió el contrato normalizado y cliente inicial de Google Books con Retrofit/Kotlin serialization. No existe aún búsqueda conectada a UI, clave configurada, migración Room ni descarga de portada.
+
 La nueva dependencia `com.google.mlkit:text-recognition:16.0.1` aporta OCR disponible sin descarga ni red, a cambio de aproximadamente 4 MB por arquitectura. No hay permisos de almacenamiento ni de internet añadidos. El filtro del manifiesto acepta `ACTION_SEND` con `image/*`; el importador resuelve el MIME concreto desde el proveedor antes de validar.
 
 La prueba manual con una captura técnica creada en el emulador verificó que una intención `ACTION_SEND` abre la ficha de lectura y que una URI sin permiso se comunica como fallo recuperable sin exponer la ruta o URI en la interfaz. Además, una prueba instrumentada generó el texto sintético `MEMORIA OCR` como PNG, lo copió al directorio privado y comprobó su reconocimiento exitoso por ML Kit. No existe aún una prueba manual exitosa con una aplicación emisora real: `adb shell` no puede otorgar al receptor el permiso temporal que entrega el Share Sheet. Tampoco se han usado ni contabilizado cinco capturas autorizadas; esa evidencia sigue pendiente según el protocolo.
