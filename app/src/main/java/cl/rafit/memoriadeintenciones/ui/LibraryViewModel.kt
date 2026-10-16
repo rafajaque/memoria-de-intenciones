@@ -10,6 +10,7 @@ import cl.rafit.memoriadeintenciones.domain.LibraryCategory
 import cl.rafit.memoriadeintenciones.domain.LibraryItem
 import cl.rafit.memoriadeintenciones.domain.LibraryStatus
 import cl.rafit.memoriadeintenciones.domain.BookMetadata
+import cl.rafit.memoriadeintenciones.domain.ItemExperience
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -107,6 +108,12 @@ class LibraryViewModel(
         repository.delete(id)
         bookCoverStorage.delete(localCover)
     }
+
+    suspend fun saveExperience(itemId: Long, experience: ItemExperience): Result<Unit> =
+        runCatching { repository.saveExperience(itemId, experience) }
+
+    suspend fun deleteExperience(itemId: Long): Result<Unit> =
+        runCatching { repository.deleteExperience(itemId) }
 
     private suspend fun storeCover(metadata: BookMetadata): BookMetadata =
         metadata.copy(coverLocalPath = bookCoverStorage.download(metadata.coverUrl, metadata.isbn))

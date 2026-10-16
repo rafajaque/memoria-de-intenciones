@@ -233,6 +233,14 @@
 - **Limpieza:** al reemplazar una portada o eliminar el libro se intenta borrar la copia anterior; los fallos de limpieza no impiden mantener la biblioteca.
 - **Migración:** Room 3→4 añade `bookCoverLocalPath` nullable y no altera registros existentes.
 
+## 2026-10-16 — Experiencia personal opcional por título
+
+- **Clasificación:** MVP.
+- **Decisión:** guardar una experiencia local separada por título, con plataforma/soporte, valoración de 1–5 y comentario. Se puede editar o eliminar desde la ficha cuando el estado sea `TERMINADO`.
+- **Motivo:** separar la valoración de la nota breve de biblioteca y permitir que marcar un título como terminado no obligue a escribir una reseña.
+- **Persistencia:** Room 4→5 crea `item_experiences` con `itemId` como clave primaria. Al eliminar el título se elimina su experiencia.
+- **Límite:** una sola experiencia por título en el MVP; no hay recomendaciones, sincronización, cuentas ni publicación remota.
+
 ## 2026-10-16 — Autocompletado editable desde Google Books
 
 - **Clasificación:** MVP; integración de UI y consulta, sin guardado automático.

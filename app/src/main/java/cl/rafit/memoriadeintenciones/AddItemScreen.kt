@@ -40,6 +40,7 @@ import cl.rafit.memoriadeintenciones.domain.LibraryItem
 import cl.rafit.memoriadeintenciones.domain.LibraryStatus
 import cl.rafit.memoriadeintenciones.domain.BookCatalogProposal
 import cl.rafit.memoriadeintenciones.domain.BookMetadata
+import cl.rafit.memoriadeintenciones.domain.ItemExperience
 import cl.rafit.memoriadeintenciones.data.catalog.BookCatalogRateLimitedException
 import cl.rafit.memoriadeintenciones.ui.LibraryPaper
 import cl.rafit.memoriadeintenciones.ui.BookCover
@@ -55,6 +56,8 @@ fun AddItemScreen(
     scannedIsbn: String? = null,
     onScanIsbn: (() -> Unit)? = null,
     onFindBook: (suspend (String) -> Result<List<BookCatalogProposal>>)? = null,
+    onSaveExperience: (suspend (Long, ItemExperience) -> Result<Unit>)? = null,
+    onDeleteExperience: (suspend (Long) -> Result<Unit>)? = null,
     onBack: () -> Unit,
     onSaved: () -> Unit
 ) {
@@ -79,6 +82,9 @@ fun AddItemScreen(
     var attemptedSave by remember(existingItem?.id) { mutableStateOf(false) }
     var saving by remember(existingItem?.id) { mutableStateOf(false) }
     var formError by remember(existingItem?.id) { mutableStateOf<String?>(null) }
+    var experiencePlatform by remember(existingItem?.id) { mutableStateOf(existingItem?.experience?.platform.orEmpty()) }
+    var experienceRating by remember(existingItem?.id) { mutableStateOf(existingItem?.experience?.rating) }
+    var experienceComment by remember(existingItem?.id) { mutableStateOf(existingItem?.experience?.comment.orEmpty()) }
     var showDeleteConfirmation by remember(existingItem?.id) { mutableStateOf(false) }
     val titleError = attemptedSave && title.isBlank()
     val parsedDuration = duration.toIntOrNull()
@@ -204,6 +210,47 @@ fun AddItemScreen(
                     color = materials.mutedInk
                 )
             }
+            if (editing && status == LibraryStatus.COMPLETED && onSaveExperience != null) {
+                item {
+                    Text("EXPERIENCIA", style = MaterialTheme.typography.labelSmall, color = materials.mutedInk)
+                    Text("Opcional: registra cómo fue esta historia.", style = MaterialTheme.typography.bodySmall, color = materials.mutedInk)
+                    OutlinedTextField(
+                        value = experiencePlatform,
+                        onValueChange = { experiencePlatform = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Plataforma o soporte") },
+                        singleLine = true
+                    )
+                    Text("Valoración", style = MaterialTheme.typography.bodyMedium)
+                    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                        (1..5).forEach { value ->
+                            TextButton(onClick = { experienceRating = value }) {
+                                Text(if (experienceRating != null && value <= experienceRating!!) "★" else "☆")
+                            }
+                        }
+                    }
+                    OutlinedTextField(
+                        value = experienceComment,
+                        onValueChange = { experienceComment = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Comentario") },
+                        minLines = 3,
+                        maxLines = 5
+                    )
+                    if (existingItem?.experience != null && onDeleteExperience != null) {
+                        TextButton(
+                            onClick = {
+                                scope.launch { onDeleteExperience(existingItem.id).onSuccess {
+                                    experiencePlatform = ""
+                                    experienceRating = null
+                                    experienceComment = ""
+                                } }
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text("Eliminar experiencia", color = MaterialTheme.colorScheme.error) }
+                    }
+                }
+            }
             item {
                 if (onScanIsbn != null) {
                     TextButton(onClick = onScanIsbn) { Text("Escanear ISBN") }
@@ -294,7 +341,20 @@ fun AddItemScreen(
                             } else {
                                 onUpdate(existingItem, title, status, parsedDuration, notes, bookMetadata)
                             }
-                            result.onSuccess { onSaved() }.onFailure { error ->
+                            result.onSuccess {
+                                if (existingItem != null && status == LibraryStatus.COMPLETED && onSaveExperience != null) {
+                                    val experience = ItemExperience(
+                                        platform = experiencePlatform,
+                                        rating = experienceRating,
+                                        comment = experienceComment,
+                                        createdAt = existingItem.experience?.createdAt ?: 0L
+                                    )
+                                    onSaveExperience(existingItem.id, experience).onFailure { error ->
+                                        saving = false
+                                        formError = error.message ?: "No se pudo guardar la experiencia."
+                                    }.onSuccess { onSaved() }
+                                } else onSaved()
+                            }.onFailure { error ->
                                 saving = false
                                 formError = error.message ?: "No se pudo guardar el título."
                             }

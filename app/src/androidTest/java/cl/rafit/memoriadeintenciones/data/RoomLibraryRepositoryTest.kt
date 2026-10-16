@@ -8,6 +8,7 @@ import cl.rafit.memoriadeintenciones.data.local.MemoriaDatabase
 import cl.rafit.memoriadeintenciones.domain.LibraryCategory
 import cl.rafit.memoriadeintenciones.domain.BookMetadata
 import cl.rafit.memoriadeintenciones.domain.LibraryStatus
+import cl.rafit.memoriadeintenciones.domain.ItemExperience
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -28,7 +29,7 @@ class RoomLibraryRepositoryTest {
         database = Room.inMemoryDatabaseBuilder(context, MemoriaDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        repository = RoomLibraryRepository(database.libraryItemDao())
+        repository = RoomLibraryRepository(database.libraryItemDao(), database.experienceDao())
     }
 
     @After
@@ -121,5 +122,31 @@ class RoomLibraryRepositoryTest {
         )
 
         assertEquals(metadata, repository.observeByCategory(LibraryCategory.BOOK).first().single().bookMetadata)
+    }
+
+    @Test
+    fun experienceCanBeCreatedEditedAndDeletedSeparately() = runBlocking {
+        repository.add(
+            title = "Libro vivido",
+            category = LibraryCategory.BOOK,
+            status = LibraryStatus.COMPLETED,
+            durationMinutes = null,
+            notes = null,
+            bookMetadata = null,
+            now = 60L
+        )
+        val item = repository.observeAll().first().single()
+
+        repository.saveExperience(item.id, ItemExperience(platform = "Kindle", rating = 4, comment = "  Me gustó  "))
+        val saved = repository.observeAll().first().single().experience
+        assertEquals("Kindle", saved?.platform)
+        assertEquals(4, saved?.rating)
+        assertEquals("Me gustó", saved?.comment)
+
+        repository.saveExperience(item.id, ItemExperience(platform = "Papel", rating = 5, comment = "Excelente", createdAt = saved!!.createdAt))
+        assertEquals("Papel", repository.observeAll().first().single().experience?.platform)
+
+        repository.deleteExperience(item.id)
+        assertNull(repository.observeAll().first().single().experience)
     }
 }

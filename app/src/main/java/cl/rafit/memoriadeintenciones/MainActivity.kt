@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
         val libraryViewModel = ViewModelProvider(
             this,
             LibraryViewModelFactory(
-                repository = RoomLibraryRepository(database.libraryItemDao()),
+                repository = RoomLibraryRepository(database.libraryItemDao(), database.experienceDao()),
                 bookCoverStorage = BookCoverStorage(applicationContext)
             )
         )[LibraryViewModel::class.java]
@@ -195,6 +195,8 @@ private fun MemoriaNavigation(
                     onSave = viewModel::add,
                     onUpdate = viewModel::edit,
                     onDelete = viewModel::delete,
+                    onSaveExperience = viewModel::saveExperience,
+                    onDeleteExperience = viewModel::deleteExperience,
                     onFindBook = viewModel::findBookByIsbn,
                     scannedIsbn = navController.currentBackStackEntry?.savedStateHandle?.get<String>("scannedIsbn"),
                     onScanIsbn = if (category.storedCategory == cl.rafit.memoriadeintenciones.domain.LibraryCategory.BOOK) ({ navController.navigate(Destinations.ISBN_SCAN) }) else null,
@@ -228,6 +230,8 @@ private fun MemoriaNavigation(
                     onSave = viewModel::add,
                     onUpdate = viewModel::edit,
                     onDelete = viewModel::delete,
+                    onSaveExperience = viewModel::saveExperience,
+                    onDeleteExperience = viewModel::deleteExperience,
                     onBack = { navController.popBackStack() },
                     onSaved = { navController.popBackStack() }
                 )

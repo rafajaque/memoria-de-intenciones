@@ -8,12 +8,13 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [LibraryItemEntity::class],
-    version = 4,
+    entities = [LibraryItemEntity::class, ExperienceEntity::class],
+    version = 5,
     exportSchema = false
 )
 abstract class MemoriaDatabase : RoomDatabase() {
     abstract fun libraryItemDao(): LibraryItemDao
+    abstract fun experienceDao(): ExperienceDao
 
     companion object {
         @Volatile
@@ -25,7 +26,7 @@ abstract class MemoriaDatabase : RoomDatabase() {
                     context.applicationContext,
                     MemoriaDatabase::class.java,
                     "memoria_de_intenciones.db"
-                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5).build().also { instance = it }
             }
 
         val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -50,6 +51,12 @@ abstract class MemoriaDatabase : RoomDatabase() {
         val MIGRATION_3_4 = object : Migration(3, 4) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE library_items ADD COLUMN bookCoverLocalPath TEXT")
+            }
+        }
+
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS item_experiences (itemId INTEGER NOT NULL, platform TEXT, rating INTEGER, comment TEXT, createdAt INTEGER NOT NULL, updatedAt INTEGER NOT NULL, PRIMARY KEY(itemId))")
             }
         }
     }

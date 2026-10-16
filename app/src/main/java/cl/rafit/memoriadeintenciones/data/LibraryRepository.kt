@@ -1,12 +1,15 @@
 package cl.rafit.memoriadeintenciones.data
 
 import cl.rafit.memoriadeintenciones.data.local.LibraryItemDao
+import cl.rafit.memoriadeintenciones.data.local.ExperienceDao
 import cl.rafit.memoriadeintenciones.data.local.toDomain
 import cl.rafit.memoriadeintenciones.data.local.toEntity
 import cl.rafit.memoriadeintenciones.domain.LibraryCategory
 import cl.rafit.memoriadeintenciones.domain.LibraryItem
 import cl.rafit.memoriadeintenciones.domain.LibraryStatus
 import cl.rafit.memoriadeintenciones.domain.BookMetadata
+import cl.rafit.memoriadeintenciones.domain.ItemExperience
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -34,16 +37,29 @@ interface LibraryRepository {
     )
     suspend fun update(item: LibraryItem)
     suspend fun delete(id: Long)
+    suspend fun saveExperience(itemId: Long, experience: ItemExperience)
+    suspend fun deleteExperience(itemId: Long)
 }
 
 class RoomLibraryRepository(
-    private val dao: LibraryItemDao
+    private val dao: LibraryItemDao,
+    private val experienceDao: ExperienceDao? = null
 ) : LibraryRepository {
     override fun observeAll(): Flow<List<LibraryItem>> =
-        dao.observeAll().map { items -> items.map { it.toDomain() } }
+        experienceDao?.let { experiences ->
+            combine(dao.observeAll(), experiences.observeAll()) { items, records ->
+                val byItem = records.associateBy { it.itemId }
+                items.map { it.toDomain(byItem[it.id]?.toDomain()) }
+            }
+        } ?: dao.observeAll().map { items -> items.map { it.toDomain() } }
 
     override fun observeByCategory(category: LibraryCategory): Flow<List<LibraryItem>> =
-        dao.observeByCategory(category.name).map { items -> items.map { it.toDomain() } }
+        experienceDao?.let { experiences ->
+            combine(dao.observeByCategory(category.name), experiences.observeAll()) { items, records ->
+                val byItem = records.associateBy { it.itemId }
+                items.map { it.toDomain(byItem[it.id]?.toDomain()) }
+            }
+        } ?: dao.observeByCategory(category.name).map { items -> items.map { it.toDomain() } }
 
     override suspend fun add(
         title: String,
@@ -109,5 +125,23 @@ class RoomLibraryRepository(
 
     override suspend fun delete(id: Long) {
         dao.deleteById(id)
+        experienceDao?.deleteByItemId(id)
+    }
+
+    override suspend fun saveExperience(itemId: Long, experience: ItemExperience) {
+        require(experience.rating == null || experience.rating in 1..5) { "La valoración debe estar entre 1 y 5" }
+        val now = System.currentTimeMillis()
+        require(experienceDao != null) { "Las experiencias no están disponibles" }
+        experienceDao.upsert(experience.copy(
+            platform = experience.platform?.trim()?.takeIf(String::isNotEmpty),
+            comment = experience.comment?.trim()?.takeIf(String::isNotEmpty),
+            createdAt = if (experience.createdAt == 0L) now else experience.createdAt,
+            updatedAt = now
+        ).toEntity(itemId))
+    }
+
+    override suspend fun deleteExperience(itemId: Long) {
+        require(experienceDao != null) { "Las experiencias no están disponibles" }
+        experienceDao.deleteByItemId(itemId)
     }
 }

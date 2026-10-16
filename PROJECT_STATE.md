@@ -179,6 +179,14 @@ La base Room subió de versión 1 a 2 mediante una migración que añade `durati
 - La interfaz usa primero la copia local, luego la URL remota y finalmente el placeholder. Al reemplazar o eliminar un libro se intenta limpiar la copia local anterior.
 - Se añadieron pruebas instrumentadas para descarga válida, rechazo de HTTP/imagen inválida y eliminación. Verificación de compilación principal y `git diff --check` sin errores; falta el recorrido manual en Redmi.
 - Verificación manual en Redmi 12 5G: un libro con portada se guardó, la portada permaneció visible al reabrir la aplicación y no se observaron problemas.
+
+### Experiencias personales — 2026-10-16
+
+- Se añadió `ItemExperience` como registro local opcional uno a uno con el título: plataforma/soporte, valoración de 1 a 5, comentario y fechas.
+- La experiencia se ofrece desde la ficha cuando el estado es `TERMINADO`; no es obligatoria y no se mezcla con la nota personal del título.
+- Room pasa de versión 4 a 5 con la tabla `item_experiences`; eliminar un título elimina también su experiencia.
+- Se añadieron pruebas instrumentadas de creación, edición y eliminación separadas del título.
+- `assembleDebug`, `lintDebug` y `compileDebugAndroidTestKotlin` terminaron con `BUILD SUCCESSFUL`; falta el recorrido manual en Redmi.
 - Pendientes de configuración anteriores al rediseño: icono de aplicación y reglas explícitas de extracción/respaldo para Android 12+. No se modificaron en esta tarea visual.
 - Las actualizaciones de SDK y dependencias deben planificarse por separado; no se cambian versiones solo para silenciar advertencias.
 - Android Studio se verificó ejecutándose con el proyecto como argumento; los archivos temporales de arranques anteriores no afectan la ejecución actual.

@@ -6,6 +6,7 @@ import cl.rafit.memoriadeintenciones.domain.LibraryCategory
 import cl.rafit.memoriadeintenciones.domain.LibraryItem
 import cl.rafit.memoriadeintenciones.domain.LibraryStatus
 import cl.rafit.memoriadeintenciones.domain.BookMetadata
+import cl.rafit.memoriadeintenciones.domain.ItemExperience
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
@@ -31,7 +32,7 @@ data class LibraryItemEntity(
     val updatedAt: Long
 )
 
-fun LibraryItemEntity.toDomain(): LibraryItem = LibraryItem(
+fun LibraryItemEntity.toDomain(experience: ItemExperience? = null): LibraryItem = LibraryItem(
     id = id,
     title = title,
     category = LibraryCategory.valueOf(category),
@@ -51,6 +52,7 @@ fun LibraryItemEntity.toDomain(): LibraryItem = LibraryItem(
             edition = bookEdition
         )
     },
+    experience = experience,
     createdAt = createdAt,
     updatedAt = updatedAt
 )

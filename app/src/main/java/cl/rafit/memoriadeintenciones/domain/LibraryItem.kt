@@ -22,6 +22,7 @@ data class LibraryItem(
     val durationMinutes: Int? = null,
     val notes: String? = null,
     val bookMetadata: BookMetadata? = null,
+    val experience: ItemExperience? = null,
     val createdAt: Long,
     val updatedAt: Long
 )
