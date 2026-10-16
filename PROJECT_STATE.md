@@ -37,6 +37,7 @@
 - Bloqueo actual: aislar si CameraX entrega a `ImageAnalysis` los mismos fotogramas que `PreviewView` o si el formato/rotación de la entrada virtual impide a ML Kit reconocerlo. El flujo de permisos, navegación y salida manual sí está comprobado.
 - Se añadió `IsbnBarcodeFixtureTest`, que carga el PNG directamente en ML Kit sin CameraX y reconoce `9788466374972`. `connectedDebugAndroidTest` terminó con `BUILD SUCCESSFUL` y 16 pruebas aprobadas. El fallo queda aislado en la entrada de `ImageAnalysis` del AVD.
 - Se probó temporalmente salida RGBA de `ImageAnalysis` y conversión a `Bitmap`; compiló, pero el recorrido siguió sin detectar el código. El cambio se retiró por no aportar una mejora comprobada.
+- Instrumentación temporal del APK: `ImageAnalysis` recibió frames YUV `640x480`, rotación `90°` y tres planos; ML Kit respondió `codes=[]` de forma consistente. Se retiró el log. El siguiente diagnóstico debe comparar el contenido real del frame analizado con el de `PreviewView`.
 - El alta de Libros incluye el acceso al escáner ISBN. CameraX analiza EAN-13 en vivo con ML Kit, valida localmente y retorna el código leído al formulario; no persiste imágenes. Aún falta convertir la respuesta de Google Books en campos editables y guardarla como `BookMetadata`.
 
 ### Autocompletado Google Books — Fase 4 parcial, 2026-10-16
