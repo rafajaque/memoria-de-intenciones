@@ -5,10 +5,38 @@
 - Fecha: 2026-10-16
 - Proyecto Android: biblioteca navegable con gestión local de títulos
 - Repositorio Git: inicializado
-- Rama actual: `feat/escanear-isbn`
+- Rama actual: `feat/tengo-tiempo-libre`
 - Base de esta iteración: `97c517a` — identidad artesanal de la biblioteca
-- Último cambio comprobado: escaneo ISBN en Redmi 12 5G y manejo de límite Google Books
+- Último cambio comprobado: Hito 5 “Tengo tiempo libre”, ranking local explicable
 - Remoto: `https://github.com/rafajaque/memoria-de-intenciones.git`
+
+## Hito 5 — “Tengo tiempo libre”, 2026-10-16
+
+- Se creó la rama `feat/tengo-tiempo-libre` desde `feat/escanear-isbn`; cada commit de esta iteración fue subido a GitHub.
+- Room pasa de versión 6 a 8 mediante migraciones aditivas: prioridad `BAJA`/`NORMAL`/`ALTA` en títulos y tabla local de feedback de recomendaciones.
+- El feedback permanece en el dispositivo: aceptar, posponer y descartar actualizan sólo el ranking; eliminar un título limpia su feedback.
+- Se implementó `RecommendationEngine` como función pura y determinista. Considera sólo pendientes, duración, prioridad, antigüedad, afinidad local y feedback; excluye descartados y explica duración desconocida.
+- Los desempates son estables: duración que cabe, duración conocida, fecha de creación más antigua e `id` menor.
+- DataStore conserva el último tiempo disponible y afinidades locales; los pesos parten de defaults neutrales y no se entrenan modelos.
+- La biblioteca incluye la entrada `Tengo tiempo libre`, con pantalla de minutos, tarjetas ordenadas, razones visibles y acciones `Aceptar`, `Posponer`, `Descartar` y `Realizar`.
+- La prioridad manual se puede seleccionar en alta/edición sin cambiar las validaciones existentes de experiencias y libros.
+
+### Verificación del Hito 5
+
+- `gradlew.bat --no-daemon --max-workers=1 assembleDebug lintDebug compileDebugAndroidTestKotlin --console=plain --info`: `BUILD SUCCESSFUL`.
+- `git diff --check`: sin errores.
+- Las pruebas de persistencia de prioridad/feedback y del motor de ranking compilan correctamente.
+- `connectedDebugAndroidTest` no pudo completar la instalación en el dispositivo disponible: `INSTALL_FAILED_USER_RESTRICTED` / `Install canceled by user`. No se cuentan pruebas instrumentadas ejecutadas en ese intento.
+- No se realizó todavía un recorrido visual en AVD/Redmi del nuevo flujo; queda como siguiente verificación externa cuando el dispositivo permita instalar la APK de tests.
+
+### Commits de la iteración
+
+- `7ed41b8` — `docs: diseñar recomendación local por tiempo`
+- `91a1692` — `docs: planificar ranking por tiempo disponible`
+- `339348d` — `feat: persistir prioridad y feedback local`
+- `8f5b6ca` — `feat: crear ranking determinista por tiempo`
+- `9ffb91e` — `feat: conectar preferencias del ranking`
+- `09ff933` — `feat: mostrar recomendaciones por tiempo`
 
 ## Último cambio comprobado
 
