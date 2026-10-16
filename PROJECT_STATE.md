@@ -220,6 +220,12 @@ La base Room subió de versión 1 a 2 mediante una migración que añade `durati
 - El comentario continúa siendo opcional y las reglas específicas de soporte y fechas se mantienen.
 - `assembleDebug`, `lintDebug` y `compileDebugAndroidTestKotlin`: `BUILD SUCCESSFUL`. Falta instalar esta APK y verificar el bloqueo en Redmi.
 
+### Cierre del hito de ficha y experiencias — 2026-10-16
+
+- Recorrido manual confirmado por el usuario en el Redmi 12 5G: alta, edición, fechas de lectura, soporte de lectura y valoración obligatoria funcionan según lo esperado.
+- La rama `feat/escanear-isbn` queda limpia y con el último commit verificado `366855d`.
+- El siguiente microhito planificado es el Hito 5: `Tengo tiempo libre`, con ranking local y explicable de títulos pendientes.
+
 ## Siguiente acción exacta
 
-Instalar la APK debug actualizada en el Redmi 12 5G y comprobar: fecha automática al elegir `EN CURSO`, `TERMINADO` o `ABANDONADO`; cambio manual; persistencia al reabrir.
+Iniciar el diseño acotado del Hito 5: definir entradas, ranking determinista, desempates y razones visibles para `Tengo tiempo libre`, sin añadir recomendaciones remotas ni cambiar el alcance aprobado.
