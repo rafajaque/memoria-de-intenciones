@@ -92,7 +92,10 @@ fun AddItemScreen(
             publishedDate = publishedDate.trim().takeIf(String::isNotEmpty),
             language = language.trim().takeIf(String::isNotEmpty),
             pageCount = parsedPageCount?.takeIf { count -> count > 0 },
-            coverUrl = coverUrl.trim().takeIf(String::isNotEmpty)
+            coverUrl = coverUrl.trim().takeIf(String::isNotEmpty),
+            coverLocalPath = existingItem?.bookMetadata
+                ?.takeIf { it.coverUrl == coverUrl.trim().takeIf(String::isNotEmpty) }
+                ?.coverLocalPath
         )
     }
 
@@ -228,8 +231,8 @@ fun AddItemScreen(
                     OutlinedTextField(pageCount, { pageCount = it.filter(Char::isDigit) }, Modifier.fillMaxWidth(), label = { Text("Páginas") }, singleLine = true)
                     if (coverUrl.isNotBlank()) {
                         Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                            BookCover(coverUrl, title.ifBlank { "libro" }, Modifier.size(72.dp, 108.dp))
-                            Text("La portada se cargará desde esta URL y no se guarda como archivo.", style = MaterialTheme.typography.bodySmall, color = materials.mutedInk)
+                            BookCover(coverUrl, title.ifBlank { "libro" }, Modifier.size(72.dp, 108.dp), existingItem?.bookMetadata?.coverLocalPath)
+                            Text("La portada se guardará en el almacenamiento privado al confirmar.", style = MaterialTheme.typography.bodySmall, color = materials.mutedInk)
                         }
                     }
                 }

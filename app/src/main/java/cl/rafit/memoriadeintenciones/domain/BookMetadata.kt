@@ -9,5 +9,6 @@ data class BookMetadata(
     val language: String? = null,
     val pageCount: Int? = null,
     val coverUrl: String? = null,
+    val coverLocalPath: String? = null,
     val edition: String? = null
 )

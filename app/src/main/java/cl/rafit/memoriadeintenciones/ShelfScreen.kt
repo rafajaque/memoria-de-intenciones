@@ -125,7 +125,7 @@ private fun LibraryItemCard(item: LibraryItem, onClick: () -> Unit) {
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
             if (item.category == cl.rafit.memoriadeintenciones.domain.LibraryCategory.BOOK && item.bookMetadata?.coverUrl != null) {
-                BookCover(item.bookMetadata.coverUrl, item.title, Modifier.size(52.dp, 78.dp))
+                BookCover(item.bookMetadata.coverUrl, item.title, Modifier.size(52.dp, 78.dp), item.bookMetadata.coverLocalPath)
             }
             Column(verticalArrangement = Arrangement.spacedBy(7.dp), modifier = Modifier.weight(1f)) {
                 Text(item.title, style = MaterialTheme.typography.titleLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)

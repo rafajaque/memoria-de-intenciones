@@ -35,6 +35,7 @@ import cl.rafit.memoriadeintenciones.data.catalog.GoogleBooksService
 import cl.rafit.memoriadeintenciones.data.catalog.OpenLibraryBookCatalogRepository
 import cl.rafit.memoriadeintenciones.data.catalog.OpenLibraryService
 import cl.rafit.memoriadeintenciones.data.local.MemoriaDatabase
+import cl.rafit.memoriadeintenciones.data.local.BookCoverStorage
 import cl.rafit.memoriadeintenciones.data.shared.IncomingSharedImage
 import cl.rafit.memoriadeintenciones.data.shared.OnDeviceIsbnReader
 import cl.rafit.memoriadeintenciones.data.shared.OnDeviceOcrTextReader
@@ -59,7 +60,10 @@ class MainActivity : ComponentActivity() {
         val database = MemoriaDatabase.getInstance(applicationContext)
         val libraryViewModel = ViewModelProvider(
             this,
-            LibraryViewModelFactory(RoomLibraryRepository(database.libraryItemDao()))
+            LibraryViewModelFactory(
+                repository = RoomLibraryRepository(database.libraryItemDao()),
+                bookCoverStorage = BookCoverStorage(applicationContext)
+            )
         )[LibraryViewModel::class.java]
 
         setContent {
@@ -114,6 +118,7 @@ private fun Intent.toIncomingSharedImage(): IncomingSharedImage? {
 
 private class LibraryViewModelFactory(
     private val repository: RoomLibraryRepository,
+    private val bookCoverStorage: BookCoverStorage,
     private val bookCatalogRepository: FallbackBookCatalogRepository = FallbackBookCatalogRepository(
         primary = GoogleBooksBookCatalogRepository(GoogleBooksService.create()),
         fallback = OpenLibraryBookCatalogRepository(OpenLibraryService.create())
@@ -122,7 +127,7 @@ private class LibraryViewModelFactory(
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         require(modelClass.isAssignableFrom(LibraryViewModel::class.java))
-        return LibraryViewModel(repository, bookCatalogRepository) as T
+        return LibraryViewModel(repository, bookCatalogRepository, bookCoverStorage) as T
     }
 }
 

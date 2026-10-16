@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cl.rafit.memoriadeintenciones.data.LibraryRepository
 import cl.rafit.memoriadeintenciones.data.catalog.BookCatalogRepository
+import cl.rafit.memoriadeintenciones.data.local.BookCoverStorage
 import cl.rafit.memoriadeintenciones.domain.BookCatalogProposal
 import cl.rafit.memoriadeintenciones.domain.LibraryCategory
 import cl.rafit.memoriadeintenciones.domain.LibraryItem
@@ -22,7 +23,8 @@ data class LibraryUiState(val items: List<LibraryItem> = emptyList()) {
 
 class LibraryViewModel(
     private val repository: LibraryRepository,
-    private val bookCatalogRepository: BookCatalogRepository
+    private val bookCatalogRepository: BookCatalogRepository,
+    private val bookCoverStorage: BookCoverStorage
 ) : ViewModel() {
 
     suspend fun findBookByIsbn(isbn: String): Result<List<BookCatalogProposal>> = runCatching {
@@ -52,13 +54,14 @@ class LibraryViewModel(
         notes: String?,
         bookMetadata: BookMetadata?
     ): Result<Long> = runCatching {
+        val storedMetadata = bookMetadata?.let { storeCover(it) }
         repository.add(
             title = title,
             category = category,
             status = status,
             durationMinutes = durationMinutes,
             notes = notes,
-            bookMetadata = bookMetadata,
+            bookMetadata = storedMetadata,
             now = System.currentTimeMillis()
         )
     }
@@ -81,16 +84,30 @@ class LibraryViewModel(
         notes: String?,
         bookMetadata: BookMetadata?
     ): Result<Unit> = runCatching {
+        val previousLocalCover = item.bookMetadata?.coverLocalPath
+        val storedMetadata = bookMetadata?.let { metadata ->
+            val sameRemoteCover = metadata.coverUrl == item.bookMetadata?.coverUrl
+            if (metadata.coverLocalPath != null || (sameRemoteCover && previousLocalCover != null) || metadata.coverUrl == null) metadata
+            else storeCover(metadata)
+        }
         repository.edit(
             item = item,
             title = title,
             status = status,
             durationMinutes = durationMinutes,
             notes = notes,
-            bookMetadata = bookMetadata,
+            bookMetadata = storedMetadata,
             now = System.currentTimeMillis()
         )
+        if (previousLocalCover != storedMetadata?.coverLocalPath) bookCoverStorage.delete(previousLocalCover)
     }
 
-    suspend fun delete(id: Long): Result<Unit> = runCatching { repository.delete(id) }
+    suspend fun delete(id: Long): Result<Unit> = runCatching {
+        val localCover = uiState.value.items.firstOrNull { it.id == id }?.bookMetadata?.coverLocalPath
+        repository.delete(id)
+        bookCoverStorage.delete(localCover)
+    }
+
+    private suspend fun storeCover(metadata: BookMetadata): BookMetadata =
+        metadata.copy(coverLocalPath = bookCoverStorage.download(metadata.coverUrl, metadata.isbn))
 }

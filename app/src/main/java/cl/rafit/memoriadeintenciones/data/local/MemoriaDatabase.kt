@@ -9,7 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     entities = [LibraryItemEntity::class],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 abstract class MemoriaDatabase : RoomDatabase() {
@@ -25,7 +25,7 @@ abstract class MemoriaDatabase : RoomDatabase() {
                     context.applicationContext,
                     MemoriaDatabase::class.java,
                     "memoria_de_intenciones.db"
-                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build().also { instance = it }
             }
 
         val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -44,6 +44,12 @@ abstract class MemoriaDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE library_items ADD COLUMN bookPageCount INTEGER")
                 db.execSQL("ALTER TABLE library_items ADD COLUMN bookCoverUrl TEXT")
                 db.execSQL("ALTER TABLE library_items ADD COLUMN bookEdition TEXT")
+            }
+        }
+
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE library_items ADD COLUMN bookCoverLocalPath TEXT")
             }
         }
     }

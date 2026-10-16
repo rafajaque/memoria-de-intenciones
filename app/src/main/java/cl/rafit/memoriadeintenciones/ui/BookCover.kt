@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import java.io.File
 import coil.compose.SubcomposeAsyncImage
 import coil.ImageLoader
 import cl.rafit.memoriadeintenciones.LocalLibraryMaterials
@@ -22,7 +23,8 @@ import cl.rafit.memoriadeintenciones.LocalLibraryMaterials
 fun BookCover(
     url: String?,
     title: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    localPath: String? = null
 ) {
     val context = LocalContext.current
     val imageLoader = remember(context) {
@@ -31,7 +33,9 @@ fun BookCover(
             .build()
     }
     SubcomposeAsyncImage(
-        model = url?.takeIf(String::isNotBlank) ?: "invalid://book-cover",
+        model = localPath?.takeIf { File(it).isFile }?.let(::File)
+            ?: url?.takeIf(String::isNotBlank)
+            ?: "invalid://book-cover",
         contentDescription = "Portada de $title",
         imageLoader = imageLoader,
         contentScale = ContentScale.Crop,

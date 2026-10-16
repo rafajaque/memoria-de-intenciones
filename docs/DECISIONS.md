@@ -225,6 +225,14 @@
 - **Decisión:** continuar sólo con el orden y los criterios del plan aprobado. Las ideas nuevas que impliquen trabajo amplio, cuentas, backend, sincronización o catálogo comunitario se registran como escalabilidad futura y no alteran el siguiente microhito.
 - **Siguiente paso planificado:** completar la gestión local de portadas del catálogo mínimo, incluyendo descarga privada y fallback visual, antes de pasar al hito de ficha y experiencias personales.
 
+## 2026-10-16 — Copia privada de portadas
+
+- **Clasificación:** MVP.
+- **Decisión:** descargar la portada HTTPS al confirmar un libro y guardar sólo una ruta privada opcional junto a la URL de catálogo. La UI prioriza archivo local, URL remota y placeholder.
+- **Límites:** máximo 10 MiB, contenido validado como imagen, sin descarga durante la consulta ni para propuestas no confirmadas. No se añaden dependencias.
+- **Limpieza:** al reemplazar una portada o eliminar el libro se intenta borrar la copia anterior; los fallos de limpieza no impiden mantener la biblioteca.
+- **Migración:** Room 3→4 añade `bookCoverLocalPath` nullable y no altera registros existentes.
+
 ## 2026-10-16 — Autocompletado editable desde Google Books
 
 - **Clasificación:** MVP; integración de UI y consulta, sin guardado automático.

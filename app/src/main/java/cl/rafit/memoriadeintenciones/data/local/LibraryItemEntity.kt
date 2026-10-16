@@ -25,6 +25,7 @@ data class LibraryItemEntity(
     val bookLanguage: String? = null,
     val bookPageCount: Int? = null,
     val bookCoverUrl: String? = null,
+    val bookCoverLocalPath: String? = null,
     val bookEdition: String? = null,
     val createdAt: Long,
     val updatedAt: Long
@@ -46,6 +47,7 @@ fun LibraryItemEntity.toDomain(): LibraryItem = LibraryItem(
             language = bookLanguage,
             pageCount = bookPageCount,
             coverUrl = bookCoverUrl,
+            coverLocalPath = bookCoverLocalPath,
             edition = bookEdition
         )
     },
@@ -67,6 +69,7 @@ fun LibraryItem.toEntity(): LibraryItemEntity = LibraryItemEntity(
     bookLanguage = bookMetadata?.language,
     bookPageCount = bookMetadata?.pageCount,
     bookCoverUrl = bookMetadata?.coverUrl,
+    bookCoverLocalPath = bookMetadata?.coverLocalPath,
     bookEdition = bookMetadata?.edition,
     createdAt = createdAt,
     updatedAt = updatedAt
