@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -47,6 +48,7 @@ import cl.rafit.memoriadeintenciones.ui.ShelfIllustration
 fun LibraryScreen(
     library: LibraryUiState,
     onOpenSettings: () -> Unit,
+    onOpenRecommendations: () -> Unit,
     onOpenCategory: (LibraryCategory) -> Unit
 ) {
     val materials = LocalLibraryMaterials.current
@@ -94,6 +96,11 @@ fun LibraryScreen(
                     style = MaterialTheme.typography.bodySmall,
                     color = materials.mutedInk
                 )
+            }
+            item {
+                Button(onClick = onOpenRecommendations, modifier = Modifier.fillMaxWidth()) {
+                    Text("Tengo tiempo libre")
+                }
             }
             items(libraryCategories, key = { category -> category.key }) { category ->
                 CategoryShelf(

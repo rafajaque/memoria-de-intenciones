@@ -46,6 +46,7 @@ import cl.rafit.memoriadeintenciones.domain.LibraryStatus
 import cl.rafit.memoriadeintenciones.domain.BookCatalogProposal
 import cl.rafit.memoriadeintenciones.domain.BookMetadata
 import cl.rafit.memoriadeintenciones.domain.ItemExperience
+import cl.rafit.memoriadeintenciones.domain.RecommendationPriority
 import cl.rafit.memoriadeintenciones.data.catalog.BookCatalogRateLimitedException
 import cl.rafit.memoriadeintenciones.ui.LibraryPaper
 import cl.rafit.memoriadeintenciones.ui.BookCover
@@ -67,6 +68,7 @@ fun AddItemScreen(
     onFindBook: (suspend (String) -> Result<List<BookCatalogProposal>>)? = null,
     onSaveExperience: (suspend (Long, ItemExperience) -> Result<Unit>)? = null,
     onDeleteExperience: (suspend (Long) -> Result<Unit>)? = null,
+    onSetRecommendationPriority: (suspend (Long, RecommendationPriority) -> Result<Unit>)? = null,
     onBack: () -> Unit,
     onSaved: () -> Unit
 ) {
@@ -75,6 +77,9 @@ fun AddItemScreen(
     val editing = existingItem != null
     var title by remember(existingItem?.id) { mutableStateOf(existingItem?.title.orEmpty()) }
     var status by remember(existingItem?.id) { mutableStateOf(existingItem?.status ?: LibraryStatus.TO_CONSUME) }
+    var recommendationPriority by remember(existingItem?.id) {
+        mutableStateOf(existingItem?.recommendationPriority ?: RecommendationPriority.NORMAL)
+    }
     var duration by remember(existingItem?.id) { mutableStateOf(existingItem?.durationMinutes?.toString().orEmpty()) }
     var notes by remember(existingItem?.id) { mutableStateOf(existingItem?.notes.orEmpty()) }
     var isbn by remember(existingItem?.id) { mutableStateOf(existingItem?.bookMetadata?.isbn.orEmpty()) }
@@ -366,6 +371,26 @@ fun AddItemScreen(
                 )
             }
             item {
+                Text("Prioridad para recomendaciones", style = MaterialTheme.typography.labelLarge)
+                Column(Modifier.selectableGroup()) {
+                    RecommendationPriority.entries.forEach { option ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .selectable(
+                                    selected = recommendationPriority == option,
+                                    role = Role.RadioButton
+                                ) { recommendationPriority = option }
+                                .padding(vertical = 2.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(selected = recommendationPriority == option, onClick = null)
+                            Text(recommendationPriorityLabel(option), modifier = Modifier.padding(start = 8.dp))
+                        }
+                    }
+                }
+            }
+            item {
                 OutlinedTextField(
                     value = notes,
                     onValueChange = { notes = it; formError = null },
@@ -405,7 +430,11 @@ fun AddItemScreen(
                                 onUpdate(existingItem, title, status, parsedDuration, notes, bookMetadata).map { existingItem.id }
                             }
                             savedIdResult.onSuccess { savedId ->
-                                if (showsExperience && onSaveExperience != null) {
+                                val priorityResult = onSetRecommendationPriority?.invoke(savedId, recommendationPriority)
+                                if (priorityResult?.isFailure == true) {
+                                    saving = false
+                                    formError = priorityResult.exceptionOrNull()?.message ?: "No se pudo guardar la prioridad."
+                                } else if (showsExperience && onSaveExperience != null) {
                                     val hasExperience = experiencePlatform.isNotBlank() || experienceRating != null ||
                                         experienceComment.isNotBlank() || experienceStartedAt != null || experienceFinishedAt != null
                                     val experienceResult = if (hasExperience) {
@@ -490,6 +519,12 @@ private fun experienceOptions(category: StoredCategory): List<String> = when (ca
     StoredCategory.MOVIE -> listOf("Cine", "Streaming", "TV", "Blu-ray / DVD", "Otro")
     StoredCategory.SERIES -> listOf("Streaming", "TV", "Blu-ray / DVD", "Otro")
     StoredCategory.GAME -> listOf("PC", "PlayStation", "Xbox", "Nintendo Switch", "Móvil", "Otro")
+}
+
+private fun recommendationPriorityLabel(priority: RecommendationPriority): String = when (priority) {
+    RecommendationPriority.LOW -> "Baja"
+    RecommendationPriority.NORMAL -> "Normal"
+    RecommendationPriority.HIGH -> "Alta"
 }
 
 private fun formatExperienceDate(millis: Long?): String? = millis?.let {

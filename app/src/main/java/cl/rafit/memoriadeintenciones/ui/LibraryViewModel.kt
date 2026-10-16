@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import cl.rafit.memoriadeintenciones.RecommendationPreferencesStore
 import cl.rafit.memoriadeintenciones.domain.Recommendation
 import cl.rafit.memoriadeintenciones.domain.RecommendationEngine
+import cl.rafit.memoriadeintenciones.domain.RecommendationPriority
 import cl.rafit.memoriadeintenciones.data.LibraryRepository
 import cl.rafit.memoriadeintenciones.data.catalog.BookCatalogRepository
 import cl.rafit.memoriadeintenciones.data.local.BookCoverStorage
@@ -99,6 +100,10 @@ class LibraryViewModel(
 
     suspend fun dismissRecommendation(itemId: Long): Result<Unit> = runCatching {
         repository.recordRecommendationDismissed(itemId)
+    }
+
+    suspend fun setRecommendationPriority(itemId: Long, priority: RecommendationPriority): Result<Unit> = runCatching {
+        repository.setRecommendationPriority(itemId, priority)
     }
 
     suspend fun add(

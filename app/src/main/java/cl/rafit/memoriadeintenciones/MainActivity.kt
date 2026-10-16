@@ -144,6 +144,7 @@ private object Destinations {
     const val ADD_ITEM = "add/{categoryKey}"
     const val EDIT_ITEM = "edit/{itemId}"
     const val ISBN_SCAN = "isbn-scan"
+    const val RECOMMENDATIONS = "recommendations"
 
     fun shelf(categoryKey: String) = "shelf/$categoryKey"
     fun addItem(categoryKey: String) = "add/$categoryKey"
@@ -157,6 +158,7 @@ private fun MemoriaNavigation(
     onThemeSelected: (AppTheme) -> Unit
 ) {
     val navController = rememberNavController()
+    val scope = rememberCoroutineScope()
     val library by viewModel.uiState.collectAsState()
 
     NavHost(navController = navController, startDestination = Destinations.LIBRARY) {
@@ -164,7 +166,26 @@ private fun MemoriaNavigation(
             LibraryScreen(
                 library = library,
                 onOpenSettings = { navController.navigate(Destinations.SETTINGS) },
+                onOpenRecommendations = { navController.navigate(Destinations.RECOMMENDATIONS) },
                 onOpenCategory = { category -> navController.navigate(Destinations.shelf(category.key)) }
+            )
+        }
+        composable(Destinations.RECOMMENDATIONS) {
+            val recommendationState by viewModel.recommendationUiState.collectAsState()
+            RecommendationScreen(
+                state = recommendationState,
+                onMinutesChanged = viewModel::setRecommendationMinutes,
+                onAccept = { recommendation ->
+                    scope.launch { viewModel.acceptRecommendation(recommendation.item.id) }
+                },
+                onPostpone = { recommendation ->
+                    scope.launch { viewModel.postponeRecommendation(recommendation.item.id) }
+                },
+                onDismiss = { recommendation ->
+                    scope.launch { viewModel.dismissRecommendation(recommendation.item.id) }
+                },
+                onRealize = { recommendation -> navController.navigate(Destinations.editItem(recommendation.item.id)) },
+                onBack = { navController.popBackStack() }
             )
         }
         composable(Destinations.SETTINGS) {
@@ -203,6 +224,7 @@ private fun MemoriaNavigation(
                     onDelete = viewModel::delete,
                     onSaveExperience = viewModel::saveExperience,
                     onDeleteExperience = viewModel::deleteExperience,
+                    onSetRecommendationPriority = viewModel::setRecommendationPriority,
                     onFindBook = viewModel::findBookByIsbn,
                     scannedIsbn = navController.currentBackStackEntry?.savedStateHandle?.get<String>("scannedIsbn"),
                     onScanIsbn = if (category.storedCategory == cl.rafit.memoriadeintenciones.domain.LibraryCategory.BOOK) ({ navController.navigate(Destinations.ISBN_SCAN) }) else null,
@@ -238,6 +260,7 @@ private fun MemoriaNavigation(
                     onDelete = viewModel::delete,
                     onSaveExperience = viewModel::saveExperience,
                     onDeleteExperience = viewModel::deleteExperience,
+                    onSetRecommendationPriority = viewModel::setRecommendationPriority,
                     onBack = { navController.popBackStack() },
                     onSaved = { navController.popBackStack() }
                 )
