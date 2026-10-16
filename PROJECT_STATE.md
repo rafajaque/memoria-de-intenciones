@@ -30,7 +30,10 @@
 - APK debug instalada en `memoria-api36`; se recorrió Biblioteca → Libros → Agregar título.
 - Se concedió el permiso de cámara y la pantalla `Escanear ISBN` abrió correctamente.
 - Al salir del escáner se conservó el formulario manual y no se creó ningún registro.
-- Bloqueo: la escena de cámara del emulador no contiene una etiqueta EAN-13/ISBN utilizable; no se afirma detección ni consulta real hasta disponer de un código físico o fixture de cámara.
+- Se inspeccionó la imagen real `Desktop/Memoria de intenciones/ISBN/www-001006524304570-01.avif`: contiene el ISBN `978-84-663-7497-2` y su código de barras. El original no se modificó.
+- El AVD se configuró con una copia PNG de prueba mediante `-camera-back imagefile:<ruta>` y la vista de cámara mostró la portada, pero el encuadre quedó ampliado sobre el texto y dejó el código de barras fuera de pantalla. No se afirma detección ni consulta real todavía.
+- Se añadió el fixture centrado `app/src/androidTest/assets/isbn-9788466374972.png` y el procedimiento reproducible en `docs/evaluation/recorrido-isbn-avd.md`; el original AVIF permanece intacto.
+- Bloqueo actual: la instancia administrada del AVD conservó el fotograma anterior y debe cerrarse completamente antes de arrancar con el fixture centrado. El flujo de permisos, navegación y salida manual sí está comprobado.
 - El alta de Libros incluye el acceso al escáner ISBN. CameraX analiza EAN-13 en vivo con ML Kit, valida localmente y retorna el código leído al formulario; no persiste imágenes. Aún falta convertir la respuesta de Google Books en campos editables y guardarla como `BookMetadata`.
 
 ### Autocompletado Google Books — Fase 4 parcial, 2026-10-16
