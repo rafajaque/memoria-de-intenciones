@@ -194,6 +194,13 @@ La base Room subió de versión 1 a 2 mediante una migración que añade `durati
 - Las actualizaciones de SDK y dependencias deben planificarse por separado; no se cambian versiones solo para silenciar advertencias.
 - Android Studio se verificó ejecutándose con el proyecto como argumento; los archivos temporales de arranques anteriores no afectan la ejecución actual.
 
+### Validación de libros terminados — 2026-10-16
+
+- Un Libro marcado como `TERMINADO` exige seleccionar fecha de término antes de guardar; la fecha de inicio permanece opcional.
+- La experiencia de lectura se muestra también durante el alta de un libro terminado y se persiste junto con el título recién creado.
+- La validación se aplica igualmente al editar libros terminados existentes que todavía no tengan fecha de término.
+- `compileDebugKotlin`, `assembleDebug`, `lintDebug` y `compileDebugAndroidTestKotlin`: `BUILD SUCCESSFUL`. Falta el recorrido manual en el Redmi 12 5G.
+
 ## Siguiente acción exacta
 
-Repetir el recorrido con una etiqueta EAN-13/ISBN visible para el emulador; comprobar propuesta, portada, cancelación y consulta sin conectividad.
+Instalar la APK debug actualizada en el Redmi 12 5G y comprobar: libro terminado sin fecha bloqueado; libro terminado con fecha guardado; fechas persistentes al reabrir.

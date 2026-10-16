@@ -223,7 +223,7 @@ fun AddItemScreen(
                     color = materials.mutedInk
                 )
             }
-            if (editing && status == LibraryStatus.COMPLETED && onSaveExperience != null) {
+            if (status == LibraryStatus.COMPLETED && onSaveExperience != null) {
                 item {
                     Text("EXPERIENCIA", style = MaterialTheme.typography.labelSmall, color = materials.mutedInk)
                     Text("Opcional: registra cómo fue esta historia.", style = MaterialTheme.typography.bodySmall, color = materials.mutedInk)
@@ -265,6 +265,8 @@ fun AddItemScreen(
                                     experiencePlatform = ""
                                     experienceRating = null
                                     experienceComment = ""
+                                    experienceStartedAt = null
+                                    experienceFinishedAt = null
                                 } }
                             },
                             modifier = Modifier.fillMaxWidth()
@@ -355,28 +357,36 @@ fun AddItemScreen(
                     onClick = {
                         attemptedSave = true
                         if (title.isBlank() || (duration.isNotBlank() && (parsedDuration == null || parsedDuration <= 0))) return@Button
+                        if (
+                            category.storedCategory == StoredCategory.BOOK &&
+                                status == LibraryStatus.COMPLETED &&
+                                experienceFinishedAt == null
+                        ) {
+                            formError = "Selecciona la fecha de término para un libro terminado."
+                            return@Button
+                        }
                         saving = true
                         scope.launch {
-                            val result = if (existingItem == null) {
-                                onSave(title, category.storedCategory, status, parsedDuration, notes, bookMetadata).map { }
+                            val savedIdResult = if (existingItem == null) {
+                                onSave(title, category.storedCategory, status, parsedDuration, notes, bookMetadata)
                             } else {
-                                onUpdate(existingItem, title, status, parsedDuration, notes, bookMetadata)
+                                onUpdate(existingItem, title, status, parsedDuration, notes, bookMetadata).map { existingItem.id }
                             }
-                            result.onSuccess {
-                                if (existingItem != null && status == LibraryStatus.COMPLETED && onSaveExperience != null) {
+                            savedIdResult.onSuccess { savedId ->
+                                if (status == LibraryStatus.COMPLETED && onSaveExperience != null) {
                                     val hasExperience = experiencePlatform.isNotBlank() || experienceRating != null ||
                                         experienceComment.isNotBlank() || experienceStartedAt != null || experienceFinishedAt != null
                                     val experienceResult = if (hasExperience) {
-                                        onSaveExperience(existingItem.id, ItemExperience(
+                                        onSaveExperience(savedId, ItemExperience(
                                             platform = experiencePlatform,
                                             rating = experienceRating,
                                             comment = experienceComment,
                                             startedAt = experienceStartedAt,
                                             finishedAt = experienceFinishedAt,
-                                            createdAt = existingItem.experience?.createdAt ?: 0L
+                                            createdAt = existingItem?.experience?.createdAt ?: 0L
                                         ))
-                                    } else if (existingItem.experience != null && onDeleteExperience != null) {
-                                        onDeleteExperience(existingItem.id)
+                                    } else if (existingItem?.experience != null && onDeleteExperience != null) {
+                                        onDeleteExperience(savedId)
                                     } else null
                                     experienceResult?.onFailure { error ->
                                         saving = false

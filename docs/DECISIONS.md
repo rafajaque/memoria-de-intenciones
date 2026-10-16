@@ -248,6 +248,14 @@
 - **Validación:** el término no puede ser anterior al inicio; ambas fechas son opcionales porque una persona puede no querer registrar el recorrido completo.
 - **Persistencia:** Room 5→6 añade dos columnas nullable en `item_experiences`; las experiencias existentes no pierden información.
 
+## 2026-10-16 — Fecha de término obligatoria para libros terminados
+
+- **Clasificación:** MVP; validación de formulario.
+- **Decisión:** un Libro marcado como `TERMINADO` debe tener fecha de término antes de poder guardarse. La fecha de inicio sigue siendo opcional.
+- **Motivo:** el estado terminado debe representar un recorrido de lectura cerrado y no dejar una ficha incompleta en el historial.
+- **Alta y edición:** la sección de experiencia aparece también al crear un libro terminado; si se confirma una fecha, la experiencia se guarda usando el ID recién creado. Las demás categorías no reciben esta obligación.
+- **Compatibilidad:** al editar libros terminados existentes sin fecha, la misma validación solicita completar la fecha antes de guardar.
+
 ## 2026-10-16 — Autocompletado editable desde Google Books
 
 - **Clasificación:** MVP; integración de UI y consulta, sin guardado automático.
