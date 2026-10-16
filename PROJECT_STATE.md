@@ -27,7 +27,7 @@
 - `git diff --check`: sin errores.
 - Las pruebas de persistencia de prioridad/feedback y del motor de ranking compilan correctamente.
 - `connectedDebugAndroidTest` no pudo completar la instalación en el dispositivo disponible: `INSTALL_FAILED_USER_RESTRICTED` / `Install canceled by user`. No se cuentan pruebas instrumentadas ejecutadas en ese intento.
-- No se realizó todavía un recorrido visual en AVD/Redmi del nuevo flujo; queda como siguiente verificación externa cuando el dispositivo permita instalar la APK de tests.
+- Verificación manual en Redmi 12 5G: la APK más reciente se instaló conservando datos, la biblioteca abrió correctamente y el usuario confirmó que el flujo de recomendaciones funciona bien. La inyección de toques por ADB permanece restringida, por lo que la confirmación de interacción se realizó directamente en el teléfono.
 
 ### Commits de la iteración
 
@@ -256,4 +256,4 @@ La base Room subió de versión 1 a 2 mediante una migración que añade `durati
 
 ## Siguiente acción exacta
 
-Completar el recorrido manual del Hito 5 en un AVD o Redmi que permita instalar la APK de tests; después iniciar el Hito 6 preparando la versión de evaluación, checklist de flujos, etiqueta Git y protocolos de evidencia.
+Iniciar el Hito 6: preparar la versión de evaluación, checklist de flujos, etiqueta Git y protocolos de evidencia.
