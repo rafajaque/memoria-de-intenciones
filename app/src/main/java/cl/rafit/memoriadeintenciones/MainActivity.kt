@@ -1,5 +1,7 @@
 package cl.rafit.memoriadeintenciones
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -28,15 +30,22 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import cl.rafit.memoriadeintenciones.data.RoomLibraryRepository
 import cl.rafit.memoriadeintenciones.data.local.MemoriaDatabase
+import cl.rafit.memoriadeintenciones.data.shared.IncomingSharedImage
+import cl.rafit.memoriadeintenciones.data.shared.OnDeviceOcrTextReader
+import cl.rafit.memoriadeintenciones.data.shared.SharedImageImporter
 import cl.rafit.memoriadeintenciones.ui.LibraryUiState
 import cl.rafit.memoriadeintenciones.ui.LibraryViewModel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
 
 private val ComponentActivity.preferencesDataStore by preferencesDataStore(name = "preferences")
 
 class MainActivity : ComponentActivity() {
+    private val sharedImage = MutableStateFlow<IncomingSharedImage?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        sharedImage.value = intent.toIncomingSharedImage()
         enableEdgeToEdge()
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightNavigationBars = true
@@ -51,24 +60,47 @@ class MainActivity : ComponentActivity() {
             val preferences = remember { ThemePreferences(preferencesDataStore) }
             val scope = rememberCoroutineScope()
             var selectedTheme by remember { mutableStateOf(AppTheme.MADERA) }
+            val incomingSharedImage by sharedImage.collectAsState()
             LaunchedEffect(preferences) { selectedTheme = preferences.readTheme() }
 
             MemoriaTheme(theme = selectedTheme) {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     Box(Modifier.safeDrawingPadding()) {
-                        MemoriaNavigation(
-                            viewModel = libraryViewModel,
-                            selectedTheme = selectedTheme,
-                            onThemeSelected = { theme ->
-                                selectedTheme = theme
-                                scope.launch { preferences.saveTheme(theme) }
-                            }
-                        )
+                        if (incomingSharedImage == null) {
+                            MemoriaNavigation(
+                                viewModel = libraryViewModel,
+                                selectedTheme = selectedTheme,
+                                onThemeSelected = { theme ->
+                                    selectedTheme = theme
+                                    scope.launch { preferences.saveTheme(theme) }
+                                }
+                            )
+                        } else {
+                            SharedCaptureScreen(
+                                incoming = incomingSharedImage!!,
+                                importer = remember { SharedImageImporter(applicationContext) },
+                                ocrReader = remember { OnDeviceOcrTextReader(applicationContext) },
+                                onClose = { sharedImage.value = null }
+                            )
+                        }
                     }
                 }
             }
         }
     }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        sharedImage.value = intent.toIncomingSharedImage()
+    }
+}
+
+@Suppress("DEPRECATION")
+private fun Intent.toIncomingSharedImage(): IncomingSharedImage? {
+    if (action != Intent.ACTION_SEND) return null
+    val stream = getParcelableExtra<Uri>(Intent.EXTRA_STREAM) ?: return null
+    return IncomingSharedImage(uri = stream, declaredMimeType = type)
 }
 
 private class LibraryViewModelFactory(

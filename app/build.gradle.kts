@@ -46,6 +46,8 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    // MVP OCR local: modelo latino empaquetado (~4 MB por arquitectura), sin descarga ni red.
+    implementation(libs.mlkit.text.recognition)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)

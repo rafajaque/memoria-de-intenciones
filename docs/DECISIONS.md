@@ -135,3 +135,13 @@
 - **Decisión:** preparar protocolos y plantillas sin datos reales antes de incorporar OCR o reclutar participantes. Las capturas, consentimientos firmados y resultados se mantienen fuera de Git.
 - **Motivo:** preservar privacidad, definir la verdad de referencia antes de medir y evitar resultados no reproducibles o datos personales versionados.
 - **Referencia:** `docs/evaluation/`.
+
+## 2026-10-15 — Spike de Share Sheet y OCR local
+
+- **Clasificación:** MVP técnico; no crea ni persiste títulos todavía.
+- **Decisión:** aceptar imágenes JPEG, PNG y WebP mediante `ACTION_SEND`, copiarlas inmediatamente a `filesDir/shared-captures` y ejecutar OCR con el modelo latino empaquetado de ML Kit 16.0.1.
+- **Privacidad:** la imagen no sale del dispositivo. La copia temporal se elimina al cerrar o abandonar la pantalla y también ante un error. El texto se muestra sólo en memoria y no se guarda en Room ni en registros.
+- **Límite:** cada captura se limita a 15 MiB para controlar el uso del almacenamiento privado; se rechazan tipos no compatibles y copias incompletas.
+- **Dependencia:** `com.google.mlkit:text-recognition:16.0.1`. Se eligió la variante empaquetada porque permite OCR local desde el primer uso, sin descarga ni servicios de Google; su costo aproximado es 4 MB por arquitectura. No se agregó `kotlinx-coroutines-play-services` porque la espera de `Task` se adapta con coroutines estándar.
+- **Verificación:** dos pruebas instrumentadas cubren copia privada, rechazo de tipo/tamaño y limpieza de archivos; la suite completa aprobó 6 pruebas en `memoria-api36`.
+- **Límite evaluativo:** la comprobación manual usó una captura técnica local. Las cinco capturas autorizadas y anonimizadas, junto con su verdad de referencia, siguen pendientes y no se sustituyen con este smoke test.
