@@ -198,3 +198,12 @@
 - **Privacidad:** sólo se envía el ISBN normalizado; no se incluyen notas, capturas, identidad ni historial. El cliente usa timeouts de 8 segundos para que la consulta no bloquee indefinidamente el alta.
 - **Persistencia:** el título y los metadatos se mantienen editables y sólo se escriben en Room mediante la confirmación existente. La portada se conserva como URL; su descarga local queda para una iteración posterior.
 - **Verificación:** `assembleDebug lintDebug connectedDebugAndroidTest --console=plain` terminó con `BUILD SUCCESSFUL`; 15 pruebas instrumentadas aprobadas en `memoria-api36`.
+
+## 2026-10-16 — Visualización de portadas
+
+- **Clasificación:** MVP; presentación visual sin almacenamiento propio de imágenes.
+- **Decisión:** usar Coil 2.7.0 (`coil-compose`) para cargar URLs HTTPS de Google Books en la selección, el formulario y las fichas de Libros. La versión se mantiene en `gradle/libs.versions.toml`.
+- **Motivo:** integra carga asíncrona y caché de ejecución con poco código, sin introducir un repositorio de archivos ni una migración Room. El costo de mantenimiento es una dependencia adicional y su caché temporal.
+- **Fallback:** una URL ausente o fallida muestra un placeholder local y no impide guardar la ficha.
+- **Privacidad:** no se suben imágenes del usuario; sólo se solicita al proveedor la URL de portada ya entregada por Google Books.
+- **Verificación:** `assembleDebug`, `lintDebug` y `connectedDebugAndroidTest` terminaron con `BUILD SUCCESSFUL`; 15 pruebas instrumentadas aprobadas en `memoria-api36`.

@@ -34,6 +34,12 @@
 - La portada todavía se conserva como URL de metadato; la descarga y el placeholder visual quedan pendientes de la siguiente microtarea.
 - `assembleDebug lintDebug connectedDebugAndroidTest --console=plain`: `BUILD SUCCESSFUL`; 15 pruebas instrumentadas aprobadas en `memoria-api36`.
 
+### Portadas visuales — Fase 4, 2026-10-16
+
+- Coil 2.7.0 carga la URL de portada en la propuesta, el formulario y las fichas de Libros; el fallo o ausencia de URL muestra un placeholder local.
+- No se guarda ningún archivo de imagen propio: la URL sigue siendo el único dato persistido y Coil gestiona su caché de ejecución.
+- `assembleDebug`, `lintDebug` y `connectedDebugAndroidTest` terminaron con `BUILD SUCCESSFUL`; 15 pruebas instrumentadas aprobadas en `memoria-api36`.
+
 Se implementó el spike técnico de Share Sheet + OCR local. La aplicación recibe una imagen compartida, la valida como JPEG/PNG/WebP, la copia a `filesDir/shared-captures` con límite de 15 MiB y usa el modelo latino empaquetado de ML Kit para leer texto en el dispositivo. La pantalla explica el alcance y muestra el resultado sólo de forma temporal: no crea un título, no escribe en Room, no registra texto y elimina la copia al cerrar, abandonar o fallar.
 
 El resultado OCR ahora puede abrir una confirmación explícita: propone un título editable, permite escoger categoría y sólo guarda en Room tras pulsar `Confirmar y guardar`. Descartar conserva la biblioteca sin cambios. La propuesta es una heurística local de líneas cortas; no sustituye la revisión humana ni llama catálogos.
@@ -135,4 +141,4 @@ La base Room subió de versión 1 a 2 mediante una migración que añade `durati
 
 ## Siguiente acción exacta
 
-Completar la descarga/visualización local de portadas y el recorrido manual del ISBN con conectividad y sin conectividad; después revisar el permiso de cámara y actualizar la evidencia visual.
+Realizar el recorrido manual del ISBN con conectividad y sin conectividad; después revisar el permiso de cámara y actualizar la evidencia visual.

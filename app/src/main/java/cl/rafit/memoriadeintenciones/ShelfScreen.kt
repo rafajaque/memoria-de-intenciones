@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import cl.rafit.memoriadeintenciones.domain.LibraryItem
 import cl.rafit.memoriadeintenciones.domain.LibraryStatus
 import cl.rafit.memoriadeintenciones.ui.BookplateMark
+import cl.rafit.memoriadeintenciones.ui.BookCover
 import cl.rafit.memoriadeintenciones.ui.CatalogueSlip
 import cl.rafit.memoriadeintenciones.ui.LibraryPaper
 import cl.rafit.memoriadeintenciones.ui.ShelfIllustration
@@ -122,14 +123,19 @@ private fun LibraryItemCard(item: LibraryItem, onClick: () -> Unit) {
                 onClick = onClick
             )
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(7.dp)) {
-            Text(item.title, style = MaterialTheme.typography.titleLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            Text(statusLabel(item.status), style = MaterialTheme.typography.labelSmall, color = materials.accent)
-            item.durationMinutes?.let { minutes ->
-                Text("Duración aproximada: $minutes min", style = MaterialTheme.typography.bodySmall, color = materials.mutedInk)
+        Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+            if (item.category == cl.rafit.memoriadeintenciones.domain.LibraryCategory.BOOK && item.bookMetadata?.coverUrl != null) {
+                BookCover(item.bookMetadata.coverUrl, item.title, Modifier.size(52.dp, 78.dp))
             }
-            item.notes?.let { note ->
-                Text(note, style = MaterialTheme.typography.bodySmall, color = materials.mutedInk)
+            Column(verticalArrangement = Arrangement.spacedBy(7.dp), modifier = Modifier.weight(1f)) {
+                Text(item.title, style = MaterialTheme.typography.titleLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(statusLabel(item.status), style = MaterialTheme.typography.labelSmall, color = materials.accent)
+                item.durationMinutes?.let { minutes ->
+                    Text("Duración aproximada: $minutes min", style = MaterialTheme.typography.bodySmall, color = materials.mutedInk)
+                }
+                item.notes?.let { note ->
+                    Text(note, style = MaterialTheme.typography.bodySmall, color = materials.mutedInk)
+                }
             }
         }
     }

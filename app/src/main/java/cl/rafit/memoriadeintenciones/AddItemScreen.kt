@@ -41,6 +41,7 @@ import cl.rafit.memoriadeintenciones.domain.LibraryStatus
 import cl.rafit.memoriadeintenciones.domain.BookCatalogProposal
 import cl.rafit.memoriadeintenciones.domain.BookMetadata
 import cl.rafit.memoriadeintenciones.ui.LibraryPaper
+import cl.rafit.memoriadeintenciones.ui.BookCover
 import kotlinx.coroutines.launch
 
 @Composable
@@ -159,7 +160,10 @@ fun AddItemScreen(
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     catalogProposals.forEach { proposal ->
                         TextButton(onClick = { applyProposal(proposal) }, modifier = Modifier.fillMaxWidth()) {
-                            Text(proposal.title + proposal.authors.firstOrNull()?.let { "\n$it" }.orEmpty())
+                            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                                BookCover(proposal.coverUrl, proposal.title, Modifier.size(48.dp, 72.dp))
+                                Text(proposal.title + proposal.authors.firstOrNull()?.let { "\n$it" }.orEmpty())
+                            }
                         }
                     }
                 }
@@ -216,7 +220,12 @@ fun AddItemScreen(
                     OutlinedTextField(publishedDate, { publishedDate = it }, Modifier.fillMaxWidth(), label = { Text("Fecha de publicación") }, singleLine = true)
                     OutlinedTextField(language, { language = it }, Modifier.fillMaxWidth(), label = { Text("Idioma") }, singleLine = true)
                     OutlinedTextField(pageCount, { pageCount = it.filter(Char::isDigit) }, Modifier.fillMaxWidth(), label = { Text("Páginas") }, singleLine = true)
-                    if (coverUrl.isNotBlank()) Text("Portada: $coverUrl", style = MaterialTheme.typography.bodySmall, color = materials.mutedInk)
+                    if (coverUrl.isNotBlank()) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                            BookCover(coverUrl, title.ifBlank { "libro" }, Modifier.size(72.dp, 108.dp))
+                            Text("La portada se cargará desde esta URL y no se guarda como archivo.", style = MaterialTheme.typography.bodySmall, color = materials.mutedInk)
+                        }
+                    }
                 }
             }
             item {
