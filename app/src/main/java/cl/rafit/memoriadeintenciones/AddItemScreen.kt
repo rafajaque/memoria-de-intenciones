@@ -239,14 +239,15 @@ fun AddItemScreen(
                 item {
                     Text(if (status == LibraryStatus.COMPLETED) "EXPERIENCIA" else "LECTURA", style = MaterialTheme.typography.labelSmall, color = materials.mutedInk)
                     Text(
-                        if (status == LibraryStatus.COMPLETED) "Opcional: registra cómo fue esta historia."
+                        if (status == LibraryStatus.COMPLETED && category.storedCategory == StoredCategory.BOOK) "Registra tu experiencia de lectura."
+                        else if (status == LibraryStatus.COMPLETED) "Opcional: registra cómo fue esta historia."
                         else "La fecha se propone automáticamente y puedes cambiarla.",
                         style = MaterialTheme.typography.bodySmall,
                         color = materials.mutedInk
                     )
-                    if (status == LibraryStatus.COMPLETED) {
+                    if (tracksBookStartDate || (status == LibraryStatus.COMPLETED && category.storedCategory != StoredCategory.BOOK)) {
                         Text(
-                            if (category.storedCategory == StoredCategory.BOOK) "Formato o soporte" else "Plataforma o soporte",
+                            if (category.storedCategory == StoredCategory.BOOK) "Formato o soporte de lectura" else "Plataforma o soporte",
                             style = MaterialTheme.typography.bodyMedium
                         )
                         OutlinedButton(onClick = { showPlatformOptions = true }, modifier = Modifier.fillMaxWidth()) {
@@ -388,6 +389,10 @@ fun AddItemScreen(
                             formError = "Selecciona la fecha de término para un libro terminado."
                             return@Button
                         }
+                        if (tracksBookStartDate && experiencePlatform.isBlank()) {
+                            formError = "Selecciona el formato o soporte de lectura."
+                            return@Button
+                        }
                         saving = true
                         scope.launch {
                             val savedIdResult = if (existingItem == null) {
@@ -440,7 +445,9 @@ fun AddItemScreen(
     if (showPlatformOptions) {
         AlertDialog(
             onDismissRequest = { showPlatformOptions = false },
-            title = { Text("Selecciona el soporte") },
+            title = {
+                Text(if (category.storedCategory == StoredCategory.BOOK) "Selecciona el formato o soporte de lectura" else "Selecciona el soporte")
+            },
             text = {
                 Column {
                     experienceOptions(category.storedCategory).forEach { option ->

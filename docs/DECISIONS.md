@@ -264,6 +264,13 @@
 - **Persistencia:** la fecha se guarda como experiencia del libro también para `EN CURSO` y `ABANDONADO`; `TERMINADO` mantiene además su fecha de término obligatoria.
 - **Migración de estado:** si un libro existente no tiene experiencia ni fecha de inicio y pasa desde `PENDIENTE` a uno de esos estados, se propone su fecha de creación como inicio; una fecha ya registrada nunca se sobrescribe automáticamente.
 
+## 2026-10-16 — Soporte de lectura obligatorio en libros activos
+
+- **Clasificación:** MVP; validación de formulario.
+- **Decisión:** un Libro en `EN CURSO`, `TERMINADO` o `ABANDONADO` debe tener un formato o soporte de lectura seleccionado.
+- **Interfaz:** el desplegable se presenta como `Formato o soporte de lectura` y conserva una lista controlada de opciones, incluida `Otro`.
+- **Alcance:** la obligación aplica sólo a Libros; las plataformas de películas, series y videojuegos mantienen sus reglas actuales.
+
 ## 2026-10-16 — Autocompletado editable desde Google Books
 
 - **Clasificación:** MVP; integración de UI y consulta, sin guardado automático.

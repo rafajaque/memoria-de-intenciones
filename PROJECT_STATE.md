@@ -208,6 +208,12 @@ La base Room subió de versión 1 a 2 mediante una migración que añade `durati
 - `assembleDebug`, `lintDebug` y `compileDebugAndroidTestKotlin`: `BUILD SUCCESSFUL`. Falta instalar esta APK en el Redmi y completar el recorrido manual.
 - Corrección posterior: al cambiar un libro existente desde `PENDIENTE` a uno de esos estados sin fecha, se usa su fecha de creación como propuesta inicial; `compileDebugKotlin`: `BUILD SUCCESSFUL`.
 
+### Soporte de lectura obligatorio — 2026-10-16
+
+- Libros en `EN CURSO`, `TERMINADO` o `ABANDONADO` deben seleccionar `Formato o soporte de lectura` antes de guardar.
+- El selector aparece también en `EN CURSO` y `ABANDONADO`; las categorías restantes no cambian.
+- `compileDebugKotlin`: `BUILD SUCCESSFUL`. Falta completar la verificación agrupada y el recorrido manual en Redmi.
+
 ## Siguiente acción exacta
 
 Instalar la APK debug actualizada en el Redmi 12 5G y comprobar: fecha automática al elegir `EN CURSO`, `TERMINADO` o `ABANDONADO`; cambio manual; persistencia al reabrir.
