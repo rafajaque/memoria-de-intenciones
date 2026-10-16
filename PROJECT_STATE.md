@@ -16,14 +16,14 @@ Se implementó el spike técnico de Share Sheet + OCR local. La aplicación reci
 
 La nueva dependencia `com.google.mlkit:text-recognition:16.0.1` aporta OCR disponible sin descarga ni red, a cambio de aproximadamente 4 MB por arquitectura. No hay permisos de almacenamiento ni de internet añadidos. El filtro del manifiesto acepta `ACTION_SEND` con `image/*`; el importador resuelve el MIME concreto desde el proveedor antes de validar.
 
-La prueba manual con una captura técnica creada en el emulador verificó que una intención `ACTION_SEND` abre la ficha de lectura y que una URI sin permiso se comunica como fallo recuperable sin exponer la ruta o URI en la interfaz. No existe aún una prueba manual exitosa con una aplicación emisora real: `adb shell` no puede otorgar al receptor el permiso temporal que entrega el Share Sheet. Tampoco se han usado ni contabilizado cinco capturas autorizadas; esa evidencia sigue pendiente según el protocolo.
+La prueba manual con una captura técnica creada en el emulador verificó que una intención `ACTION_SEND` abre la ficha de lectura y que una URI sin permiso se comunica como fallo recuperable sin exponer la ruta o URI en la interfaz. Además, una prueba instrumentada generó el texto sintético `MEMORIA OCR` como PNG, lo copió al directorio privado y comprobó su reconocimiento exitoso por ML Kit. No existe aún una prueba manual exitosa con una aplicación emisora real: `adb shell` no puede otorgar al receptor el permiso temporal que entrega el Share Sheet. Tampoco se han usado ni contabilizado cinco capturas autorizadas; esa evidencia sigue pendiente según el protocolo.
 
 ### Verificación realizada
 
 - Prueba roja: `compileDebugAndroidTestKotlin` falló inicialmente porque no existían `PrivateImageCopier` ni `SharedImageImportException`.
 - Prueba verde: `compileDebugAndroidTestKotlin` terminó con `BUILD SUCCESSFUL` tras incorporar el copiador privado.
 - `assembleDebug` y `lintDebug`: terminaron sin errores. El informe local de lint queda en `app/build/reports/lint-results-debug.html` (ignorado por Git).
-- `connectedDebugAndroidTest`: 6 pruebas aprobadas en `memoria-api36` (API 36): las cuatro de persistencia existentes y dos nuevas para copia privada, límite, tipos y limpieza tras error.
+- `connectedDebugAndroidTest`: 7 pruebas aprobadas en `memoria-api36` (API 36): las cuatro de persistencia existentes, dos para copia privada/límite/tipos/limpieza y una que reconoce `MEMORIA OCR` desde una imagen sintética privada.
 - Recorrido ADB: una `ACTION_SEND` con URI de contenido abrió la ficha `Lectura local`; la URI generada por la shell no tuvo permiso de lectura para el paquete, y la aplicación mostró el error genérico recuperable esperado. No se considera una lectura OCR exitosa.
 
 ## Último cambio comprobado anterior

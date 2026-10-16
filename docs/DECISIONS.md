@@ -143,5 +143,5 @@
 - **Privacidad:** la imagen no sale del dispositivo. La copia temporal se elimina al cerrar o abandonar la pantalla y también ante un error. El texto se muestra sólo en memoria y no se guarda en Room ni en registros.
 - **Límite:** cada captura se limita a 15 MiB para controlar el uso del almacenamiento privado; se rechazan tipos no compatibles y copias incompletas.
 - **Dependencia:** `com.google.mlkit:text-recognition:16.0.1`. Se eligió la variante empaquetada porque permite OCR local desde el primer uso, sin descarga ni servicios de Google; su costo aproximado es 4 MB por arquitectura. No se agregó `kotlinx-coroutines-play-services` porque la espera de `Task` se adapta con coroutines estándar.
-- **Verificación:** dos pruebas instrumentadas cubren copia privada, rechazo de tipo/tamaño y limpieza de archivos; la suite completa aprobó 6 pruebas en `memoria-api36`.
+- **Verificación:** tres pruebas instrumentadas cubren copia privada, rechazo de tipo/tamaño, limpieza de archivos y una lectura OCR exitosa sobre una imagen sintética privada. La suite completa aprobó 7 pruebas en `memoria-api36`.
 - **Límite evaluativo:** la comprobación manual usó una captura técnica local. Las cinco capturas autorizadas y anonimizadas, junto con su verdad de referencia, siguen pendientes y no se sustituyen con este smoke test.
