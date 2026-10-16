@@ -41,3 +41,7 @@ La navegación, el permiso y la pantalla del escáner funcionaron. Con el fixtur
 Una captura temporal del primer frame mostró que el AVD aplica un recorte asimétrico distinto al de la previsualización. La captura se retiró después de inspeccionarla; no se guardan imágenes de cámara en la aplicación.
 
 Se hizo una segunda prueba con una fuente `imagefile` de `640×480` y el EAN-13 reducido. El AVD alternó entre una previsualización en blanco y un encuadre ampliado que cortaba el código, sin producir lectura. La prueba queda bloqueada en el entorno del AVD; `adb devices -l` no muestra ningún dispositivo físico disponible.
+
+## Resultado final en dispositivo físico
+
+El 16 de octubre de 2026 se repitió el recorrido en un Xiaomi Redmi 12 5G. La cámara leyó un ISBN real, el catálogo completó automáticamente los datos de la ficha y el libro se guardó correctamente en la estantería Libros. Google Books respondió `HTTP 429` durante la sesión; el respaldo Open Library permitió completar el flujo sin edición manual.
