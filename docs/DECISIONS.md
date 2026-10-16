@@ -294,3 +294,14 @@
 - **Fallback:** una URL ausente o fallida muestra un placeholder local y no impide guardar la ficha.
 - **Privacidad:** no se suben imágenes del usuario; sólo se solicita al proveedor la URL de portada ya entregada por Google Books.
 - **Verificación:** `assembleDebug`, `lintDebug` y `connectedDebugAndroidTest` terminaron con `BUILD SUCCESSFUL`; 15 pruebas instrumentadas aprobadas en `memoria-api36`.
+
+## 2026-10-16 — Hito 5: recomendación local “Tengo tiempo libre”
+
+- **Clasificación:** MVP; diseño aprobado para implementación.
+- **Decisión:** recomendar sólo títulos `PENDIENTE` mediante una función pura y determinista que combina ajuste al tiempo, prioridad, antigüedad, afinidad local y feedback.
+- **Datos:** películas, series y videojuegos reutilizan su duración aproximada existente; no se añaden géneros, plataformas, capítulos ni catálogos. Los libros tampoco requieren metadatos nuevos para este hito.
+- **Persistencia:** prioridad y feedback se guardan localmente en Room; pesos mínimos y preferencias se guardan en DataStore, con valores neutrales para registros existentes.
+- **Explicabilidad:** cada razón visible se genera desde el mismo factor y umbral que afectó la puntuación; la duración desconocida se penaliza suavemente y se comunica.
+- **Acciones:** aceptar y posponer ajustan feedback local; descartar excluye sin borrar; realizar abre la ficha existente y conserva sus validaciones.
+- **Privacidad:** no se consultan servicios remotos ni se envía historial, notas o feedback.
+- **Referencia:** especificación en `docs/superpowers/specs/2026-10-16-tengo-tiempo-libre-design.md`.
