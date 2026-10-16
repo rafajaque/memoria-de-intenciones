@@ -9,6 +9,7 @@ import cl.rafit.memoriadeintenciones.domain.LibraryCategory
 import cl.rafit.memoriadeintenciones.domain.BookMetadata
 import cl.rafit.memoriadeintenciones.domain.LibraryStatus
 import cl.rafit.memoriadeintenciones.domain.ItemExperience
+import cl.rafit.memoriadeintenciones.domain.RecommendationPriority
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -29,7 +30,11 @@ class RoomLibraryRepositoryTest {
         database = Room.inMemoryDatabaseBuilder(context, MemoriaDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        repository = RoomLibraryRepository(database.libraryItemDao(), database.experienceDao())
+        repository = RoomLibraryRepository(
+            database.libraryItemDao(),
+            database.experienceDao(),
+            database.recommendationFeedbackDao()
+        )
     }
 
     @After
@@ -150,5 +155,35 @@ class RoomLibraryRepositoryTest {
 
         repository.deleteExperience(item.id)
         assertNull(repository.observeAll().first().single().experience)
+    }
+
+    @Test
+    fun recommendationPriorityAndFeedbackPersistLocally() = runBlocking {
+        repository.add(
+            title = "Pendiente para recomendar",
+            category = LibraryCategory.GAME,
+            status = LibraryStatus.TO_CONSUME,
+            durationMinutes = 90,
+            notes = null,
+            bookMetadata = null,
+            now = 70L
+        )
+        val item = repository.observeAll().first().single()
+
+        assertEquals(RecommendationPriority.NORMAL, item.recommendationPriority)
+        repository.setRecommendationPriority(item.id, RecommendationPriority.HIGH)
+        repository.recordRecommendationAccepted(item.id)
+        repository.recordRecommendationPostponed(item.id)
+        repository.recordRecommendationDismissed(item.id)
+
+        val stored = repository.observeAll().first().single()
+        assertEquals(RecommendationPriority.HIGH, stored.recommendationPriority)
+        assertEquals(1, stored.recommendationFeedback.acceptedCount)
+        assertEquals(1, stored.recommendationFeedback.postponedCount)
+        assertEquals(true, stored.recommendationFeedback.dismissed)
+
+        repository.delete(item.id)
+        assertEquals(emptyList<Any>(), repository.observeAll().first())
+        assertEquals(emptyList<Any>(), database.recommendationFeedbackDao().observeAll().first())
     }
 }

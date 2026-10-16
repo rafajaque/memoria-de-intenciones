@@ -19,10 +19,12 @@ data class LibraryItem(
     val title: String,
     val category: LibraryCategory,
     val status: LibraryStatus = LibraryStatus.TO_CONSUME,
+    val recommendationPriority: RecommendationPriority = RecommendationPriority.NORMAL,
     val durationMinutes: Int? = null,
     val notes: String? = null,
     val bookMetadata: BookMetadata? = null,
     val experience: ItemExperience? = null,
+    val recommendationFeedback: RecommendationFeedback = RecommendationFeedback(),
     val createdAt: Long,
     val updatedAt: Long
 )

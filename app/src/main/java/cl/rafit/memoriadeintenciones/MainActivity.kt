@@ -61,7 +61,11 @@ class MainActivity : ComponentActivity() {
         val libraryViewModel = ViewModelProvider(
             this,
             LibraryViewModelFactory(
-                repository = RoomLibraryRepository(database.libraryItemDao(), database.experienceDao()),
+                repository = RoomLibraryRepository(
+                    database.libraryItemDao(),
+                    database.experienceDao(),
+                    database.recommendationFeedbackDao()
+                ),
                 bookCoverStorage = BookCoverStorage(applicationContext)
             )
         )[LibraryViewModel::class.java]

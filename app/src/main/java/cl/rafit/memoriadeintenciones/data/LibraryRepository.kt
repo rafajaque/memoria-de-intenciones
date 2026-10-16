@@ -2,6 +2,7 @@ package cl.rafit.memoriadeintenciones.data
 
 import cl.rafit.memoriadeintenciones.data.local.LibraryItemDao
 import cl.rafit.memoriadeintenciones.data.local.ExperienceDao
+import cl.rafit.memoriadeintenciones.data.local.RecommendationFeedbackDao
 import cl.rafit.memoriadeintenciones.data.local.toDomain
 import cl.rafit.memoriadeintenciones.data.local.toEntity
 import cl.rafit.memoriadeintenciones.domain.LibraryCategory
@@ -9,9 +10,12 @@ import cl.rafit.memoriadeintenciones.domain.LibraryItem
 import cl.rafit.memoriadeintenciones.domain.LibraryStatus
 import cl.rafit.memoriadeintenciones.domain.BookMetadata
 import cl.rafit.memoriadeintenciones.domain.ItemExperience
+import cl.rafit.memoriadeintenciones.domain.RecommendationFeedback
+import cl.rafit.memoriadeintenciones.domain.RecommendationPriority
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.first
 
 interface LibraryRepository {
     fun observeAll(): Flow<List<LibraryItem>>
@@ -39,27 +43,35 @@ interface LibraryRepository {
     suspend fun delete(id: Long)
     suspend fun saveExperience(itemId: Long, experience: ItemExperience)
     suspend fun deleteExperience(itemId: Long)
+    suspend fun setRecommendationPriority(itemId: Long, priority: RecommendationPriority)
+    suspend fun recordRecommendationAccepted(itemId: Long)
+    suspend fun recordRecommendationPostponed(itemId: Long)
+    suspend fun recordRecommendationDismissed(itemId: Long)
 }
 
 class RoomLibraryRepository(
     private val dao: LibraryItemDao,
-    private val experienceDao: ExperienceDao? = null
+    private val experienceDao: ExperienceDao? = null,
+    private val recommendationFeedbackDao: RecommendationFeedbackDao? = null
 ) : LibraryRepository {
-    override fun observeAll(): Flow<List<LibraryItem>> =
-        experienceDao?.let { experiences ->
-            combine(dao.observeAll(), experiences.observeAll()) { items, records ->
-                val byItem = records.associateBy { it.itemId }
-                items.map { it.toDomain(byItem[it.id]?.toDomain()) }
-            }
-        } ?: dao.observeAll().map { items -> items.map { it.toDomain() } }
+    override fun observeAll(): Flow<List<LibraryItem>> = observeItems(dao.observeAll())
 
-    override fun observeByCategory(category: LibraryCategory): Flow<List<LibraryItem>> =
-        experienceDao?.let { experiences ->
-            combine(dao.observeByCategory(category.name), experiences.observeAll()) { items, records ->
-                val byItem = records.associateBy { it.itemId }
-                items.map { it.toDomain(byItem[it.id]?.toDomain()) }
+    override fun observeByCategory(category: LibraryCategory): Flow<List<LibraryItem>> = observeItems(dao.observeByCategory(category.name))
+
+    private fun observeItems(items: Flow<List<cl.rafit.memoriadeintenciones.data.local.LibraryItemEntity>>): Flow<List<LibraryItem>> {
+        val experiences = experienceDao?.observeAll() ?: flowOf(emptyList())
+        val feedback = recommendationFeedbackDao?.observeAll() ?: flowOf(emptyList())
+        return combine(items, experiences, feedback) { records, experienceRecords, feedbackRecords ->
+            val byExperience = experienceRecords.associateBy { it.itemId }
+            val byFeedback = feedbackRecords.associateBy { it.itemId }
+            records.map { record ->
+                record.toDomain(
+                    experience = byExperience[record.id]?.toDomain(),
+                    recommendationFeedback = byFeedback[record.id]?.toDomain() ?: RecommendationFeedback()
+                )
             }
-        } ?: dao.observeByCategory(category.name).map { items -> items.map { it.toDomain() } }
+        }
+    }
 
     override suspend fun add(
         title: String,
@@ -126,6 +138,7 @@ class RoomLibraryRepository(
     override suspend fun delete(id: Long) {
         dao.deleteById(id)
         experienceDao?.deleteByItemId(id)
+        recommendationFeedbackDao?.deleteByItemId(id)
     }
 
     override suspend fun saveExperience(itemId: Long, experience: ItemExperience) {
@@ -146,5 +159,28 @@ class RoomLibraryRepository(
     override suspend fun deleteExperience(itemId: Long) {
         require(experienceDao != null) { "Las experiencias no están disponibles" }
         experienceDao.deleteByItemId(itemId)
+    }
+
+    override suspend fun setRecommendationPriority(itemId: Long, priority: RecommendationPriority) {
+        val item = dao.observeAll().first().firstOrNull { it.id == itemId } ?: return
+        dao.update(item.copy(recommendationPriority = priority.name, updatedAt = System.currentTimeMillis()))
+    }
+
+    override suspend fun recordRecommendationAccepted(itemId: Long) = updateFeedback(itemId) { feedback ->
+        feedback.copy(acceptedCount = feedback.acceptedCount + 1, dismissed = false)
+    }
+
+    override suspend fun recordRecommendationPostponed(itemId: Long) = updateFeedback(itemId) { feedback ->
+        feedback.copy(postponedCount = feedback.postponedCount + 1)
+    }
+
+    override suspend fun recordRecommendationDismissed(itemId: Long) = updateFeedback(itemId) { feedback ->
+        feedback.copy(dismissed = true)
+    }
+
+    private suspend fun updateFeedback(itemId: Long, update: (RecommendationFeedback) -> RecommendationFeedback) {
+        val feedbackDao = recommendationFeedbackDao ?: error("Las recomendaciones no están disponibles")
+        val current = feedbackDao.observeAll().first().firstOrNull { it.itemId == itemId }?.toDomain() ?: RecommendationFeedback()
+        feedbackDao.upsert(update(current).copy(updatedAt = System.currentTimeMillis()).toEntity(itemId))
     }
 }

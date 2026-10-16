@@ -8,13 +8,14 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [LibraryItemEntity::class, ExperienceEntity::class],
-    version = 6,
+    entities = [LibraryItemEntity::class, ExperienceEntity::class, RecommendationFeedbackEntity::class],
+    version = 8,
     exportSchema = false
 )
 abstract class MemoriaDatabase : RoomDatabase() {
     abstract fun libraryItemDao(): LibraryItemDao
     abstract fun experienceDao(): ExperienceDao
+    abstract fun recommendationFeedbackDao(): RecommendationFeedbackDao
 
     companion object {
         @Volatile
@@ -26,7 +27,7 @@ abstract class MemoriaDatabase : RoomDatabase() {
                     context.applicationContext,
                     MemoriaDatabase::class.java,
                     "memoria_de_intenciones.db"
-                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6).build().also { instance = it }
+                ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8).build().also { instance = it }
             }
 
         val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -64,6 +65,18 @@ abstract class MemoriaDatabase : RoomDatabase() {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE item_experiences ADD COLUMN startedAt INTEGER")
                 db.execSQL("ALTER TABLE item_experiences ADD COLUMN finishedAt INTEGER")
+            }
+        }
+
+        val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE library_items ADD COLUMN recommendationPriority TEXT NOT NULL DEFAULT 'NORMAL'")
+            }
+        }
+
+        val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS recommendation_feedback (itemId INTEGER NOT NULL, acceptedCount INTEGER NOT NULL, postponedCount INTEGER NOT NULL, dismissed INTEGER NOT NULL, updatedAt INTEGER NOT NULL, PRIMARY KEY(itemId))")
             }
         }
     }

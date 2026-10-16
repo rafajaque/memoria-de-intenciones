@@ -7,6 +7,7 @@ import cl.rafit.memoriadeintenciones.domain.LibraryItem
 import cl.rafit.memoriadeintenciones.domain.LibraryStatus
 import cl.rafit.memoriadeintenciones.domain.BookMetadata
 import cl.rafit.memoriadeintenciones.domain.ItemExperience
+import cl.rafit.memoriadeintenciones.domain.RecommendationPriority
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
@@ -17,6 +18,7 @@ data class LibraryItemEntity(
     val title: String,
     val category: String,
     val status: String,
+    val recommendationPriority: String = "NORMAL",
     val durationMinutes: Int? = null,
     val notes: String?,
     val bookIsbn: String? = null,
@@ -32,11 +34,16 @@ data class LibraryItemEntity(
     val updatedAt: Long
 )
 
-fun LibraryItemEntity.toDomain(experience: ItemExperience? = null): LibraryItem = LibraryItem(
+fun LibraryItemEntity.toDomain(
+    experience: ItemExperience? = null,
+    recommendationFeedback: cl.rafit.memoriadeintenciones.domain.RecommendationFeedback = cl.rafit.memoriadeintenciones.domain.RecommendationFeedback()
+): LibraryItem = LibraryItem(
     id = id,
     title = title,
     category = LibraryCategory.valueOf(category),
     status = LibraryStatus.valueOf(status),
+    recommendationPriority = runCatching { RecommendationPriority.valueOf(recommendationPriority) }
+        .getOrDefault(RecommendationPriority.NORMAL),
     durationMinutes = durationMinutes,
     notes = notes,
     bookMetadata = bookIsbn?.let { isbn ->
@@ -53,6 +60,7 @@ fun LibraryItemEntity.toDomain(experience: ItemExperience? = null): LibraryItem 
         )
     },
     experience = experience,
+    recommendationFeedback = recommendationFeedback,
     createdAt = createdAt,
     updatedAt = updatedAt
 )
@@ -62,6 +70,7 @@ fun LibraryItem.toEntity(): LibraryItemEntity = LibraryItemEntity(
     title = title,
     category = category.name,
     status = status.name,
+    recommendationPriority = recommendationPriority.name,
     durationMinutes = durationMinutes,
     notes = notes,
     bookIsbn = bookMetadata?.isbn,
