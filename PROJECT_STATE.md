@@ -169,6 +169,7 @@ La base Room subió de versión 1 a 2 mediante una migración que añade `durati
 - Se añadió una prueba instrumentada sobre `isbn-9788466374972.png` para validar la lectura directa de `9788466374972`, además de una prueba de extracción desde texto.
 - Verificación actual: `assembleDebug lintDebug compileDebugAndroidTestKotlin --console=plain` terminó correctamente y `git diff --check` no reportó errores. Falta el recorrido manual final en el Redmi 12 5G con la captura compartida para confirmar la propuesta visible de catálogo.
 - Corrección posterior: si el ISBN se detecta pero ambos catálogos no entregan una ficha, la propuesta ya no reutiliza una línea OCR de editorial como título; deja el título vacío y solicita completarlo manualmente.
+- Verificación manual posterior en Redmi 12 5G: un segundo libro con ISBN presente en Google Books/Open Library completó correctamente título, autor y editorial, y quedó listo para guardar. El caso `9788466374972` permanece como limitación de cobertura del catálogo, no como fallo de lectura del código.
 - Pendientes de configuración anteriores al rediseño: icono de aplicación y reglas explícitas de extracción/respaldo para Android 12+. No se modificaron en esta tarea visual.
 - Las actualizaciones de SDK y dependencias deben planificarse por separado; no se cambian versiones solo para silenciar advertencias.
 - Android Studio se verificó ejecutándose con el proyecto como argumento; los archivos temporales de arranques anteriores no afectan la ejecución actual.
