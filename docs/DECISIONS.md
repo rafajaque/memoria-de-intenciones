@@ -175,3 +175,10 @@
 - **Persistencia:** Room pasa de versión 2 a 3 con `MIGRATION_2_3` aditiva; conserva todos los registros existentes. Los autores se serializan localmente como JSON y un valor dañado se interpreta como lista vacía, no como un cierre de la biblioteca.
 - **Restricción:** el repositorio rechaza metadatos bibliográficos para categorías distintas de Libros. No se guarda imagen: `coverUrl` es sólo una referencia aún no utilizada por UI.
 - **Verificación:** `gradlew.bat assembleDebug lintDebug connectedDebugAndroidTest --console=plain` terminó con `BUILD SUCCESSFUL`; 13 pruebas instrumentadas aprobadas en `memoria-api36`.
+
+## 2026-10-16 — Consulta de catálogo por ISBN
+
+- **Clasificación:** MVP; capa de datos sin interfaz.
+- **Decisión:** `GoogleBooksBookCatalogRepository` consulta sólo `isbn:<ISBN normalizado>`, limita a cinco resultados y entrega propuestas editables sin crear registros locales.
+- **Privacidad:** se rechaza un ISBN inválido antes de tocar el servicio; las pruebas usan un doble local, sin tráfico de red.
+- **Verificación:** `assembleDebug`, `lintDebug` y `connectedDebugAndroidTest` finalizaron correctamente con 15 pruebas instrumentadas en `memoria-api36`.

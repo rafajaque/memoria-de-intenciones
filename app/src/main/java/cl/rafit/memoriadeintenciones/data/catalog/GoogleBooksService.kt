@@ -10,7 +10,7 @@ import okhttp3.MediaType.Companion.toMediaType
 
 @Serializable data class GoogleBooksResponse(val items: List<GoogleBooksNetworkVolume> = emptyList())
 @Serializable data class GoogleBooksNetworkVolume(val id: String, val volumeInfo: VolumeInfo = VolumeInfo())
-@Serializable data class VolumeInfo(val title: String? = null, val authors: List<String> = emptyList(), val publisher: String? = null, val publishedDate: String? = null, val industryIdentifiers: List<BookIdentifier> = emptyList(), val imageLinks: ImageLinks? = null)
+@Serializable data class VolumeInfo(val title: String? = null, val authors: List<String> = emptyList(), val publisher: String? = null, val publishedDate: String? = null, val language: String? = null, val pageCount: Int? = null, val industryIdentifiers: List<BookIdentifier> = emptyList(), val imageLinks: ImageLinks? = null)
 @Serializable data class ImageLinks(val thumbnail: String? = null)
 
 interface GoogleBooksService {

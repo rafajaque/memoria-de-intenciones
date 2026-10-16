@@ -13,3 +13,17 @@ data class CatalogItem(
 )
 
 enum class CatalogProvider { GOOGLE_BOOKS, OPEN_LIBRARY, TMDB }
+
+// MVP: propuesta remota editable; no equivale a un registro guardado en Room.
+data class BookCatalogProposal(
+    val provider: CatalogProvider,
+    val externalId: String,
+    val title: String,
+    val isbn: String?,
+    val authors: List<String>,
+    val publisher: String?,
+    val publishedDate: String?,
+    val language: String?,
+    val pageCount: Int?,
+    val coverUrl: String?
+)
