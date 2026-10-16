@@ -6,6 +6,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import cl.rafit.memoriadeintenciones.data.local.MemoriaDatabase
 import cl.rafit.memoriadeintenciones.domain.LibraryCategory
+import cl.rafit.memoriadeintenciones.domain.BookMetadata
 import cl.rafit.memoriadeintenciones.domain.LibraryStatus
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -43,6 +44,7 @@ class RoomLibraryRepositoryTest {
             status = LibraryStatus.TO_CONSUME,
             durationMinutes = 125,
             notes = "   ",
+            bookMetadata = null,
             now = 42L
         )
 
@@ -66,6 +68,7 @@ class RoomLibraryRepositoryTest {
             status = LibraryStatus.TO_CONSUME,
             durationMinutes = 116,
             notes = null,
+            bookMetadata = null,
             now = 10L
         )
         val original = repository.observeAll().first().single()
@@ -76,6 +79,7 @@ class RoomLibraryRepositoryTest {
             status = LibraryStatus.COMPLETED,
             durationMinutes = null,
             notes = "  Volver a verla  ",
+            bookMetadata = null,
             now = 20L
         )
 
@@ -91,5 +95,31 @@ class RoomLibraryRepositoryTest {
 
         repository.delete(edited.id)
         assertEquals(emptyList<Any>(), repository.observeAll().first())
+    }
+
+    @Test
+    fun bookMetadataPersistsOnlyForBooks() = runBlocking {
+        val metadata = BookMetadata(
+            isbn = "9780306406157",
+            authors = listOf("Autor Uno", "Autora Dos"),
+            publisher = "Editorial de prueba",
+            publishedDate = "2026",
+            language = "es",
+            pageCount = 320,
+            coverUrl = "https://example.com/cover.jpg",
+            edition = "2.ª edición"
+        )
+
+        repository.add(
+            title = "Libro de prueba",
+            category = LibraryCategory.BOOK,
+            status = LibraryStatus.TO_CONSUME,
+            durationMinutes = null,
+            notes = null,
+            bookMetadata = metadata,
+            now = 50L
+        )
+
+        assertEquals(metadata, repository.observeByCategory(LibraryCategory.BOOK).first().single().bookMetadata)
     }
 }

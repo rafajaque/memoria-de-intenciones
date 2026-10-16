@@ -21,6 +21,7 @@ data class LibraryItem(
     val status: LibraryStatus = LibraryStatus.TO_CONSUME,
     val durationMinutes: Int? = null,
     val notes: String? = null,
+    val bookMetadata: BookMetadata? = null,
     val createdAt: Long,
     val updatedAt: Long
 )

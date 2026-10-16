@@ -166,3 +166,12 @@
 - **Motivo:** evita enviar códigos mal formados y permite probar la regla de negocio sin cámara, red ni datos personales.
 - **Implementación:** `domain/Isbn` acepta el dígito de control `X` de ISBN-10 y aplica las fórmulas ISO correspondientes. No guarda ni transmite el valor.
 - **Verificación:** `gradlew.bat assembleDebug lintDebug connectedDebugAndroidTest --console=plain` terminó con `BUILD SUCCESSFUL`; 12 pruebas instrumentadas aprobadas en `memoria-api36`.
+
+## 2026-10-16 — Metadatos bibliográficos locales
+
+- **Clasificación:** MVP; segunda microtarea del escáner ISBN.
+- **Decisión:** añadir `BookMetadata` opcional a un título y persistirlo en columnas nullable exclusivas de libros: ISBN, autores, editorial, fecha, idioma, páginas, URL de portada y edición.
+- **Motivo:** permite que una consulta futura precargue información sin obligar a películas, series o videojuegos a usar un esquema ajeno. La edición se conserva sólo como texto confirmado, sin inferencias.
+- **Persistencia:** Room pasa de versión 2 a 3 con `MIGRATION_2_3` aditiva; conserva todos los registros existentes. Los autores se serializan localmente como JSON y un valor dañado se interpreta como lista vacía, no como un cierre de la biblioteca.
+- **Restricción:** el repositorio rechaza metadatos bibliográficos para categorías distintas de Libros. No se guarda imagen: `coverUrl` es sólo una referencia aún no utilizada por UI.
+- **Verificación:** `gradlew.bat assembleDebug lintDebug connectedDebugAndroidTest --console=plain` terminó con `BUILD SUCCESSFUL`; 13 pruebas instrumentadas aprobadas en `memoria-api36`.

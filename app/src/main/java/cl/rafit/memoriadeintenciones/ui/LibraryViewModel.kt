@@ -6,6 +6,7 @@ import cl.rafit.memoriadeintenciones.data.LibraryRepository
 import cl.rafit.memoriadeintenciones.domain.LibraryCategory
 import cl.rafit.memoriadeintenciones.domain.LibraryItem
 import cl.rafit.memoriadeintenciones.domain.LibraryStatus
+import cl.rafit.memoriadeintenciones.domain.BookMetadata
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -34,6 +35,15 @@ class LibraryViewModel(
         status: LibraryStatus,
         durationMinutes: Int?,
         notes: String?
+    ): Result<Long> = add(title, category, status, durationMinutes, notes, null)
+
+    suspend fun add(
+        title: String,
+        category: LibraryCategory,
+        status: LibraryStatus,
+        durationMinutes: Int?,
+        notes: String?,
+        bookMetadata: BookMetadata?
     ): Result<Long> = runCatching {
         repository.add(
             title = title,
@@ -41,6 +51,7 @@ class LibraryViewModel(
             status = status,
             durationMinutes = durationMinutes,
             notes = notes,
+            bookMetadata = bookMetadata,
             now = System.currentTimeMillis()
         )
     }
@@ -53,6 +64,15 @@ class LibraryViewModel(
         status: LibraryStatus,
         durationMinutes: Int?,
         notes: String?
+    ): Result<Unit> = edit(item, title, status, durationMinutes, notes, item.bookMetadata)
+
+    suspend fun edit(
+        item: LibraryItem,
+        title: String,
+        status: LibraryStatus,
+        durationMinutes: Int?,
+        notes: String?,
+        bookMetadata: BookMetadata?
     ): Result<Unit> = runCatching {
         repository.edit(
             item = item,
@@ -60,6 +80,7 @@ class LibraryViewModel(
             status = status,
             durationMinutes = durationMinutes,
             notes = notes,
+            bookMetadata = bookMetadata,
             now = System.currentTimeMillis()
         )
     }

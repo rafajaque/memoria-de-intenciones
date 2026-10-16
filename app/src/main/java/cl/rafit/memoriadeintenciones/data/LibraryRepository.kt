@@ -6,6 +6,7 @@ import cl.rafit.memoriadeintenciones.data.local.toEntity
 import cl.rafit.memoriadeintenciones.domain.LibraryCategory
 import cl.rafit.memoriadeintenciones.domain.LibraryItem
 import cl.rafit.memoriadeintenciones.domain.LibraryStatus
+import cl.rafit.memoriadeintenciones.domain.BookMetadata
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -18,6 +19,7 @@ interface LibraryRepository {
         status: LibraryStatus,
         durationMinutes: Int?,
         notes: String?,
+        bookMetadata: BookMetadata?,
         now: Long
     ): Long
     suspend fun insert(item: LibraryItem): Long
@@ -27,6 +29,7 @@ interface LibraryRepository {
         status: LibraryStatus,
         durationMinutes: Int?,
         notes: String?,
+        bookMetadata: BookMetadata?,
         now: Long
     )
     suspend fun update(item: LibraryItem)
@@ -48,11 +51,13 @@ class RoomLibraryRepository(
         status: LibraryStatus,
         durationMinutes: Int?,
         notes: String?,
+        bookMetadata: BookMetadata?,
         now: Long
     ): Long {
         val normalizedTitle = title.trim()
         require(normalizedTitle.isNotEmpty()) { "El título no puede estar vacío" }
         require(durationMinutes == null || durationMinutes > 0) { "La duración debe ser mayor que cero" }
+        require(category == LibraryCategory.BOOK || bookMetadata == null) { "Los metadatos bibliográficos sólo corresponden a Libros" }
         return insert(
             LibraryItem(
                 title = normalizedTitle,
@@ -60,6 +65,7 @@ class RoomLibraryRepository(
                 status = status,
                 durationMinutes = durationMinutes,
                 notes = notes?.trim()?.takeIf { it.isNotEmpty() },
+                bookMetadata = bookMetadata,
                 createdAt = now,
                 updatedAt = now
             )
@@ -77,17 +83,20 @@ class RoomLibraryRepository(
         status: LibraryStatus,
         durationMinutes: Int?,
         notes: String?,
+        bookMetadata: BookMetadata?,
         now: Long
     ) {
         val normalizedTitle = title.trim()
         require(normalizedTitle.isNotEmpty()) { "El título no puede estar vacío" }
         require(durationMinutes == null || durationMinutes > 0) { "La duración debe ser mayor que cero" }
+        require(item.category == LibraryCategory.BOOK || bookMetadata == null) { "Los metadatos bibliográficos sólo corresponden a Libros" }
         update(
             item.copy(
                 title = normalizedTitle,
                 status = status,
                 durationMinutes = durationMinutes,
                 notes = notes?.trim()?.takeIf { it.isNotEmpty() },
+                bookMetadata = bookMetadata,
                 updatedAt = now
             )
         )

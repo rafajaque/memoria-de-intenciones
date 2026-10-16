@@ -19,6 +19,9 @@
 - `gradlew.bat assembleDebug lintDebug connectedDebugAndroidTest --console=plain`: `BUILD SUCCESSFUL`; 12 pruebas instrumentadas aprobadas en el AVD `memoria-api36`.
 - Durante el primer intento no había dispositivo conectado; se inició el AVD y se repitió la verificación completa correctamente.
 - Diseño aprobado: `docs/superpowers/specs/2026-10-15-escaner-isbn-libros-design.md` (commit `398a0fc`). Plan por fases: `docs/superpowers/plans/2026-10-16-plan-escaner-isbn-libros.md`.
+- Se incorporó `BookMetadata` opcional para Libros: ISBN, autores, editorial, fecha, idioma, páginas, URL de portada y edición. Room migra de 2 a 3 mediante columnas nullable; películas, series y videojuegos mantienen sus fichas sin esos datos.
+- La prueba de repositorio comprueba que esos metadatos se persisten para Libros. `assembleDebug`, `lintDebug` y `connectedDebugAndroidTest` terminaron con `BUILD SUCCESSFUL`; 13 pruebas instrumentadas aprobadas en `memoria-api36`.
+- Todavía no hay consulta activa a Google Books, permiso/cámara, previsualización, descarga de portada ni exposición de los campos en el formulario. La siguiente microtarea es el contrato de búsqueda por ISBN, sin conectar UI.
 
 Se implementó el spike técnico de Share Sheet + OCR local. La aplicación recibe una imagen compartida, la valida como JPEG/PNG/WebP, la copia a `filesDir/shared-captures` con límite de 15 MiB y usa el modelo latino empaquetado de ML Kit para leer texto en el dispositivo. La pantalla explica el alcance y muestra el resultado sólo de forma temporal: no crea un título, no escribe en Room, no registra texto y elimina la copia al cerrar, abandonar o fallar.
 
