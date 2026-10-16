@@ -214,6 +214,12 @@ La base Room subió de versión 1 a 2 mediante una migración que añade `durati
 - El selector aparece también en `EN CURSO` y `ABANDONADO`; las categorías restantes no cambian.
 - `compileDebugKotlin`: `BUILD SUCCESSFUL`. Falta completar la verificación agrupada y el recorrido manual en Redmi.
 
+### Valoración obligatoria al terminar — 2026-10-16
+
+- Cualquier título en `TERMINADO` debe seleccionar una valoración de 1 a 5 estrellas antes de guardar.
+- El comentario continúa siendo opcional y las reglas específicas de soporte y fechas se mantienen.
+- `assembleDebug`, `lintDebug` y `compileDebugAndroidTestKotlin`: `BUILD SUCCESSFUL`. Falta instalar esta APK y verificar el bloqueo en Redmi.
+
 ## Siguiente acción exacta
 
 Instalar la APK debug actualizada en el Redmi 12 5G y comprobar: fecha automática al elegir `EN CURSO`, `TERMINADO` o `ABANDONADO`; cambio manual; persistencia al reabrir.

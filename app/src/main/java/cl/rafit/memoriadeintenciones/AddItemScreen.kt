@@ -265,10 +265,10 @@ fun AddItemScreen(
                         }
                     }
                     if (status == LibraryStatus.COMPLETED) {
-                        Text("Valoración", style = MaterialTheme.typography.bodyMedium)
+                        Text("Valoración (obligatoria)", style = MaterialTheme.typography.bodyMedium)
                         Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
                             (1..5).forEach { value ->
-                                TextButton(onClick = { experienceRating = value }) {
+                                TextButton(onClick = { experienceRating = value; formError = null }) {
                                     Text(if (experienceRating != null && value <= experienceRating!!) "★" else "☆")
                                 }
                             }
@@ -391,6 +391,10 @@ fun AddItemScreen(
                         }
                         if (tracksBookStartDate && experiencePlatform.isBlank()) {
                             formError = "Selecciona el formato o soporte de lectura."
+                            return@Button
+                        }
+                        if (status == LibraryStatus.COMPLETED && experienceRating == null) {
+                            formError = "Selecciona una valoración de 1 a 5 estrellas."
                             return@Button
                         }
                         saving = true

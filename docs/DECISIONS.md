@@ -271,6 +271,13 @@
 - **Interfaz:** el desplegable se presenta como `Formato o soporte de lectura` y conserva una lista controlada de opciones, incluida `Otro`.
 - **Alcance:** la obligación aplica sólo a Libros; las plataformas de películas, series y videojuegos mantienen sus reglas actuales.
 
+## 2026-10-16 — Valoración obligatoria al terminar
+
+- **Clasificación:** MVP; validación de experiencia.
+- **Decisión:** cualquier título marcado como `TERMINADO` debe incluir una valoración de 1 a 5 estrellas antes de guardarse.
+- **Motivo:** una experiencia terminada debe aportar una señal mínima de conformidad para que los metadatos sean comparables y útiles.
+- **Alcance:** el comentario sigue siendo opcional; la obligación aplica a Películas, Series, Libros y Videojuegos.
+
 ## 2026-10-16 — Autocompletado editable desde Google Books
 
 - **Clasificación:** MVP; integración de UI y consulta, sin guardado automático.
