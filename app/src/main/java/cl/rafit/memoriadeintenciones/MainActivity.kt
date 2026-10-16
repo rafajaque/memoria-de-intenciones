@@ -29,8 +29,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import cl.rafit.memoriadeintenciones.data.RoomLibraryRepository
+import cl.rafit.memoriadeintenciones.data.catalog.FallbackBookCatalogRepository
 import cl.rafit.memoriadeintenciones.data.catalog.GoogleBooksBookCatalogRepository
 import cl.rafit.memoriadeintenciones.data.catalog.GoogleBooksService
+import cl.rafit.memoriadeintenciones.data.catalog.OpenLibraryBookCatalogRepository
+import cl.rafit.memoriadeintenciones.data.catalog.OpenLibraryService
 import cl.rafit.memoriadeintenciones.data.local.MemoriaDatabase
 import cl.rafit.memoriadeintenciones.data.shared.IncomingSharedImage
 import cl.rafit.memoriadeintenciones.data.shared.OnDeviceOcrTextReader
@@ -108,7 +111,10 @@ private fun Intent.toIncomingSharedImage(): IncomingSharedImage? {
 
 private class LibraryViewModelFactory(
     private val repository: RoomLibraryRepository,
-    private val bookCatalogRepository: GoogleBooksBookCatalogRepository = GoogleBooksBookCatalogRepository(GoogleBooksService.create())
+    private val bookCatalogRepository: FallbackBookCatalogRepository = FallbackBookCatalogRepository(
+        primary = GoogleBooksBookCatalogRepository(GoogleBooksService.create()),
+        fallback = OpenLibraryBookCatalogRepository(OpenLibraryService.create())
+    )
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

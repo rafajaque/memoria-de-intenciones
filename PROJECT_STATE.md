@@ -44,6 +44,7 @@
 - El alta de Libros incluye el acceso al escáner ISBN. CameraX analiza EAN-13 en vivo con ML Kit, valida localmente y retorna el código leído al formulario; no persiste imágenes. Aún falta convertir la respuesta de Google Books en campos editables y guardarla como `BookMetadata`.
 - En el Redmi 12 5G el escáner leyó un ISBN real y volvió al formulario sin la pantalla blanca reproducida previamente. Se añadió una barrera de lectura única y se detienen el analizador y el cliente ML Kit al desmontar la vista, evitando múltiples `popBackStack()`.
 - Google Books respondió `HTTP 429` durante la consulta real. El ISBN permanece en el formulario y ahora el error se transforma en un mensaje recuperable para completar el título manualmente; no se agregan reintentos automáticos.
+- Se añadió Open Library como respaldo automático para respuestas 429, fallos temporales o resultados vacíos de Google Books. El respaldo mapea título, autores, editorial, año, idioma, páginas y portada al mismo formulario editable. La consulta real de Open Library devolvió datos para `9780306406157`; `9788466374972` no tiene registro allí.
 - `assembleDebug lintDebug compileDebugAndroidTestKotlin --console=plain`: `BUILD SUCCESSFUL`. La suite conectada posterior no pudo instalar el APK de pruebas en MIUI por `INSTALL_FAILED_USER_RESTRICTED`; la suite anterior en el Redmi había aprobado 17 pruebas antes del cambio de manejo 429.
 
 ### Autocompletado Google Books — Fase 4 parcial, 2026-10-16
@@ -52,6 +53,7 @@
 - Una propuesta se aplica automáticamente; varias se muestran para selección explícita; cero resultados y errores dejan disponible el formulario manual.
 - Título, ISBN, autores, editorial, fecha, idioma, páginas y URL de portada quedan editables y sólo se guardan al confirmar el formulario.
 - La portada todavía se conserva como URL de metadato; la descarga y el placeholder visual quedan pendientes de la siguiente microtarea.
+- Google Books conserva prioridad y Open Library se consulta automáticamente sólo como respaldo cuando el primer catálogo está limitado, falla temporalmente o no devuelve propuestas. Se añadieron repositorio, servicio y pruebas de mapeo/fallback; no se añadió una clave ni se envían datos personales.
 - `assembleDebug lintDebug connectedDebugAndroidTest --console=plain`: `BUILD SUCCESSFUL`; 15 pruebas instrumentadas aprobadas en `memoria-api36`.
 
 ### Portadas visuales — Fase 4, 2026-10-16

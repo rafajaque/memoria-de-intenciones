@@ -165,6 +165,13 @@
 - **Motivo:** una cámara real entrega varios frames del mismo código y las lecturas duplicadas podían ejecutar la navegación varias veces, dejando una pantalla blanca. Reintentar automáticamente ante 429 puede aumentar el límite y no debe impedir el alta manual local.
 - **Consecuencia:** el escaneo queda validado en el Redmi 12 5G; la ficha puede completarse manualmente cuando Google Books no esté disponible.
 
+## 2026-10-16 — Respaldo automático del catálogo ISBN
+
+- **Decisión:** consultar Open Library por ISBN cuando Google Books responda 429, falle temporalmente o devuelva cero propuestas; Google Books mantiene prioridad.
+- **Motivo:** el objetivo del escaneo es completar la ficha automáticamente y un límite temporal de un proveedor no debe degradar inmediatamente el flujo a edición manual.
+- **Privacidad:** sólo se envía el ISBN normalizado; no se envían capturas, notas, identidad ni historial.
+- **Límite:** la cobertura depende de los registros públicos de cada catálogo; si ambos no encuentran la edición, el ISBN queda editable para completar manualmente.
+
 ## 2026-10-16 — Validación local de ISBN
 
 - **Clasificación:** MVP; primera microtarea del escáner ISBN.
