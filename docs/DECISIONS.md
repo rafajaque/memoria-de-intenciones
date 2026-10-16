@@ -213,6 +213,13 @@
 - **Privacidad:** la imagen y el texto permanecen en memoria/almacenamiento temporal privado; no se incorporan nuevos datos enviados al catálogo aparte del ISBN normalizado.
 - **Verificación:** compilación de APK, lint y compilación de tests instrumentados correctas; prueba instrumentada añadida para leer `9788466374972` desde el fixture de código de barras. El recorrido en Redmi 12 5G queda pendiente para validar la propuesta visible.
 
+## Futuro — Contribuciones bibliográficas opt-in
+
+- **Clasificación:** futura; fuera del MVP actual.
+- **Idea:** cuando un ISBN no tenga ficha, permitir completar el libro manualmente y ofrecer, de forma explícita y opcional, compartir sólo los metadatos bibliográficos mínimos para alimentar un catálogo reutilizable por otros usuarios.
+- **Condiciones:** conservar el guardado local aunque la persona no contribuya; deduplicar por ISBN y edición; registrar procedencia y fecha; validar o moderar cambios; excluir notas personales, capturas, identidad e historial.
+- **Escalabilidad:** separar el catálogo comunitario de la biblioteca personal y diseñar una API/proxy con autenticación, límites y protección contra abuso antes de habilitar sincronización remota.
+
 ## 2026-10-16 — Autocompletado editable desde Google Books
 
 - **Clasificación:** MVP; integración de UI y consulta, sin guardado automático.
