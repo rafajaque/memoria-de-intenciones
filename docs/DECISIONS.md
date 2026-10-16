@@ -158,3 +158,11 @@
 - **Clasificación:** preparación MVP; sin UI ni consulta activada todavía.
 - **Decisión:** normalizar resultados públicos con Retrofit y Kotlin serialization, con máximo de cinco resultados previsto en el servicio.
 - **Seguridad:** no se añade clave al repositorio; la búsqueda pública no incorpora cuenta, captura, nota ni historial.
+
+## 2026-10-16 — Validación local de ISBN
+
+- **Clasificación:** MVP; primera microtarea del escáner ISBN.
+- **Decisión:** normalizar ISBN-10 e ISBN-13 eliminando separadores y validar su checksum localmente antes de que una consulta de catálogo pueda ejecutarse.
+- **Motivo:** evita enviar códigos mal formados y permite probar la regla de negocio sin cámara, red ni datos personales.
+- **Implementación:** `domain/Isbn` acepta el dígito de control `X` de ISBN-10 y aplica las fórmulas ISO correspondientes. No guarda ni transmite el valor.
+- **Verificación:** `gradlew.bat assembleDebug lintDebug connectedDebugAndroidTest --console=plain` terminó con `BUILD SUCCESSFUL`; 12 pruebas instrumentadas aprobadas en `memoria-api36`.

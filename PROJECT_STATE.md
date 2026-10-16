@@ -12,6 +12,14 @@
 
 ## Último cambio comprobado
 
+### Escáner ISBN — Fase 1, 2026-10-16
+
+- Se añadió validación local de ISBN-10 e ISBN-13, incluida la normalización de separadores y el dígito de control `X` para ISBN-10.
+- La validación no llama red, no abre cámara y no persiste valores; será la barrera previa al lector en vivo y Google Books.
+- `gradlew.bat assembleDebug lintDebug connectedDebugAndroidTest --console=plain`: `BUILD SUCCESSFUL`; 12 pruebas instrumentadas aprobadas en el AVD `memoria-api36`.
+- Durante el primer intento no había dispositivo conectado; se inició el AVD y se repitió la verificación completa correctamente.
+- Diseño aprobado: `docs/superpowers/specs/2026-10-15-escaner-isbn-libros-design.md` (commit `398a0fc`). Plan por fases: `docs/superpowers/plans/2026-10-16-plan-escaner-isbn-libros.md`.
+
 Se implementó el spike técnico de Share Sheet + OCR local. La aplicación recibe una imagen compartida, la valida como JPEG/PNG/WebP, la copia a `filesDir/shared-captures` con límite de 15 MiB y usa el modelo latino empaquetado de ML Kit para leer texto en el dispositivo. La pantalla explica el alcance y muestra el resultado sólo de forma temporal: no crea un título, no escribe en Room, no registra texto y elimina la copia al cerrar, abandonar o fallar.
 
 El resultado OCR ahora puede abrir una confirmación explícita: propone un título editable, permite escoger categoría y sólo guarda en Room tras pulsar `Confirmar y guardar`. Descartar conserva la biblioteca sin cambios. La propuesta es una heurística local de líneas cortas; no sustituye la revisión humana ni llama catálogos.
