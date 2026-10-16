@@ -66,7 +66,8 @@ class MainActivity : ComponentActivity() {
                     database.experienceDao(),
                     database.recommendationFeedbackDao()
                 ),
-                bookCoverStorage = BookCoverStorage(applicationContext)
+                bookCoverStorage = BookCoverStorage(applicationContext),
+                recommendationPreferencesStore = RecommendationPreferencesStore(preferencesDataStore)
             )
         )[LibraryViewModel::class.java]
 
@@ -123,6 +124,7 @@ private fun Intent.toIncomingSharedImage(): IncomingSharedImage? {
 private class LibraryViewModelFactory(
     private val repository: RoomLibraryRepository,
     private val bookCoverStorage: BookCoverStorage,
+    private val recommendationPreferencesStore: RecommendationPreferencesStore,
     private val bookCatalogRepository: FallbackBookCatalogRepository = FallbackBookCatalogRepository(
         primary = GoogleBooksBookCatalogRepository(GoogleBooksService.create()),
         fallback = OpenLibraryBookCatalogRepository(OpenLibraryService.create())
@@ -131,7 +133,7 @@ private class LibraryViewModelFactory(
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         require(modelClass.isAssignableFrom(LibraryViewModel::class.java))
-        return LibraryViewModel(repository, bookCatalogRepository, bookCoverStorage) as T
+        return LibraryViewModel(repository, bookCatalogRepository, bookCoverStorage, recommendationPreferencesStore) as T
     }
 }
 

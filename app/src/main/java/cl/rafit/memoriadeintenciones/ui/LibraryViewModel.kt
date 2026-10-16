@@ -2,6 +2,9 @@ package cl.rafit.memoriadeintenciones.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cl.rafit.memoriadeintenciones.RecommendationPreferencesStore
+import cl.rafit.memoriadeintenciones.domain.Recommendation
+import cl.rafit.memoriadeintenciones.domain.RecommendationEngine
 import cl.rafit.memoriadeintenciones.data.LibraryRepository
 import cl.rafit.memoriadeintenciones.data.catalog.BookCatalogRepository
 import cl.rafit.memoriadeintenciones.data.local.BookCoverStorage
@@ -12,8 +15,11 @@ import cl.rafit.memoriadeintenciones.domain.LibraryStatus
 import cl.rafit.memoriadeintenciones.domain.BookMetadata
 import cl.rafit.memoriadeintenciones.domain.ItemExperience
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 data class LibraryUiState(val items: List<LibraryItem> = emptyList()) {
     fun itemsFor(category: LibraryCategory): List<LibraryItem> =
@@ -22,10 +28,17 @@ data class LibraryUiState(val items: List<LibraryItem> = emptyList()) {
     fun countFor(category: LibraryCategory): Int = items.count { it.category == category }
 }
 
+data class RecommendationUiState(
+    val inputMinutes: String = "",
+    val recommendations: List<Recommendation> = emptyList(),
+    val error: String? = null
+)
+
 class LibraryViewModel(
     private val repository: LibraryRepository,
     private val bookCatalogRepository: BookCatalogRepository,
-    private val bookCoverStorage: BookCoverStorage
+    private val bookCoverStorage: BookCoverStorage,
+    private val recommendationPreferencesStore: RecommendationPreferencesStore
 ) : ViewModel() {
 
     suspend fun findBookByIsbn(isbn: String): Result<List<BookCatalogProposal>> = runCatching {
@@ -38,6 +51,55 @@ class LibraryViewModel(
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = LibraryUiState()
         )
+
+    private val recommendationInputMinutes = MutableStateFlow("")
+    val recommendationUiState = combine(
+        uiState,
+        recommendationInputMinutes,
+        recommendationPreferencesStore.preferences
+    ) { library, input, storedPreferences ->
+        val minutes = input.toIntOrNull()
+        val effectiveMinutes = minutes ?: storedPreferences.lastAvailableMinutes
+        if (effectiveMinutes == null) {
+            RecommendationUiState(inputMinutes = input)
+        } else if (effectiveMinutes <= 0 || (input.isNotBlank() && minutes == null)) {
+            RecommendationUiState(inputMinutes = input, error = "Escribe un número de minutos mayor que cero.")
+        } else {
+            RecommendationUiState(
+                inputMinutes = input.ifBlank { effectiveMinutes.toString() },
+                recommendations = RecommendationEngine.rank(
+                    items = library.items,
+                    availableMinutes = effectiveMinutes,
+                    asOfMillis = System.currentTimeMillis(),
+                    preferences = storedPreferences.engine
+                )
+            )
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = RecommendationUiState()
+    )
+
+    fun setRecommendationMinutes(value: String) {
+        recommendationInputMinutes.value = value.filter(Char::isDigit)
+        val minutes = recommendationInputMinutes.value.toIntOrNull()
+        if (minutes != null && minutes > 0) {
+            viewModelScope.launch { recommendationPreferencesStore.saveLastAvailableMinutes(minutes) }
+        }
+    }
+
+    suspend fun acceptRecommendation(itemId: Long): Result<Unit> = runCatching {
+        repository.recordRecommendationAccepted(itemId)
+    }
+
+    suspend fun postponeRecommendation(itemId: Long): Result<Unit> = runCatching {
+        repository.recordRecommendationPostponed(itemId)
+    }
+
+    suspend fun dismissRecommendation(itemId: Long): Result<Unit> = runCatching {
+        repository.recordRecommendationDismissed(itemId)
+    }
 
     suspend fun add(
         title: String,
