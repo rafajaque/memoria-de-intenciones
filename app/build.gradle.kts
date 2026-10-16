@@ -52,6 +52,12 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     // MVP OCR local: modelo latino empaquetado (~4 MB por arquitectura), sin descarga ni red.
     implementation(libs.mlkit.text.recognition)
+    // MVP ISBN: CameraX muestra el flujo en vivo; ML Kit empaquetado evita descargas al primer uso (~2,4 MB).
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.mlkit.barcode.scanning)
     implementation(libs.retrofit)
     implementation(libs.retrofit.kotlinx.serialization)
     implementation(libs.kotlinx.serialization.json)

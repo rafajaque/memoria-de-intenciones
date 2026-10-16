@@ -24,6 +24,7 @@
 - Todavía no hay consulta activa a Google Books, permiso/cámara, previsualización, descarga de portada ni exposición de los campos en el formulario. La siguiente microtarea es el contrato de búsqueda por ISBN, sin conectar UI.
 - La consulta de Google Books por ISBN ya está aislada en `GoogleBooksBookCatalogRepository`; normaliza el código, limita cinco propuestas y no hace red en sus pruebas. Aún no está conectada a UI ni a cámara.
 - `assembleDebug`, `lintDebug` y `connectedDebugAndroidTest` terminaron con `BUILD SUCCESSFUL`; 15 pruebas instrumentadas aprobadas en `memoria-api36`.
+- El alta de Libros incluye el acceso al escáner ISBN. CameraX analiza EAN-13 en vivo con ML Kit, valida localmente y retorna el código leído al formulario; no persiste imágenes. Aún falta convertir la respuesta de Google Books en campos editables y guardarla como `BookMetadata`.
 
 Se implementó el spike técnico de Share Sheet + OCR local. La aplicación recibe una imagen compartida, la valida como JPEG/PNG/WebP, la copia a `filesDir/shared-captures` con límite de 15 MiB y usa el modelo latino empaquetado de ML Kit para leer texto en el dispositivo. La pantalla explica el alcance y muestra el resultado sólo de forma temporal: no crea un título, no escribe en Room, no registra texto y elimina la copia al cerrar, abandonar o fallar.
 

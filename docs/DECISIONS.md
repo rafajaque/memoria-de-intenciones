@@ -182,3 +182,11 @@
 - **Decisión:** `GoogleBooksBookCatalogRepository` consulta sólo `isbn:<ISBN normalizado>`, limita a cinco resultados y entrega propuestas editables sin crear registros locales.
 - **Privacidad:** se rechaza un ISBN inválido antes de tocar el servicio; las pruebas usan un doble local, sin tráfico de red.
 - **Verificación:** `assembleDebug`, `lintDebug` y `connectedDebugAndroidTest` finalizaron correctamente con 15 pruebas instrumentadas en `memoria-api36`.
+
+## 2026-10-16 — Escáner ISBN en vivo
+
+- **Clasificación:** MVP.
+- **Decisión:** usar CameraX 1.5.3 y ML Kit Barcode Scanning 17.3.0 empaquetado, restringido a EAN-13 y validado como ISBN antes de devolverlo al formulario.
+- **Privacidad:** no se toma, guarda ni transmite una foto; cada fotograma se usa sólo en memoria y se cierra tras analizarse. El permiso se pide al entrar al escáner.
+- **Distribución:** `android.hardware.camera` se declara opcional, manteniendo instalación posible en equipos sin cámara. El modelo empaquetado añade aproximadamente 2,4 MB pero no exige descarga inicial.
+- **Verificación:** `assembleDebug`, `lintDebug` y `connectedDebugAndroidTest` terminaron con `BUILD SUCCESSFUL`; 15 pruebas instrumentadas aprobadas.

@@ -120,6 +120,7 @@ private object Destinations {
     const val SHELF = "shelf/{categoryKey}"
     const val ADD_ITEM = "add/{categoryKey}"
     const val EDIT_ITEM = "edit/{itemId}"
+    const val ISBN_SCAN = "isbn-scan"
 
     fun shelf(categoryKey: String) = "shelf/$categoryKey"
     fun addItem(categoryKey: String) = "add/$categoryKey"
@@ -177,10 +178,21 @@ private fun MemoriaNavigation(
                     onSave = viewModel::add,
                     onUpdate = viewModel::edit,
                     onDelete = viewModel::delete,
+                    scannedIsbn = navController.currentBackStackEntry?.savedStateHandle?.get<String>("scannedIsbn"),
+                    onScanIsbn = if (category.storedCategory == cl.rafit.memoriadeintenciones.domain.LibraryCategory.BOOK) ({ navController.navigate(Destinations.ISBN_SCAN) }) else null,
                     onBack = { navController.popBackStack() },
                     onSaved = { navController.popBackStack() }
                 )
             }
+        }
+        composable(Destinations.ISBN_SCAN) {
+            IsbnScannerScreen(
+                onFound = { isbn ->
+                    navController.previousBackStackEntry?.savedStateHandle?.set("scannedIsbn", isbn)
+                    navController.popBackStack()
+                },
+                onBack = { navController.popBackStack() }
+            )
         }
         composable(
             route = Destinations.EDIT_ITEM,

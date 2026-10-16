@@ -47,6 +47,8 @@ fun AddItemScreen(
     onSave: suspend (String, StoredCategory, LibraryStatus, Int?, String?) -> Result<Long>,
     onUpdate: suspend (LibraryItem, String, LibraryStatus, Int?, String?) -> Result<Unit>,
     onDelete: suspend (Long) -> Result<Unit>,
+    scannedIsbn: String? = null,
+    onScanIsbn: (() -> Unit)? = null,
     onBack: () -> Unit,
     onSaved: () -> Unit
 ) {
@@ -117,6 +119,10 @@ fun AddItemScreen(
                 )
             }
             item {
+                if (onScanIsbn != null) {
+                    TextButton(onClick = onScanIsbn) { Text("Escanear ISBN") }
+                    scannedIsbn?.let { Text("ISBN leído: $it", style = MaterialTheme.typography.bodySmall) }
+                }
                 OutlinedTextField(
                     value = title,
                     onValueChange = { title = it; formError = null },
