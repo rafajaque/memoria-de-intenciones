@@ -7,7 +7,7 @@
 - Repositorio Git: inicializado
 - Rama actual: `feat/escanear-isbn`
 - Base de esta iteración: `97c517a` — identidad artesanal de la biblioteca
-- Último cambio comprobado: confirmación humana de propuesta OCR (MVP)
+- Último cambio comprobado: escaneo ISBN en Redmi 12 5G y manejo de límite Google Books
 - Remoto: `https://github.com/rafajaque/memoria-de-intenciones.git`
 
 ## Último cambio comprobado
@@ -42,6 +42,9 @@
 - Instrumentación temporal del APK: `ImageAnalysis` recibió frames YUV `640x480`, rotación `90°` y tres planos; ML Kit respondió `codes=[]` de forma consistente. Se retiró el log. El siguiente diagnóstico debe comparar el contenido real del frame analizado con el de `PreviewView`.
 - Se capturó un único frame YUV convertido a PNG en debug: confirmó que el AVD recorta asimétricamente la imagen. El fixture desplazado mejora el encuadre, pero la captura diagnóstica interfirió con el ciclo de análisis y se retiró junto con todos los logs; no se cambia producción sin una prueba estable.
 - El alta de Libros incluye el acceso al escáner ISBN. CameraX analiza EAN-13 en vivo con ML Kit, valida localmente y retorna el código leído al formulario; no persiste imágenes. Aún falta convertir la respuesta de Google Books en campos editables y guardarla como `BookMetadata`.
+- En el Redmi 12 5G el escáner leyó un ISBN real y volvió al formulario sin la pantalla blanca reproducida previamente. Se añadió una barrera de lectura única y se detienen el analizador y el cliente ML Kit al desmontar la vista, evitando múltiples `popBackStack()`.
+- Google Books respondió `HTTP 429` durante la consulta real. El ISBN permanece en el formulario y ahora el error se transforma en un mensaje recuperable para completar el título manualmente; no se agregan reintentos automáticos.
+- `assembleDebug lintDebug compileDebugAndroidTestKotlin --console=plain`: `BUILD SUCCESSFUL`. La suite conectada posterior no pudo instalar el APK de pruebas en MIUI por `INSTALL_FAILED_USER_RESTRICTED`; la suite anterior en el Redmi había aprobado 17 pruebas antes del cambio de manejo 429.
 
 ### Autocompletado Google Books — Fase 4 parcial, 2026-10-16
 

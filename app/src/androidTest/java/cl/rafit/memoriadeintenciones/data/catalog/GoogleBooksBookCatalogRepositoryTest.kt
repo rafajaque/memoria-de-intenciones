@@ -1,9 +1,12 @@
 package cl.rafit.memoriadeintenciones.data.catalog
 
 import kotlinx.coroutines.runBlocking
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Test
+import retrofit2.HttpException
+import retrofit2.Response
 
 class GoogleBooksBookCatalogRepositoryTest {
     @Test fun findsAndNormalizesBookProposalsWithoutNetwork() = runBlocking {
@@ -43,6 +46,20 @@ class GoogleBooksBookCatalogRepositoryTest {
             // Resultado esperado: el contrato corta antes de hacer red.
         }
         assertEquals(null, service.query)
+    }
+
+    @Test fun mapsRateLimitToRecoverableCatalogError() = runBlocking {
+        val service = object : GoogleBooksService {
+            override suspend fun search(query: String, maxResults: Int): GoogleBooksResponse =
+                throw HttpException(Response.error<GoogleBooksResponse>(429, "{}".toResponseBody()))
+        }
+
+        try {
+            GoogleBooksBookCatalogRepository(service).findByIsbn("9780306406157")
+            fail("Un 429 debe convertirse en un error de límite reconocible")
+        } catch (_: BookCatalogRateLimitedException) {
+            // El formulario puede conservar el ISBN y continuar manualmente.
+        }
     }
 
     private class RecordingService(private val response: GoogleBooksResponse) : GoogleBooksService {

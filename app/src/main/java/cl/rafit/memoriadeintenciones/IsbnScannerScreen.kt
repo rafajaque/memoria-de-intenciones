@@ -35,14 +35,24 @@ fun IsbnScannerScreen(onFound: (String) -> Unit, onBack: () -> Unit) {
         AndroidView(factory = { viewContext ->
             PreviewView(viewContext).also { previewView ->
                 val provider = ProcessCameraProvider.getInstance(viewContext)
+                val scanner = BarcodeScanning.getClient(BarcodeScannerOptions.Builder().setBarcodeFormats(Barcode.FORMAT_EAN_13).build())
+                val scanGate = IsbnScanGate()
+                previewView.addOnAttachStateChangeListener(object : android.view.View.OnAttachStateChangeListener {
+                    override fun onViewAttachedToWindow(view: android.view.View) = Unit
+                    override fun onViewDetachedFromWindow(view: android.view.View) {
+                        if (provider.isDone) provider.get().unbindAll()
+                        scanner.close()
+                    }
+                })
                 provider.addListener({
                     val camera = provider.get()
                     val preview = Preview.Builder().build().also { it.surfaceProvider = previewView.surfaceProvider }
-                    val scanner = BarcodeScanning.getClient(BarcodeScannerOptions.Builder().setBarcodeFormats(Barcode.FORMAT_EAN_13).build())
                     val analysis = ImageAnalysis.Builder().build().also { use -> use.setAnalyzer(ContextCompat.getMainExecutor(viewContext)) { image ->
                         val media = image.image
                         if (media == null) image.close() else scanner.process(com.google.mlkit.vision.common.InputImage.fromMediaImage(media, image.imageInfo.rotationDegrees)).addOnSuccessListener { codes ->
-                            codes.firstOrNull()?.rawValue?.takeIf(Isbn::isValid)?.let(onFound)
+                            val rawValue = codes.firstOrNull()?.rawValue
+                            if (rawValue?.let(Isbn::isValid) == true) use.clearAnalyzer()
+                            scanGate.emitIfValid(rawValue, onFound)
                         }.addOnCompleteListener { image.close() }
                     } }
                     camera.unbindAll(); camera.bindToLifecycle(context as androidx.lifecycle.LifecycleOwner, androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA, preview, analysis)

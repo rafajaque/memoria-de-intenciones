@@ -159,6 +159,12 @@
 - **Decisión:** normalizar resultados públicos con Retrofit y Kotlin serialization, con máximo de cinco resultados previsto en el servicio.
 - **Seguridad:** no se añade clave al repositorio; la búsqueda pública no incorpora cuenta, captura, nota ni historial.
 
+## 2026-10-16 — Lectura única y límite del catálogo ISBN
+
+- **Decisión:** el escáner acepta sólo la primera lectura válida por apertura y libera CameraX/ML Kit al salir; los errores HTTP 429 de Google Books se presentan como una limitación temporal y dejan el ISBN editable.
+- **Motivo:** una cámara real entrega varios frames del mismo código y las lecturas duplicadas podían ejecutar la navegación varias veces, dejando una pantalla blanca. Reintentar automáticamente ante 429 puede aumentar el límite y no debe impedir el alta manual local.
+- **Consecuencia:** el escaneo queda validado en el Redmi 12 5G; la ficha puede completarse manualmente cuando Google Books no esté disponible.
+
 ## 2026-10-16 — Validación local de ISBN
 
 - **Clasificación:** MVP; primera microtarea del escáner ISBN.

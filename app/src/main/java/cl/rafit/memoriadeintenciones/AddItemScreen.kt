@@ -40,6 +40,7 @@ import cl.rafit.memoriadeintenciones.domain.LibraryItem
 import cl.rafit.memoriadeintenciones.domain.LibraryStatus
 import cl.rafit.memoriadeintenciones.domain.BookCatalogProposal
 import cl.rafit.memoriadeintenciones.domain.BookMetadata
+import cl.rafit.memoriadeintenciones.data.catalog.BookCatalogRateLimitedException
 import cl.rafit.memoriadeintenciones.ui.LibraryPaper
 import cl.rafit.memoriadeintenciones.ui.BookCover
 import kotlinx.coroutines.launch
@@ -120,7 +121,12 @@ fun AddItemScreen(
                 if (proposals.size == 1) applyProposal(proposals.single())
                 if (proposals.isEmpty()) catalogError = "No encontramos una ficha. Puedes completar el formulario manualmente."
             }
-            .onFailure { error -> catalogError = error.message ?: "No se pudo consultar Google Books." }
+            .onFailure { error ->
+                catalogError = when (error) {
+                    is BookCatalogRateLimitedException -> "Google Books está temporalmente limitado. El ISBN quedó cargado; completa el título manualmente o inténtalo más tarde."
+                    else -> error.message ?: "No se pudo consultar Google Books. Puedes completar el formulario manualmente."
+                }
+            }
         catalogLoading = false
     }
 
