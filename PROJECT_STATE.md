@@ -201,6 +201,12 @@ La base Room subió de versión 1 a 2 mediante una migración que añade `durati
 - La validación se aplica igualmente al editar libros terminados existentes que todavía no tengan fecha de término.
 - `compileDebugKotlin`, `assembleDebug`, `lintDebug` y `compileDebugAndroidTestKotlin`: `BUILD SUCCESSFUL`. Falta el recorrido manual en el Redmi 12 5G.
 
+### Precarga de inicio de lectura — 2026-10-16
+
+- En Libros nuevos, los estados `EN CURSO`, `TERMINADO` y `ABANDONADO` proponen automáticamente la fecha actual como inicio.
+- La fecha se puede cambiar con calendario y se conserva al editar; también se persiste para `EN CURSO` y `ABANDONADO`.
+- `assembleDebug`, `lintDebug` y `compileDebugAndroidTestKotlin`: `BUILD SUCCESSFUL`. Falta instalar esta APK en el Redmi y completar el recorrido manual.
+
 ## Siguiente acción exacta
 
-Instalar la APK debug actualizada en el Redmi 12 5G y comprobar: libro terminado sin fecha bloqueado; libro terminado con fecha guardado; fechas persistentes al reabrir.
+Instalar la APK debug actualizada en el Redmi 12 5G y comprobar: fecha automática al elegir `EN CURSO`, `TERMINADO` o `ABANDONADO`; cambio manual; persistencia al reabrir.

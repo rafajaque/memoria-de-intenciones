@@ -256,6 +256,13 @@
 - **Alta y edición:** la sección de experiencia aparece también al crear un libro terminado; si se confirma una fecha, la experiencia se guarda usando el ID recién creado. Las demás categorías no reciben esta obligación.
 - **Compatibilidad:** al editar libros terminados existentes sin fecha, la misma validación solicita completar la fecha antes de guardar.
 
+## 2026-10-16 — Precarga de inicio de lectura
+
+- **Clasificación:** MVP; comodidad de registro.
+- **Decisión:** al crear un Libro con estado `EN CURSO`, `TERMINADO` o `ABANDONADO`, se propone como fecha de inicio el día actual del dispositivo.
+- **Edición:** la persona puede cambiar la fecha mediante el calendario; al editar un título existente se conserva la fecha ya guardada y no se reemplaza automáticamente.
+- **Persistencia:** la fecha se guarda como experiencia del libro también para `EN CURSO` y `ABANDONADO`; `TERMINADO` mantiene además su fecha de término obligatoria.
+
 ## 2026-10-16 — Autocompletado editable desde Google Books
 
 - **Clasificación:** MVP; integración de UI y consulta, sin guardado automático.

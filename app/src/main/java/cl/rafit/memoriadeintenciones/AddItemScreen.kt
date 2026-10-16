@@ -51,6 +51,7 @@ import cl.rafit.memoriadeintenciones.ui.LibraryPaper
 import cl.rafit.memoriadeintenciones.ui.BookCover
 import kotlinx.coroutines.launch
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -99,6 +100,8 @@ fun AddItemScreen(
     var showStartDatePicker by remember(existingItem?.id) { mutableStateOf(false) }
     var showFinishedDatePicker by remember(existingItem?.id) { mutableStateOf(false) }
     var showDeleteConfirmation by remember(existingItem?.id) { mutableStateOf(false) }
+    val tracksBookStartDate = category.storedCategory == StoredCategory.BOOK && status.tracksBookStartDate()
+    val showsExperience = status == LibraryStatus.COMPLETED || tracksBookStartDate
     val titleError = attemptedSave && title.isBlank()
     val parsedDuration = duration.toIntOrNull()
     val durationError = attemptedSave && duration.isNotBlank() && (parsedDuration == null || parsedDuration <= 0)
@@ -116,6 +119,13 @@ fun AddItemScreen(
                 ?.takeIf { it.coverUrl == coverUrl.trim().takeIf(String::isNotEmpty) }
                 ?.coverLocalPath
         )
+    }
+
+    LaunchedEffect(existingItem?.id, category.storedCategory, status) {
+        if (existingItem == null && tracksBookStartDate && experienceStartedAt == null) {
+            val zone = ZoneId.systemDefault()
+            experienceStartedAt = LocalDate.now(zone).atStartOfDay(zone).toInstant().toEpochMilli()
+        }
     }
 
     fun applyProposal(proposal: BookCatalogProposal) {
@@ -223,54 +233,65 @@ fun AddItemScreen(
                     color = materials.mutedInk
                 )
             }
-            if (status == LibraryStatus.COMPLETED && onSaveExperience != null) {
+            if (showsExperience && onSaveExperience != null) {
                 item {
-                    Text("EXPERIENCIA", style = MaterialTheme.typography.labelSmall, color = materials.mutedInk)
-                    Text("Opcional: registra cómo fue esta historia.", style = MaterialTheme.typography.bodySmall, color = materials.mutedInk)
+                    Text(if (status == LibraryStatus.COMPLETED) "EXPERIENCIA" else "LECTURA", style = MaterialTheme.typography.labelSmall, color = materials.mutedInk)
                     Text(
-                        if (category.storedCategory == StoredCategory.BOOK) "Formato o soporte" else "Plataforma o soporte",
-                        style = MaterialTheme.typography.bodyMedium
+                        if (status == LibraryStatus.COMPLETED) "Opcional: registra cómo fue esta historia."
+                        else "La fecha se propone automáticamente y puedes cambiarla.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = materials.mutedInk
                     )
-                    OutlinedButton(onClick = { showPlatformOptions = true }, modifier = Modifier.fillMaxWidth()) {
-                        Text(experiencePlatform.ifBlank { "Seleccionar" })
+                    if (status == LibraryStatus.COMPLETED) {
+                        Text(
+                            if (category.storedCategory == StoredCategory.BOOK) "Formato o soporte" else "Plataforma o soporte",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        OutlinedButton(onClick = { showPlatformOptions = true }, modifier = Modifier.fillMaxWidth()) {
+                            Text(experiencePlatform.ifBlank { "Seleccionar" })
+                        }
                     }
                     if (category.storedCategory == StoredCategory.BOOK) {
                         OutlinedButton(onClick = { showStartDatePicker = true }, modifier = Modifier.fillMaxWidth()) {
                             Text("Inicio: ${formatExperienceDate(experienceStartedAt) ?: "Seleccionar fecha"}")
                         }
-                        OutlinedButton(onClick = { showFinishedDatePicker = true }, modifier = Modifier.fillMaxWidth()) {
-                            Text("Término: ${formatExperienceDate(experienceFinishedAt) ?: "Seleccionar fecha"}")
-                        }
-                    }
-                    Text("Valoración", style = MaterialTheme.typography.bodyMedium)
-                    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                        (1..5).forEach { value ->
-                            TextButton(onClick = { experienceRating = value }) {
-                                Text(if (experienceRating != null && value <= experienceRating!!) "★" else "☆")
+                        if (status == LibraryStatus.COMPLETED) {
+                            OutlinedButton(onClick = { showFinishedDatePicker = true }, modifier = Modifier.fillMaxWidth()) {
+                                Text("Término: ${formatExperienceDate(experienceFinishedAt) ?: "Seleccionar fecha"}")
                             }
                         }
                     }
-                    OutlinedTextField(
-                        value = experienceComment,
-                        onValueChange = { experienceComment = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text("Comentario") },
-                        minLines = 3,
-                        maxLines = 5
-                    )
-                    if (existingItem?.experience != null && onDeleteExperience != null) {
-                        TextButton(
-                            onClick = {
-                                scope.launch { onDeleteExperience(existingItem.id).onSuccess {
-                                    experiencePlatform = ""
-                                    experienceRating = null
-                                    experienceComment = ""
-                                    experienceStartedAt = null
-                                    experienceFinishedAt = null
-                                } }
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        ) { Text("Eliminar experiencia", color = MaterialTheme.colorScheme.error) }
+                    if (status == LibraryStatus.COMPLETED) {
+                        Text("Valoración", style = MaterialTheme.typography.bodyMedium)
+                        Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                            (1..5).forEach { value ->
+                                TextButton(onClick = { experienceRating = value }) {
+                                    Text(if (experienceRating != null && value <= experienceRating!!) "★" else "☆")
+                                }
+                            }
+                        }
+                        OutlinedTextField(
+                            value = experienceComment,
+                            onValueChange = { experienceComment = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text("Comentario") },
+                            minLines = 3,
+                            maxLines = 5
+                        )
+                        if (existingItem?.experience != null && onDeleteExperience != null) {
+                            TextButton(
+                                onClick = {
+                                    scope.launch { onDeleteExperience(existingItem.id).onSuccess {
+                                        experiencePlatform = ""
+                                        experienceRating = null
+                                        experienceComment = ""
+                                        experienceStartedAt = null
+                                        experienceFinishedAt = null
+                                    } }
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) { Text("Eliminar experiencia", color = MaterialTheme.colorScheme.error) }
+                        }
                     }
                 }
             }
@@ -373,7 +394,7 @@ fun AddItemScreen(
                                 onUpdate(existingItem, title, status, parsedDuration, notes, bookMetadata).map { existingItem.id }
                             }
                             savedIdResult.onSuccess { savedId ->
-                                if (status == LibraryStatus.COMPLETED && onSaveExperience != null) {
+                                if (showsExperience && onSaveExperience != null) {
                                     val hasExperience = experiencePlatform.isNotBlank() || experienceRating != null ||
                                         experienceComment.isNotBlank() || experienceStartedAt != null || experienceFinishedAt != null
                                     val experienceResult = if (hasExperience) {
@@ -461,6 +482,10 @@ private fun experienceOptions(category: StoredCategory): List<String> = when (ca
 private fun formatExperienceDate(millis: Long?): String? = millis?.let {
     Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
 }
+
+private fun LibraryStatus.tracksBookStartDate(): Boolean = this == LibraryStatus.IN_PROGRESS ||
+    this == LibraryStatus.COMPLETED ||
+    this == LibraryStatus.ABANDONED
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
