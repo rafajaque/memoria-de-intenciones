@@ -45,3 +45,5 @@ Se hizo una segunda prueba con una fuente `imagefile` de `640×480` y el EAN-13 
 ## Resultado final en dispositivo físico
 
 El 16 de octubre de 2026 se repitió el recorrido en un Xiaomi Redmi 12 5G. La cámara leyó un ISBN real, el catálogo completó automáticamente los datos de la ficha y el libro se guardó correctamente en la estantería Libros. Google Books respondió `HTTP 429` durante la sesión; el respaldo Open Library permitió completar el flujo sin edición manual.
+
+También se verificó un ISBN ausente de ambos catálogos: la aplicación mostró el mensaje de no encontrado, conservó el ISBN para edición manual y permitió guardar y editar el título correctamente.
