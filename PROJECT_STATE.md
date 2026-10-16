@@ -256,4 +256,4 @@ La base Room subió de versión 1 a 2 mediante una migración que añade `durati
 
 ## Siguiente acción exacta
 
-Iniciar el diseño acotado del Hito 5: definir entradas, ranking determinista, desempates y razones visibles para `Tengo tiempo libre`, sin añadir recomendaciones remotas ni cambiar el alcance aprobado.
+Completar el recorrido manual del Hito 5 en un AVD o Redmi que permita instalar la APK de tests; después iniciar el Hito 6 preparando la versión de evaluación, checklist de flujos, etiqueta Git y protocolos de evidencia.
