@@ -2,10 +2,10 @@
 
 ## Estado actual
 
-- Fecha: 2026-10-15
+- Fecha: 2026-10-16
 - Proyecto Android: biblioteca navegable con gestión local de títulos
 - Repositorio Git: inicializado
-- Rama actual: `feat/share-ocr-local`
+- Rama actual: `feat/escanear-isbn`
 - Base de esta iteración: `97c517a` — identidad artesanal de la biblioteca
 - Último cambio comprobado: confirmación humana de propuesta OCR (MVP)
 - Remoto: `https://github.com/rafajaque/memoria-de-intenciones.git`
@@ -25,6 +25,14 @@
 - La consulta de Google Books por ISBN ya está aislada en `GoogleBooksBookCatalogRepository`; normaliza el código, limita cinco propuestas y no hace red en sus pruebas. Aún no está conectada a UI ni a cámara.
 - `assembleDebug`, `lintDebug` y `connectedDebugAndroidTest` terminaron con `BUILD SUCCESSFUL`; 15 pruebas instrumentadas aprobadas en `memoria-api36`.
 - El alta de Libros incluye el acceso al escáner ISBN. CameraX analiza EAN-13 en vivo con ML Kit, valida localmente y retorna el código leído al formulario; no persiste imágenes. Aún falta convertir la respuesta de Google Books en campos editables y guardarla como `BookMetadata`.
+
+### Autocompletado Google Books — Fase 4 parcial, 2026-10-16
+
+- El ISBN leído vuelve al formulario y dispara una consulta de Google Books con timeout de 8 segundos.
+- Una propuesta se aplica automáticamente; varias se muestran para selección explícita; cero resultados y errores dejan disponible el formulario manual.
+- Título, ISBN, autores, editorial, fecha, idioma, páginas y URL de portada quedan editables y sólo se guardan al confirmar el formulario.
+- La portada todavía se conserva como URL de metadato; la descarga y el placeholder visual quedan pendientes de la siguiente microtarea.
+- `assembleDebug lintDebug connectedDebugAndroidTest --console=plain`: `BUILD SUCCESSFUL`; 15 pruebas instrumentadas aprobadas en `memoria-api36`.
 
 Se implementó el spike técnico de Share Sheet + OCR local. La aplicación recibe una imagen compartida, la valida como JPEG/PNG/WebP, la copia a `filesDir/shared-captures` con límite de 15 MiB y usa el modelo latino empaquetado de ML Kit para leer texto en el dispositivo. La pantalla explica el alcance y muestra el resultado sólo de forma temporal: no crea un título, no escribe en Room, no registra texto y elimina la copia al cerrar, abandonar o fallar.
 
@@ -127,4 +135,4 @@ La base Room subió de versión 1 a 2 mediante una migración que añade `durati
 
 ## Siguiente acción exacta
 
-Completar la ejecución controlada de las cinco capturas autorizadas mediante el Share Sheet real, registrar métricas agregadas fuera de Git y revisar la nueva confirmación. Después, iniciar Hito 3: consulta de catálogos y portadas sin identidad.
+Completar la descarga/visualización local de portadas y el recorrido manual del ISBN con conectividad y sin conectividad; después revisar el permiso de cámara y actualizar la evidencia visual.

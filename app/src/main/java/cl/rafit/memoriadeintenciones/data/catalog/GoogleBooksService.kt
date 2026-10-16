@@ -7,6 +7,8 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import java.util.concurrent.TimeUnit
 
 @Serializable data class GoogleBooksResponse(val items: List<GoogleBooksNetworkVolume> = emptyList())
 @Serializable data class GoogleBooksNetworkVolume(val id: String, val volumeInfo: VolumeInfo = VolumeInfo())
@@ -17,6 +19,17 @@ interface GoogleBooksService {
     @GET("books/v1/volumes") suspend fun search(@Query("q") query: String, @Query("maxResults") maxResults: Int = 5): GoogleBooksResponse
     companion object {
         private val json = Json { ignoreUnknownKeys = true }
-        fun create(): GoogleBooksService = Retrofit.Builder().baseUrl("https://www.googleapis.com/").addConverterFactory(json.asConverterFactory("application/json".toMediaType())).build().create(GoogleBooksService::class.java)
+        fun create(apiKey: String? = null): GoogleBooksService = Retrofit.Builder()
+            .baseUrl("https://www.googleapis.com/")
+            .client(
+                OkHttpClient.Builder()
+                    .connectTimeout(8, TimeUnit.SECONDS)
+                    .readTimeout(8, TimeUnit.SECONDS)
+                    .writeTimeout(8, TimeUnit.SECONDS)
+                    .build()
+            )
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
+            .create(GoogleBooksService::class.java)
     }
 }

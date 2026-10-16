@@ -3,6 +3,8 @@ package cl.rafit.memoriadeintenciones.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cl.rafit.memoriadeintenciones.data.LibraryRepository
+import cl.rafit.memoriadeintenciones.data.catalog.BookCatalogRepository
+import cl.rafit.memoriadeintenciones.domain.BookCatalogProposal
 import cl.rafit.memoriadeintenciones.domain.LibraryCategory
 import cl.rafit.memoriadeintenciones.domain.LibraryItem
 import cl.rafit.memoriadeintenciones.domain.LibraryStatus
@@ -19,8 +21,13 @@ data class LibraryUiState(val items: List<LibraryItem> = emptyList()) {
 }
 
 class LibraryViewModel(
-    private val repository: LibraryRepository
+    private val repository: LibraryRepository,
+    private val bookCatalogRepository: BookCatalogRepository
 ) : ViewModel() {
+
+    suspend fun findBookByIsbn(isbn: String): Result<List<BookCatalogProposal>> = runCatching {
+        bookCatalogRepository.findByIsbn(isbn)
+    }
     val uiState = repository.observeAll()
         .map(::LibraryUiState)
         .stateIn(

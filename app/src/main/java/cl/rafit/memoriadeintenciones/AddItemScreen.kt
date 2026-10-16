@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,6 +38,8 @@ import androidx.compose.ui.unit.dp
 import cl.rafit.memoriadeintenciones.domain.LibraryCategory as StoredCategory
 import cl.rafit.memoriadeintenciones.domain.LibraryItem
 import cl.rafit.memoriadeintenciones.domain.LibraryStatus
+import cl.rafit.memoriadeintenciones.domain.BookCatalogProposal
+import cl.rafit.memoriadeintenciones.domain.BookMetadata
 import cl.rafit.memoriadeintenciones.ui.LibraryPaper
 import kotlinx.coroutines.launch
 
@@ -44,11 +47,12 @@ import kotlinx.coroutines.launch
 fun AddItemScreen(
     category: LibraryCategory,
     existingItem: LibraryItem? = null,
-    onSave: suspend (String, StoredCategory, LibraryStatus, Int?, String?) -> Result<Long>,
-    onUpdate: suspend (LibraryItem, String, LibraryStatus, Int?, String?) -> Result<Unit>,
+    onSave: suspend (String, StoredCategory, LibraryStatus, Int?, String?, BookMetadata?) -> Result<Long>,
+    onUpdate: suspend (LibraryItem, String, LibraryStatus, Int?, String?, BookMetadata?) -> Result<Unit>,
     onDelete: suspend (Long) -> Result<Unit>,
     scannedIsbn: String? = null,
     onScanIsbn: (() -> Unit)? = null,
+    onFindBook: (suspend (String) -> Result<List<BookCatalogProposal>>)? = null,
     onBack: () -> Unit,
     onSaved: () -> Unit
 ) {
@@ -59,6 +63,17 @@ fun AddItemScreen(
     var status by remember(existingItem?.id) { mutableStateOf(existingItem?.status ?: LibraryStatus.TO_CONSUME) }
     var duration by remember(existingItem?.id) { mutableStateOf(existingItem?.durationMinutes?.toString().orEmpty()) }
     var notes by remember(existingItem?.id) { mutableStateOf(existingItem?.notes.orEmpty()) }
+    var isbn by remember(existingItem?.id) { mutableStateOf(existingItem?.bookMetadata?.isbn.orEmpty()) }
+    var authors by remember(existingItem?.id) { mutableStateOf(existingItem?.bookMetadata?.authors?.joinToString(", ").orEmpty()) }
+    var publisher by remember(existingItem?.id) { mutableStateOf(existingItem?.bookMetadata?.publisher.orEmpty()) }
+    var publishedDate by remember(existingItem?.id) { mutableStateOf(existingItem?.bookMetadata?.publishedDate.orEmpty()) }
+    var language by remember(existingItem?.id) { mutableStateOf(existingItem?.bookMetadata?.language.orEmpty()) }
+    var pageCount by remember(existingItem?.id) { mutableStateOf(existingItem?.bookMetadata?.pageCount?.toString().orEmpty()) }
+    var coverUrl by remember(existingItem?.id) { mutableStateOf(existingItem?.bookMetadata?.coverUrl.orEmpty()) }
+    var catalogProposals by remember { mutableStateOf<List<BookCatalogProposal>>(emptyList()) }
+    var catalogError by remember { mutableStateOf<String?>(null) }
+    var catalogLoading by remember { mutableStateOf(false) }
+    var searchedIsbn by remember { mutableStateOf<String?>(null) }
     var attemptedSave by remember(existingItem?.id) { mutableStateOf(false) }
     var saving by remember(existingItem?.id) { mutableStateOf(false) }
     var formError by remember(existingItem?.id) { mutableStateOf<String?>(null) }
@@ -66,6 +81,47 @@ fun AddItemScreen(
     val titleError = attemptedSave && title.isBlank()
     val parsedDuration = duration.toIntOrNull()
     val durationError = attemptedSave && duration.isNotBlank() && (parsedDuration == null || parsedDuration <= 0)
+    val parsedPageCount = pageCount.toIntOrNull()
+    val bookMetadata = isbn.trim().takeIf { it.isNotEmpty() }?.let {
+        BookMetadata(
+            isbn = it,
+            authors = authors.split(",").map(String::trim).filter(String::isNotEmpty),
+            publisher = publisher.trim().takeIf(String::isNotEmpty),
+            publishedDate = publishedDate.trim().takeIf(String::isNotEmpty),
+            language = language.trim().takeIf(String::isNotEmpty),
+            pageCount = parsedPageCount?.takeIf { count -> count > 0 },
+            coverUrl = coverUrl.trim().takeIf(String::isNotEmpty)
+        )
+    }
+
+    fun applyProposal(proposal: BookCatalogProposal) {
+        title = proposal.title
+        isbn = proposal.isbn ?: isbn
+        authors = proposal.authors.joinToString(", ")
+        publisher = proposal.publisher.orEmpty()
+        publishedDate = proposal.publishedDate.orEmpty()
+        language = proposal.language.orEmpty()
+        pageCount = proposal.pageCount?.toString().orEmpty()
+        coverUrl = proposal.coverUrl.orEmpty()
+        catalogProposals = emptyList()
+    }
+
+    LaunchedEffect(scannedIsbn, onFindBook) {
+        val isbnToSearch = scannedIsbn?.takeIf { it != searchedIsbn } ?: return@LaunchedEffect
+        searchedIsbn = isbnToSearch
+        isbn = isbnToSearch
+        if (onFindBook == null) return@LaunchedEffect
+        catalogLoading = true
+        catalogError = null
+        onFindBook(isbnToSearch)
+            .onSuccess { proposals ->
+                catalogProposals = proposals
+                if (proposals.size == 1) applyProposal(proposals.single())
+                if (proposals.isEmpty()) catalogError = "No encontramos una ficha. Puedes completar el formulario manualmente."
+            }
+            .onFailure { error -> catalogError = error.message ?: "No se pudo consultar Google Books." }
+        catalogLoading = false
+    }
 
     if (showDeleteConfirmation && existingItem != null) {
         AlertDialog(
@@ -95,6 +151,23 @@ fun AddItemScreen(
         )
     }
 
+    if (catalogProposals.size > 1) {
+        AlertDialog(
+            onDismissRequest = { catalogProposals = emptyList() },
+            title = { Text("Elige una ficha") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    catalogProposals.forEach { proposal ->
+                        TextButton(onClick = { applyProposal(proposal) }, modifier = Modifier.fillMaxWidth()) {
+                            Text(proposal.title + proposal.authors.firstOrNull()?.let { "\n$it" }.orEmpty())
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { catalogProposals = emptyList() }) { Text("Completar manualmente") } }
+        )
+    }
+
     LibraryPaper(Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -121,7 +194,7 @@ fun AddItemScreen(
             item {
                 if (onScanIsbn != null) {
                     TextButton(onClick = onScanIsbn) { Text("Escanear ISBN") }
-                    scannedIsbn?.let { Text("ISBN leído: $it", style = MaterialTheme.typography.bodySmall) }
+                    scannedIsbn?.let { Text(if (catalogLoading) "Consultando Google Books…" else "ISBN leído: $it", style = MaterialTheme.typography.bodySmall) }
                 }
                 OutlinedTextField(
                     value = title,
@@ -132,6 +205,19 @@ fun AddItemScreen(
                     isError = titleError,
                     supportingText = if (titleError) ({ Text("Escribe un título para guardarlo.") }) else null
                 )
+            }
+            if (category.storedCategory == StoredCategory.BOOK && (isbn.isNotBlank() || catalogError != null)) {
+                item {
+                    Text("DATOS BIBLIOGRÁFICOS", style = MaterialTheme.typography.labelSmall, color = materials.mutedInk)
+                    catalogError?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
+                    OutlinedTextField(isbn, { isbn = it }, Modifier.fillMaxWidth(), label = { Text("ISBN") }, singleLine = true)
+                    OutlinedTextField(authors, { authors = it }, Modifier.fillMaxWidth(), label = { Text("Autores (separados por coma)") }, singleLine = true)
+                    OutlinedTextField(publisher, { publisher = it }, Modifier.fillMaxWidth(), label = { Text("Editorial") }, singleLine = true)
+                    OutlinedTextField(publishedDate, { publishedDate = it }, Modifier.fillMaxWidth(), label = { Text("Fecha de publicación") }, singleLine = true)
+                    OutlinedTextField(language, { language = it }, Modifier.fillMaxWidth(), label = { Text("Idioma") }, singleLine = true)
+                    OutlinedTextField(pageCount, { pageCount = it.filter(Char::isDigit) }, Modifier.fillMaxWidth(), label = { Text("Páginas") }, singleLine = true)
+                    if (coverUrl.isNotBlank()) Text("Portada: $coverUrl", style = MaterialTheme.typography.bodySmall, color = materials.mutedInk)
+                }
             }
             item {
                 Text("ESTADO", style = MaterialTheme.typography.labelSmall, color = materials.mutedInk)
@@ -186,9 +272,9 @@ fun AddItemScreen(
                         saving = true
                         scope.launch {
                             val result = if (existingItem == null) {
-                                onSave(title, category.storedCategory, status, parsedDuration, notes).map { }
+                                onSave(title, category.storedCategory, status, parsedDuration, notes, bookMetadata).map { }
                             } else {
-                                onUpdate(existingItem, title, status, parsedDuration, notes)
+                                onUpdate(existingItem, title, status, parsedDuration, notes, bookMetadata)
                             }
                             result.onSuccess { onSaved() }.onFailure { error ->
                                 saving = false

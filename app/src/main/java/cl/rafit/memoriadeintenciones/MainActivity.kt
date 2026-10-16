@@ -29,6 +29,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import cl.rafit.memoriadeintenciones.data.RoomLibraryRepository
+import cl.rafit.memoriadeintenciones.data.catalog.GoogleBooksBookCatalogRepository
+import cl.rafit.memoriadeintenciones.data.catalog.GoogleBooksService
 import cl.rafit.memoriadeintenciones.data.local.MemoriaDatabase
 import cl.rafit.memoriadeintenciones.data.shared.IncomingSharedImage
 import cl.rafit.memoriadeintenciones.data.shared.OnDeviceOcrTextReader
@@ -105,12 +107,13 @@ private fun Intent.toIncomingSharedImage(): IncomingSharedImage? {
 }
 
 private class LibraryViewModelFactory(
-    private val repository: RoomLibraryRepository
+    private val repository: RoomLibraryRepository,
+    private val bookCatalogRepository: GoogleBooksBookCatalogRepository = GoogleBooksBookCatalogRepository(GoogleBooksService.create())
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         require(modelClass.isAssignableFrom(LibraryViewModel::class.java))
-        return LibraryViewModel(repository) as T
+        return LibraryViewModel(repository, bookCatalogRepository) as T
     }
 }
 
@@ -178,6 +181,7 @@ private fun MemoriaNavigation(
                     onSave = viewModel::add,
                     onUpdate = viewModel::edit,
                     onDelete = viewModel::delete,
+                    onFindBook = viewModel::findBookByIsbn,
                     scannedIsbn = navController.currentBackStackEntry?.savedStateHandle?.get<String>("scannedIsbn"),
                     onScanIsbn = if (category.storedCategory == cl.rafit.memoriadeintenciones.domain.LibraryCategory.BOOK) ({ navController.navigate(Destinations.ISBN_SCAN) }) else null,
                     onBack = { navController.popBackStack() },

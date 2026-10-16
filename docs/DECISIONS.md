@@ -190,3 +190,11 @@
 - **Privacidad:** no se toma, guarda ni transmite una foto; cada fotograma se usa sólo en memoria y se cierra tras analizarse. El permiso se pide al entrar al escáner.
 - **Distribución:** `android.hardware.camera` se declara opcional, manteniendo instalación posible en equipos sin cámara. El modelo empaquetado añade aproximadamente 2,4 MB pero no exige descarga inicial.
 - **Verificación:** `assembleDebug`, `lintDebug` y `connectedDebugAndroidTest` terminaron con `BUILD SUCCESSFUL`; 15 pruebas instrumentadas aprobadas.
+
+## 2026-10-16 — Autocompletado editable desde Google Books
+
+- **Clasificación:** MVP; integración de UI y consulta, sin guardado automático.
+- **Decisión:** al volver del escáner, consultar el ISBN validado; aplicar una única propuesta automáticamente y pedir selección cuando haya varias. Los estados vacío y error conservan el formulario manual.
+- **Privacidad:** sólo se envía el ISBN normalizado; no se incluyen notas, capturas, identidad ni historial. El cliente usa timeouts de 8 segundos para que la consulta no bloquee indefinidamente el alta.
+- **Persistencia:** el título y los metadatos se mantienen editables y sólo se escriben en Room mediante la confirmación existente. La portada se conserva como URL; su descarga local queda para una iteración posterior.
+- **Verificación:** `assembleDebug lintDebug connectedDebugAndroidTest --console=plain` terminó con `BUILD SUCCESSFUL`; 15 pruebas instrumentadas aprobadas en `memoria-api36`.
