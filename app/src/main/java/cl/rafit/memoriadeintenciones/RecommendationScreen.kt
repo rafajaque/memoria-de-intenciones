@@ -57,7 +57,7 @@ fun RecommendationScreen(
                     style = MaterialTheme.typography.labelSmall,
                     color = materials.mutedInk
                 )
-                Text("Elige qué cabe hoy", style = MaterialTheme.typography.headlineLarge)
+                Text("Recomendaciones para tu tiempo disponible", style = MaterialTheme.typography.headlineLarge)
                 Text(
                     "Recomendaciones calculadas sólo con tu biblioteca local.",
                     modifier = Modifier.padding(top = 6.dp),
