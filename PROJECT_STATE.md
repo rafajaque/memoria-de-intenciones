@@ -24,6 +24,13 @@
 - Todavía no hay consulta activa a Google Books, permiso/cámara, previsualización, descarga de portada ni exposición de los campos en el formulario. La siguiente microtarea es el contrato de búsqueda por ISBN, sin conectar UI.
 - La consulta de Google Books por ISBN ya está aislada en `GoogleBooksBookCatalogRepository`; normaliza el código, limita cinco propuestas y no hace red en sus pruebas. Aún no está conectada a UI ni a cámara.
 - `assembleDebug`, `lintDebug` y `connectedDebugAndroidTest` terminaron con `BUILD SUCCESSFUL`; 15 pruebas instrumentadas aprobadas en `memoria-api36`.
+
+### Recorrido manual ISBN — parcial, 2026-10-16
+
+- APK debug instalada en `memoria-api36`; se recorrió Biblioteca → Libros → Agregar título.
+- Se concedió el permiso de cámara y la pantalla `Escanear ISBN` abrió correctamente.
+- Al salir del escáner se conservó el formulario manual y no se creó ningún registro.
+- Bloqueo: la escena de cámara del emulador no contiene una etiqueta EAN-13/ISBN utilizable; no se afirma detección ni consulta real hasta disponer de un código físico o fixture de cámara.
 - El alta de Libros incluye el acceso al escáner ISBN. CameraX analiza EAN-13 en vivo con ML Kit, valida localmente y retorna el código leído al formulario; no persiste imágenes. Aún falta convertir la respuesta de Google Books en campos editables y guardarla como `BookMetadata`.
 
 ### Autocompletado Google Books — Fase 4 parcial, 2026-10-16
@@ -141,4 +148,4 @@ La base Room subió de versión 1 a 2 mediante una migración que añade `durati
 
 ## Siguiente acción exacta
 
-Realizar el recorrido manual del ISBN con conectividad y sin conectividad; después revisar el permiso de cámara y actualizar la evidencia visual.
+Repetir el recorrido con una etiqueta EAN-13/ISBN visible para el emulador; comprobar propuesta, portada, cancelación y consulta sin conectividad.
