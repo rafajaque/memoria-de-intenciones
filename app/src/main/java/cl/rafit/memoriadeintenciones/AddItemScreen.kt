@@ -125,6 +125,8 @@ fun AddItemScreen(
         if (existingItem == null && tracksBookStartDate && experienceStartedAt == null) {
             val zone = ZoneId.systemDefault()
             experienceStartedAt = LocalDate.now(zone).atStartOfDay(zone).toInstant().toEpochMilli()
+        } else if (existingItem != null && tracksBookStartDate && experienceStartedAt == null) {
+            experienceStartedAt = existingItem.createdAt
         }
     }
 

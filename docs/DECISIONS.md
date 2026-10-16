@@ -262,6 +262,7 @@
 - **Decisión:** al crear un Libro con estado `EN CURSO`, `TERMINADO` o `ABANDONADO`, se propone como fecha de inicio el día actual del dispositivo.
 - **Edición:** la persona puede cambiar la fecha mediante el calendario; al editar un título existente se conserva la fecha ya guardada y no se reemplaza automáticamente.
 - **Persistencia:** la fecha se guarda como experiencia del libro también para `EN CURSO` y `ABANDONADO`; `TERMINADO` mantiene además su fecha de término obligatoria.
+- **Migración de estado:** si un libro existente no tiene experiencia ni fecha de inicio y pasa desde `PENDIENTE` a uno de esos estados, se propone su fecha de creación como inicio; una fecha ya registrada nunca se sobrescribe automáticamente.
 
 ## 2026-10-16 — Autocompletado editable desde Google Books
 

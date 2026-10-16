@@ -206,6 +206,7 @@ La base Room subió de versión 1 a 2 mediante una migración que añade `durati
 - En Libros nuevos, los estados `EN CURSO`, `TERMINADO` y `ABANDONADO` proponen automáticamente la fecha actual como inicio.
 - La fecha se puede cambiar con calendario y se conserva al editar; también se persiste para `EN CURSO` y `ABANDONADO`.
 - `assembleDebug`, `lintDebug` y `compileDebugAndroidTestKotlin`: `BUILD SUCCESSFUL`. Falta instalar esta APK en el Redmi y completar el recorrido manual.
+- Corrección posterior: al cambiar un libro existente desde `PENDIENTE` a uno de esos estados sin fecha, se usa su fecha de creación como propuesta inicial; `compileDebugKotlin`: `BUILD SUCCESSFUL`.
 
 ## Siguiente acción exacta
 
