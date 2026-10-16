@@ -6,7 +6,7 @@ El fixture `app/src/androidTest/assets/isbn-9788466374972.png` es una copia reco
 
 ISBN esperado: `978-84-663-7497-2`.
 
-El recorte deja el EAN-13 centrado, con margen suficiente para que la cámara virtual no lo pierda al adaptar la relación de aspecto.
+El recorte conserva el EAN-13 con margen y desplazado hacia la izquierda para compensar el recorte asimétrico observado en la cámara virtual.
 
 ## Preparar la cámara virtual
 
@@ -36,6 +36,6 @@ Si ya existe una instancia del AVD, hay que cerrarla completamente antes de arra
 
 ## Resultado de la sesión 2026-10-16
 
-La navegación, el permiso y la pantalla del escáner funcionaron. Tras reiniciar el AVD, el fixture centrado quedó visible y completo en `PreviewView`, pero CameraX no produjo una lectura visible en seis segundos. La prueba instrumentada `IsbnBarcodeFixtureTest` reconoce el mismo PNG directamente con ML Kit (`connectedDebugAndroidTest`: 16 pruebas aprobadas), por lo que el siguiente diagnóstico debe centrarse en los fotogramas entregados por `ImageAnalysis`.
+La navegación, el permiso y la pantalla del escáner funcionaron. Con el fixture desplazado, la entrada `imagefile` del AVD no mostró de forma estable el código en `PreviewView` y CameraX no produjo una lectura visible en seis segundos. También se probó temporalmente pasar rotación `0` a ML Kit, sin cambios; el código conserva la rotación entregada por CameraX. La prueba instrumentada `IsbnBarcodeFixtureTest` reconoce el mismo PNG directamente con ML Kit (`connectedDebugAndroidTest`: 16 pruebas aprobadas), por lo que el bloqueo queda acotado a la entrada virtual de `ImageAnalysis`/AVD.
 
 Una captura temporal del primer frame mostró que el AVD aplica un recorte asimétrico distinto al de la previsualización. La captura se retiró después de inspeccionarla; no se guardan imágenes de cámara en la aplicación.
