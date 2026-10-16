@@ -220,6 +220,11 @@
 - **Condiciones:** conservar el guardado local aunque la persona no contribuya; deduplicar por ISBN y edición; registrar procedencia y fecha; validar o moderar cambios; excluir notas personales, capturas, identidad e historial.
 - **Escalabilidad:** separar el catálogo comunitario de la biblioteca personal y diseñar una API/proxy con autenticación, límites y protección contra abuso antes de habilitar sincronización remota.
 
+## 2026-10-16 — Disciplina de alcance del MVP
+
+- **Decisión:** continuar sólo con el orden y los criterios del plan aprobado. Las ideas nuevas que impliquen trabajo amplio, cuentas, backend, sincronización o catálogo comunitario se registran como escalabilidad futura y no alteran el siguiente microhito.
+- **Siguiente paso planificado:** completar la gestión local de portadas del catálogo mínimo, incluyendo descarga privada y fallback visual, antes de pasar al hito de ficha y experiencias personales.
+
 ## 2026-10-16 — Autocompletado editable desde Google Books
 
 - **Clasificación:** MVP; integración de UI y consulta, sin guardado automático.
