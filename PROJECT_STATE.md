@@ -7,12 +7,14 @@
 - Repositorio Git: inicializado
 - Rama actual: `feat/share-ocr-local`
 - Base de esta iteración: `97c517a` — identidad artesanal de la biblioteca
-- Último cambio comprobado: recepción de capturas y OCR local transitorio (MVP técnico)
+- Último cambio comprobado: confirmación humana de propuesta OCR (MVP)
 - Remoto: `https://github.com/rafajaque/memoria-de-intenciones.git`
 
 ## Último cambio comprobado
 
 Se implementó el spike técnico de Share Sheet + OCR local. La aplicación recibe una imagen compartida, la valida como JPEG/PNG/WebP, la copia a `filesDir/shared-captures` con límite de 15 MiB y usa el modelo latino empaquetado de ML Kit para leer texto en el dispositivo. La pantalla explica el alcance y muestra el resultado sólo de forma temporal: no crea un título, no escribe en Room, no registra texto y elimina la copia al cerrar, abandonar o fallar.
+
+El resultado OCR ahora puede abrir una confirmación explícita: propone un título editable, permite escoger categoría y sólo guarda en Room tras pulsar `Confirmar y guardar`. Descartar conserva la biblioteca sin cambios. La propuesta es una heurística local de líneas cortas; no sustituye la revisión humana ni llama catálogos.
 
 La nueva dependencia `com.google.mlkit:text-recognition:16.0.1` aporta OCR disponible sin descarga ni red, a cambio de aproximadamente 4 MB por arquitectura. No hay permisos de almacenamiento ni de internet añadidos. El filtro del manifiesto acepta `ACTION_SEND` con `image/*`; el importador resuelve el MIME concreto desde el proveedor antes de validar.
 
@@ -23,7 +25,7 @@ La prueba manual con una captura técnica creada en el emulador verificó que un
 - Prueba roja: `compileDebugAndroidTestKotlin` falló inicialmente porque no existían `PrivateImageCopier` ni `SharedImageImportException`.
 - Prueba verde: `compileDebugAndroidTestKotlin` terminó con `BUILD SUCCESSFUL` tras incorporar el copiador privado.
 - `assembleDebug` y `lintDebug`: terminaron sin errores. El informe local de lint queda en `app/build/reports/lint-results-debug.html` (ignorado por Git).
-- `connectedDebugAndroidTest`: 7 pruebas aprobadas en `memoria-api36` (API 36): las cuatro de persistencia existentes, dos para copia privada/límite/tipos/limpieza y una que reconoce `MEMORIA OCR` desde una imagen sintética privada.
+- `connectedDebugAndroidTest`: 8 pruebas aprobadas en `memoria-api36` (API 36), incluida la prueba de propuesta OCR que cubre la unión de líneas cortas para revisión.
 - Recorrido ADB: una `ACTION_SEND` con URI de contenido abrió la ficha `Lectura local`; la URI generada por la shell no tuvo permiso de lectura para el paquete, y la aplicación mostró el error genérico recuperable esperado. No se considera una lectura OCR exitosa.
 
 ## Último cambio comprobado anterior
@@ -109,4 +111,4 @@ La base Room subió de versión 1 a 2 mediante una migración que añade `durati
 
 ## Siguiente acción exacta
 
-Revisar los protocolos creados en `docs/evaluation/` con el profesor guía o institución y ejecutar el conjunto de cinco capturas autorizadas y anonimizadas mediante un emisor real de Share Sheet. Registrar sólo métricas agregadas y la verdad de referencia fuera de Git. Con esa evidencia, decidir si se inicia el Hito 2: confirmar candidatos OCR antes de crear un título.
+Completar la ejecución controlada de las cinco capturas autorizadas mediante el Share Sheet real, registrar métricas agregadas fuera de Git y revisar la nueva confirmación. Después, iniciar Hito 3: consulta de catálogos y portadas sin identidad.

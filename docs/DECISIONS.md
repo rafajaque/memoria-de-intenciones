@@ -145,3 +145,10 @@
 - **Dependencia:** `com.google.mlkit:text-recognition:16.0.1`. Se eligió la variante empaquetada porque permite OCR local desde el primer uso, sin descarga ni servicios de Google; su costo aproximado es 4 MB por arquitectura. No se agregó `kotlinx-coroutines-play-services` porque la espera de `Task` se adapta con coroutines estándar.
 - **Verificación:** tres pruebas instrumentadas cubren copia privada, rechazo de tipo/tamaño, limpieza de archivos y una lectura OCR exitosa sobre una imagen sintética privada. La suite completa aprobó 7 pruebas en `memoria-api36`.
 - **Límite evaluativo:** la comprobación manual usó una captura técnica local. Las cinco capturas autorizadas y anonimizadas, junto con su verdad de referencia, siguen pendientes y no se sustituyen con este smoke test.
+
+## 2026-10-15 — Confirmación humana de propuesta OCR
+
+- **Clasificación:** MVP.
+- **Decisión:** el OCR entrega una propuesta local editable, no un título automático. La persona revisa título y categoría y debe pulsar `Confirmar y guardar`; `Descartar captura` no persiste nada.
+- **Motivo:** el OCR de portadas puede devolver texto parcial o erróneo, como la variante `FUEGO SNGRE` observada durante la prueba manual.
+- **Límite:** la heurística usa líneas cortas del final del texto y parte en Libros; no infiere metadatos, no consulta catálogos y no garantiza exactitud.

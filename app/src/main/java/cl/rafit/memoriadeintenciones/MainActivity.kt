@@ -80,6 +80,7 @@ class MainActivity : ComponentActivity() {
                                 incoming = incomingSharedImage!!,
                                 importer = remember { SharedImageImporter(applicationContext) },
                                 ocrReader = remember { OnDeviceOcrTextReader(applicationContext) },
+                                onSave = libraryViewModel::add,
                                 onClose = { sharedImage.value = null }
                             )
                         }
