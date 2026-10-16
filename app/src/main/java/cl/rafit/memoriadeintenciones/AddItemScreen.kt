@@ -119,7 +119,7 @@ fun AddItemScreen(
             .onSuccess { proposals ->
                 catalogProposals = proposals
                 if (proposals.size == 1) applyProposal(proposals.single())
-                if (proposals.isEmpty()) catalogError = "No encontramos una ficha. Puedes completar el formulario manualmente."
+                if (proposals.isEmpty()) catalogError = "No encontramos este ISBN en nuestros catálogos. Completa los datos manualmente."
             }
             .onFailure { error ->
                 catalogError = when (error) {

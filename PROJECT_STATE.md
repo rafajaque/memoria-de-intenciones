@@ -46,6 +46,7 @@
 - Google Books respondió `HTTP 429` durante la consulta real. El ISBN permanece en el formulario y ahora el error se transforma en un mensaje recuperable para completar el título manualmente; no se agregan reintentos automáticos.
 - Se añadió Open Library como respaldo automático para respuestas 429, fallos temporales o resultados vacíos de Google Books. El respaldo mapea título, autores, editorial, año, idioma, páginas y portada al mismo formulario editable. La consulta real de Open Library devolvió datos para `9780306406157`; `9788466374972` no tiene registro allí.
 - Verificación manual final en Xiaomi Redmi 12 5G: se escaneó un ISBN real, se rellenaron automáticamente los datos del libro usando el respaldo de catálogo y se guardó el registro en la estantería Libros.
+- Cuando ninguno de los catálogos encuentra el ISBN, el formulario conserva el código y muestra: `No encontramos este ISBN en nuestros catálogos. Completa los datos manualmente.`
 - `assembleDebug lintDebug compileDebugAndroidTestKotlin --console=plain`: `BUILD SUCCESSFUL`. La suite conectada posterior no pudo instalar el APK de pruebas en MIUI por `INSTALL_FAILED_USER_RESTRICTED`; la suite anterior en el Redmi había aprobado 17 pruebas antes del cambio de manejo 429.
 
 ### Autocompletado Google Books — Fase 4 parcial, 2026-10-16
