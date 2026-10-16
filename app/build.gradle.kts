@@ -6,6 +6,7 @@ plugins {
 }
 
 val googleBooksApiKey = providers.gradleProperty("GOOGLE_BOOKS_API_KEY").orNull.orEmpty()
+val isbnDbApiKey = providers.gradleProperty("ISBNDB_API_KEY").orNull.orEmpty()
 
 android {
     namespace = "cl.rafit.memoriadeintenciones"
@@ -17,6 +18,7 @@ android {
     }
 
     defaultConfig {
+        buildConfigField("String", "ISBNDB_API_KEY", "\"$isbnDbApiKey\"")
         applicationId = "cl.rafit.memoriadeintenciones"
         minSdk = 26
         targetSdk = 36

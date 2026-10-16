@@ -213,6 +213,15 @@
 - **Privacidad:** la imagen y el texto permanecen en memoria/almacenamiento temporal privado; no se incorporan nuevos datos enviados al catálogo aparte del ISBN normalizado.
 - **Verificación:** compilación de APK, lint y compilación de tests instrumentados correctas; prueba instrumentada añadida para leer `9788466374972` desde el fixture de código de barras. El recorrido en Redmi 12 5G queda pendiente para validar la propuesta visible.
 
+## 2026-10-16 — Tercer respaldo bibliográfico opcional
+
+- **Clasificación:** MVP opcional; respaldo de catálogo.
+- **Decisión:** encadenar ISBNdb después de Google Books y Open Library mediante `IsbnDbBookCatalogRepository`.
+- **Configuración:** la clave se lee desde la propiedad Gradle local `ISBNDB_API_KEY` y se inyecta sólo en el build local. No se guarda en Git ni se activa tráfico ISBNdb cuando la propiedad está vacía.
+- **Motivo:** algunas ediciones españolas, como `9788466374972`, no aparecen en Open Library y Google Books puede responder `429`. ISBNdb ofrece consulta directa por ISBN, pero requiere autenticación y sus propios límites/condiciones.
+- **Privacidad:** sólo se envía el ISBN normalizado; no se envían imágenes, OCR, identidad ni notas.
+- **Costo:** no se añade dependencia; se reutilizan Retrofit y kotlinx.serialization. La disponibilidad real requiere una cuenta/clave de ISBNdb y revisar sus condiciones antes de distribuir.
+
 ## 2026-10-16 — Autocompletado editable desde Google Books
 
 - **Clasificación:** MVP; integración de UI y consulta, sin guardado automático.

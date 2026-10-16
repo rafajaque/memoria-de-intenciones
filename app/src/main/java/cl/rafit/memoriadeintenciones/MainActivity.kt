@@ -34,6 +34,8 @@ import cl.rafit.memoriadeintenciones.data.catalog.GoogleBooksBookCatalogReposito
 import cl.rafit.memoriadeintenciones.data.catalog.GoogleBooksService
 import cl.rafit.memoriadeintenciones.data.catalog.OpenLibraryBookCatalogRepository
 import cl.rafit.memoriadeintenciones.data.catalog.OpenLibraryService
+import cl.rafit.memoriadeintenciones.data.catalog.IsbnDbBookCatalogRepository
+import cl.rafit.memoriadeintenciones.data.catalog.IsbnDbService
 import cl.rafit.memoriadeintenciones.data.local.MemoriaDatabase
 import cl.rafit.memoriadeintenciones.data.shared.IncomingSharedImage
 import cl.rafit.memoriadeintenciones.data.shared.OnDeviceIsbnReader
@@ -116,7 +118,10 @@ private class LibraryViewModelFactory(
     private val repository: RoomLibraryRepository,
     private val bookCatalogRepository: FallbackBookCatalogRepository = FallbackBookCatalogRepository(
         primary = GoogleBooksBookCatalogRepository(GoogleBooksService.create()),
-        fallback = OpenLibraryBookCatalogRepository(OpenLibraryService.create())
+        fallback = FallbackBookCatalogRepository(
+            primary = OpenLibraryBookCatalogRepository(OpenLibraryService.create()),
+            fallback = IsbnDbBookCatalogRepository(IsbnDbService.create(), BuildConfig.ISBNDB_API_KEY)
+        )
     )
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
