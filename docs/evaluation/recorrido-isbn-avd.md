@@ -37,3 +37,5 @@ Si ya existe una instancia del AVD, hay que cerrarla completamente antes de arra
 ## Resultado de la sesión 2026-10-16
 
 La navegación, el permiso y la pantalla del escáner funcionaron. Tras reiniciar el AVD, el fixture centrado quedó visible y completo en `PreviewView`, pero CameraX no produjo una lectura visible en seis segundos. La prueba instrumentada `IsbnBarcodeFixtureTest` reconoce el mismo PNG directamente con ML Kit (`connectedDebugAndroidTest`: 16 pruebas aprobadas), por lo que el siguiente diagnóstico debe centrarse en los fotogramas entregados por `ImageAnalysis`.
+
+Una captura temporal del primer frame mostró que el AVD aplica un recorte asimétrico distinto al de la previsualización. La captura se retiró después de inspeccionarla; no se guardan imágenes de cámara en la aplicación.
