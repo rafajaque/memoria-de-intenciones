@@ -2,7 +2,8 @@ package cl.rafit.memoriadeintenciones.domain
 
 // MVP: propuesta local y explicable; la persona siempre la revisa antes de guardar.
 object OcrCandidateExtractor {
-    fun titleFrom(text: String): String {
+    fun titleFrom(text: String, isbnDetected: Boolean = false): String {
+        if (isbnDetected) return ""
         val lines = text.lineSequence()
             .map { it.trim().replace(Regex("\\s+"), " ") }
             .filter { line -> line.count(Char::isLetter) >= 3 }

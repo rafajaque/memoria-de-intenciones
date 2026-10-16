@@ -128,6 +128,7 @@ fun SharedCaptureScreen(
                         } else {
                             ConfirmCandidateContent(
                                 ocrText = confirmingText!!,
+                                isbn = current.isbn,
                                 catalogProposal = current.catalogProposal,
                                 onSave = { title, category, metadata -> onSave(title, category, LibraryStatus.TO_CONSUME, null, null, metadata) },
                                 onSaved = ::closeAndDiscard,
@@ -182,19 +183,31 @@ private fun ReadyContent(text: String, isbn: String?, proposal: BookCatalogPropo
 @Composable
 private fun ConfirmCandidateContent(
     ocrText: String,
+    isbn: String?,
     catalogProposal: BookCatalogProposal?,
     onSave: suspend (String, StoredCategory, BookMetadata?) -> Result<Long>,
     onSaved: () -> Unit,
     onDiscard: () -> Unit
 ) {
     val scope = androidx.compose.runtime.rememberCoroutineScope()
-    var title by remember(ocrText, catalogProposal?.externalId) { mutableStateOf(catalogProposal?.title ?: OcrCandidateExtractor.titleFrom(ocrText)) }
+    var title by remember(ocrText, isbn, catalogProposal?.externalId) {
+        mutableStateOf(
+            catalogProposal?.title
+                ?: OcrCandidateExtractor.titleFrom(ocrText, isbnDetected = isbn != null)
+        )
+    }
     var category by remember(ocrText) { mutableStateOf(StoredCategory.BOOK) }
     var saving by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("CONFIRMAR PROPUESTA", style = MaterialTheme.typography.labelSmall)
         Text("Corrige la propuesta antes de crear un título.", style = MaterialTheme.typography.bodyMedium)
+        if (isbn != null && catalogProposal == null) {
+            Text(
+                "ISBN detectado, pero no encontramos una ficha en nuestros catálogos. Completa el título manualmente.",
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
         androidx.compose.material3.OutlinedTextField(
             value = title,
             onValueChange = { title = it; error = null },

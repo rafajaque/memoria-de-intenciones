@@ -11,4 +11,15 @@ class OcrCandidateExtractorTest {
             OcrCandidateExtractor.titleFrom("GEORGE R.R.\nMARTIN\nFUEGO\nSNGRE")
         )
     }
+
+    @Test
+    fun doesNotUseOcrHeuristicWhenIsbnWasDetectedWithoutCatalogProposal() {
+        assertEquals(
+            "",
+            OcrCandidateExtractor.titleFrom(
+                "ISBN: 978-84-663-7497-2\nRandom House Grupo Editorial",
+                isbnDetected = true
+            )
+        )
+    }
 }
