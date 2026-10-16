@@ -35,6 +35,7 @@
 - Se añadió el fixture centrado `app/src/androidTest/assets/isbn-9788466374972.png` y el procedimiento reproducible en `docs/evaluation/recorrido-isbn-avd.md`; el original AVIF permanece intacto.
 - El AVD se reinició con una copia sin espacios y el EAN-13 quedó completo, centrado y legible en la vista de cámara. ML Kit no devolvió una lectura después de 6 segundos; no se afirma todavía detección ni consulta Google Books.
 - Bloqueo actual: aislar si CameraX entrega a `ImageAnalysis` los mismos fotogramas que `PreviewView` o si el formato/rotación de la entrada virtual impide a ML Kit reconocerlo. El flujo de permisos, navegación y salida manual sí está comprobado.
+- Se añadió `IsbnBarcodeFixtureTest`, que carga el PNG directamente en ML Kit sin CameraX y reconoce `9788466374972`. `connectedDebugAndroidTest` terminó con `BUILD SUCCESSFUL` y 16 pruebas aprobadas. El fallo queda aislado en la entrada de `ImageAnalysis` del AVD.
 - El alta de Libros incluye el acceso al escáner ISBN. CameraX analiza EAN-13 en vivo con ML Kit, valida localmente y retorna el código leído al formulario; no persiste imágenes. Aún falta convertir la respuesta de Google Books en campos editables y guardarla como `BookMetadata`.
 
 ### Autocompletado Google Books — Fase 4 parcial, 2026-10-16

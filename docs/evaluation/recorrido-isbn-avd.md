@@ -36,4 +36,4 @@ Si ya existe una instancia del AVD, hay que cerrarla completamente antes de arra
 
 ## Resultado de la sesión 2026-10-16
 
-La navegación, el permiso y la pantalla del escáner funcionaron. La instancia administrada del AVD conservó un fotograma anterior y no permitió verificar todavía la detección con el fixture centrado; por eso el resultado queda marcado como pendiente y no como recorrido completado.
+La navegación, el permiso y la pantalla del escáner funcionaron. Tras reiniciar el AVD, el fixture centrado quedó visible y completo en `PreviewView`, pero CameraX no produjo una lectura visible en seis segundos. La prueba instrumentada `IsbnBarcodeFixtureTest` reconoce el mismo PNG directamente con ML Kit (`connectedDebugAndroidTest`: 16 pruebas aprobadas), por lo que el siguiente diagnóstico debe centrarse en los fotogramas entregados por `ImageAnalysis`.
