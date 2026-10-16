@@ -160,6 +160,14 @@ La base Room subió de versión 1 a 2 mediante una migración que añade `durati
 ## Notas
 
 - Hay tres pruebas instrumentadas de Room y una revisión ADB del flujo de alta; todavía no existe una suite automatizada de pruebas Compose.
+
+### Share Sheet: ISBN desde código de barras — 2026-10-16
+
+- El flujo de captura compartida intenta primero leer un EAN-13 con ML Kit Barcode Scanning sobre la imagen completa y un recorte ampliado de la zona inferior; sólo después usa el ISBN encontrado por OCR textual.
+- Cuando se obtiene un ISBN válido, se consulta el catálogo existente y su propuesta bibliográfica tiene prioridad sobre heurísticas de líneas OCR como nombres editoriales.
+- La lectura del código y la consulta mantienen el comportamiento local-first del flujo: no se guarda la imagen compartida ni se registra el texto OCR; sólo se conserva la ficha al confirmar.
+- Se añadió una prueba instrumentada sobre `isbn-9788466374972.png` para validar la lectura directa de `9788466374972`, además de una prueba de extracción desde texto.
+- Verificación actual: `assembleDebug lintDebug compileDebugAndroidTestKotlin --console=plain` terminó correctamente y `git diff --check` no reportó errores. Falta el recorrido manual final en el Redmi 12 5G con la captura compartida para confirmar la propuesta visible de catálogo.
 - Pendientes de configuración anteriores al rediseño: icono de aplicación y reglas explícitas de extracción/respaldo para Android 12+. No se modificaron en esta tarea visual.
 - Las actualizaciones de SDK y dependencias deben planificarse por separado; no se cambian versiones solo para silenciar advertencias.
 - Android Studio se verificó ejecutándose con el proyecto como argumento; los archivos temporales de arranques anteriores no afectan la ejecución actual.

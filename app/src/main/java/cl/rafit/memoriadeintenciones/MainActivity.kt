@@ -36,6 +36,7 @@ import cl.rafit.memoriadeintenciones.data.catalog.OpenLibraryBookCatalogReposito
 import cl.rafit.memoriadeintenciones.data.catalog.OpenLibraryService
 import cl.rafit.memoriadeintenciones.data.local.MemoriaDatabase
 import cl.rafit.memoriadeintenciones.data.shared.IncomingSharedImage
+import cl.rafit.memoriadeintenciones.data.shared.OnDeviceIsbnReader
 import cl.rafit.memoriadeintenciones.data.shared.OnDeviceOcrTextReader
 import cl.rafit.memoriadeintenciones.data.shared.SharedImageImporter
 import cl.rafit.memoriadeintenciones.ui.LibraryUiState
@@ -86,7 +87,9 @@ class MainActivity : ComponentActivity() {
                                 importer = remember { SharedImageImporter(applicationContext) },
                                 ocrReader = remember { OnDeviceOcrTextReader(applicationContext) },
                                 onSave = libraryViewModel::add,
-                                onClose = { sharedImage.value = null }
+                                onClose = { sharedImage.value = null },
+                                onFindBook = libraryViewModel::findBookByIsbn,
+                                isbnReader = remember { OnDeviceIsbnReader(applicationContext) }
                             )
                         }
                     }

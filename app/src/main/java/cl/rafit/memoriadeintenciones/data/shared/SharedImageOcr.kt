@@ -2,6 +2,8 @@ package cl.rafit.memoriadeintenciones.data.shared
 
 import android.content.ContentResolver
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
@@ -34,14 +36,39 @@ class SharedImageImporter(context: Context) {
 
 // MVP: OCR con el modelo latino empaquetado; no transmite la imagen ni el texto.
 class OnDeviceOcrTextReader(private val context: Context) {
-    suspend fun read(imageFile: SharedImageFile): String = suspendCancellableCoroutine { continuation ->
-        val input = runCatching { InputImage.fromFilePath(context, Uri.fromFile(imageFile.file)) }
-            .getOrElse {
-                continuation.resumeWithException(it)
-                return@suspendCancellableCoroutine
-            }
-        TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-            .process(input)
+    suspend fun read(imageFile: SharedImageFile): String {
+        val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+        return try {
+            val fullText = recognize(recognizer, InputImage.fromFilePath(context, Uri.fromFile(imageFile.file)))
+            val bottomText = readBottomBand(recognizer, imageFile.file)
+            listOf(fullText, bottomText).filter(String::isNotBlank).distinct().joinToString("\n")
+        } finally {
+            recognizer.close()
+        }
+    }
+
+    private suspend fun readBottomBand(
+        recognizer: com.google.mlkit.vision.text.TextRecognizer,
+        file: File
+    ): String {
+        val bitmap = BitmapFactory.decodeFile(file.absolutePath) ?: return ""
+        val top = (bitmap.height * .62f).toInt().coerceAtMost(bitmap.height - 1)
+        val crop = Bitmap.createBitmap(bitmap, 0, top, bitmap.width, bitmap.height - top)
+        val scaled = Bitmap.createScaledBitmap(crop, crop.width * 2, crop.height * 2, true)
+        return try {
+            recognize(recognizer, InputImage.fromBitmap(scaled, 0))
+        } finally {
+            if (scaled !== crop) scaled.recycle()
+            crop.recycle()
+            bitmap.recycle()
+        }
+    }
+
+    private suspend fun recognize(
+        recognizer: com.google.mlkit.vision.text.TextRecognizer,
+        input: InputImage
+    ): String = suspendCancellableCoroutine { continuation ->
+        recognizer.process(input)
             .addOnSuccessListener { result ->
                 if (continuation.isActive) continuation.resume(result.text)
             }

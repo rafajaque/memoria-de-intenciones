@@ -2,7 +2,13 @@ package cl.rafit.memoriadeintenciones.domain
 
 // MVP: validación local previa a consultar cualquier catálogo.
 object Isbn {
+    private val embeddedIsbn = Regex("(?<!\\d)[0-9Xx][0-9Xx -]{8,20}[0-9Xx](?!\\d)")
+
     fun normalize(value: String): String = value.filter { it.isDigit() || it == 'X' || it == 'x' }.uppercase()
+
+    fun findIn(text: String): String? = embeddedIsbn.findAll(text)
+        .map { normalize(it.value) }
+        .firstOrNull(::isValid)
 
     fun isValid(value: String): Boolean {
         val isbn = normalize(value)

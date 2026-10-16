@@ -28,9 +28,13 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import cl.rafit.memoriadeintenciones.domain.LibraryCategory as StoredCategory
 import cl.rafit.memoriadeintenciones.domain.LibraryStatus
+import cl.rafit.memoriadeintenciones.domain.BookCatalogProposal
+import cl.rafit.memoriadeintenciones.domain.BookMetadata
+import cl.rafit.memoriadeintenciones.domain.Isbn
 import cl.rafit.memoriadeintenciones.domain.OcrCandidateExtractor
 import cl.rafit.memoriadeintenciones.data.shared.IncomingSharedImage
 import cl.rafit.memoriadeintenciones.data.shared.OnDeviceOcrTextReader
+import cl.rafit.memoriadeintenciones.data.shared.OnDeviceIsbnReader
 import cl.rafit.memoriadeintenciones.data.shared.SharedImageFile
 import cl.rafit.memoriadeintenciones.data.shared.SharedImageImporter
 import cl.rafit.memoriadeintenciones.ui.CatalogueSlip
@@ -39,7 +43,12 @@ import kotlinx.coroutines.launch
 
 private sealed interface SharedCaptureState {
     data object Processing : SharedCaptureState
-    data class Ready(val image: SharedImageFile, val text: String) : SharedCaptureState
+    data class Ready(
+        val image: SharedImageFile,
+        val text: String,
+        val isbn: String? = null,
+        val catalogProposal: BookCatalogProposal? = null
+    ) : SharedCaptureState
     data class Failed(val message: String) : SharedCaptureState
 }
 
@@ -48,8 +57,10 @@ fun SharedCaptureScreen(
     incoming: IncomingSharedImage,
     importer: SharedImageImporter,
     ocrReader: OnDeviceOcrTextReader,
-    onSave: suspend (String, StoredCategory, LibraryStatus, Int?, String?) -> Result<Long>,
-    onClose: () -> Unit
+    onSave: suspend (String, StoredCategory, LibraryStatus, Int?, String?, BookMetadata?) -> Result<Long>,
+    onClose: () -> Unit,
+    onFindBook: (suspend (String) -> Result<List<BookCatalogProposal>>)? = null,
+    isbnReader: OnDeviceIsbnReader? = null
 ) {
     var state by remember(incoming) { mutableStateOf<SharedCaptureState>(SharedCaptureState.Processing) }
     var importedImage by remember(incoming) { mutableStateOf<SharedImageFile?>(null) }
@@ -66,7 +77,7 @@ fun SharedCaptureScreen(
         }.mapCatching { image ->
             ocrReader.read(image)
         }
-        state = result.fold(
+        val nextState = result.fold(
             onSuccess = { text -> SharedCaptureState.Ready(importedImage ?: error("Archivo no disponible"), text) },
             onFailure = { error ->
                 importedImage?.file?.delete()
@@ -74,6 +85,11 @@ fun SharedCaptureScreen(
                 SharedCaptureState.Failed(error.userFacingMessage())
             }
         )
+        state = if (nextState is SharedCaptureState.Ready) {
+            val isbn = isbnReader?.find(nextState.image) ?: Isbn.findIn(nextState.text)
+            val proposal = isbn?.let { onFindBook?.invoke(it)?.getOrNull()?.firstOrNull() }
+            nextState.copy(isbn = isbn, catalogProposal = proposal)
+        } else nextState
     }
 
     fun closeAndDiscard() {
@@ -108,11 +124,12 @@ fun SharedCaptureScreen(
                     when (val current = state) {
                         SharedCaptureState.Processing -> ProcessingContent()
                         is SharedCaptureState.Ready -> if (confirmingText == null) {
-                            ReadyContent(current.text, onReview = { confirmingText = current.text }, onClose = ::closeAndDiscard)
+                            ReadyContent(current.text, current.isbn, current.catalogProposal, onReview = { confirmingText = current.text }, onClose = ::closeAndDiscard)
                         } else {
                             ConfirmCandidateContent(
                                 ocrText = confirmingText!!,
-                                onSave = { title, category -> onSave(title, category, LibraryStatus.TO_CONSUME, null, null) },
+                                catalogProposal = current.catalogProposal,
+                                onSave = { title, category, metadata -> onSave(title, category, LibraryStatus.TO_CONSUME, null, null, metadata) },
                                 onSaved = ::closeAndDiscard,
                                 onDiscard = ::closeAndDiscard
                             )
@@ -143,7 +160,7 @@ private fun ProcessingContent() {
 }
 
 @Composable
-private fun ReadyContent(text: String, onReview: () -> Unit, onClose: () -> Unit) {
+private fun ReadyContent(text: String, isbn: String?, proposal: BookCatalogProposal?, onReview: () -> Unit, onClose: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Text("TEXTO DETECTADO", style = MaterialTheme.typography.labelSmall)
         Text(
@@ -155,6 +172,8 @@ private fun ReadyContent(text: String, onReview: () -> Unit, onClose: () -> Unit
             style = MaterialTheme.typography.bodySmall,
             fontStyle = FontStyle.Italic
         )
+        isbn?.let { Text("ISBN detectado: $it", style = MaterialTheme.typography.bodySmall) }
+        proposal?.let { Text("Ficha encontrada: ${it.title}", style = MaterialTheme.typography.titleMedium) }
         Button(onClick = onReview) { Text("Revisar propuesta") }
         TextButton(onClick = onClose) { Text("Cerrar y descartar") }
     }
@@ -163,12 +182,13 @@ private fun ReadyContent(text: String, onReview: () -> Unit, onClose: () -> Unit
 @Composable
 private fun ConfirmCandidateContent(
     ocrText: String,
-    onSave: suspend (String, StoredCategory) -> Result<Long>,
+    catalogProposal: BookCatalogProposal?,
+    onSave: suspend (String, StoredCategory, BookMetadata?) -> Result<Long>,
     onSaved: () -> Unit,
     onDiscard: () -> Unit
 ) {
     val scope = androidx.compose.runtime.rememberCoroutineScope()
-    var title by remember(ocrText) { mutableStateOf(OcrCandidateExtractor.titleFrom(ocrText)) }
+    var title by remember(ocrText, catalogProposal?.externalId) { mutableStateOf(catalogProposal?.title ?: OcrCandidateExtractor.titleFrom(ocrText)) }
     var category by remember(ocrText) { mutableStateOf(StoredCategory.BOOK) }
     var saving by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -196,7 +216,18 @@ private fun ConfirmCandidateContent(
             onClick = {
                 if (title.isBlank()) { error = "Escribe un título antes de guardarlo."; return@Button }
                 saving = true
-                scope.launch { onSave(title, category).onSuccess { onSaved() }.onFailure { failure -> saving = false; error = failure.message ?: "No se pudo guardar." } }
+                val metadata = catalogProposal?.let {
+                    BookMetadata(
+                        isbn = it.isbn.orEmpty(),
+                        authors = it.authors,
+                        publisher = it.publisher,
+                        publishedDate = it.publishedDate,
+                        language = it.language,
+                        pageCount = it.pageCount,
+                        coverUrl = it.coverUrl
+                    )
+                }
+                scope.launch { onSave(title, category, metadata).onSuccess { onSaved() }.onFailure { failure -> saving = false; error = failure.message ?: "No se pudo guardar." } }
             },
             enabled = !saving,
             modifier = Modifier.fillMaxWidth()

@@ -12,4 +12,7 @@ class IsbnTest {
         assertTrue(Isbn.isValid("9780306406157"))
     }
     @Test fun rejectsInvalidChecksum() { assertFalse(Isbn.isValid("9780306406158")) }
+    @Test fun findsIsbnInsideOcrText() {
+        assertEquals("9788466374972", Isbn.findIn("ISBN: 978-84-663-7497-2 / editorial"))
+    }
 }

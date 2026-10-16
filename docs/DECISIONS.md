@@ -204,6 +204,15 @@
 - **Distribución:** `android.hardware.camera` se declara opcional, manteniendo instalación posible en equipos sin cámara. El modelo empaquetado añade aproximadamente 2,4 MB pero no exige descarga inicial.
 - **Verificación:** `assembleDebug`, `lintDebug` y `connectedDebugAndroidTest` terminaron con `BUILD SUCCESSFUL`; 15 pruebas instrumentadas aprobadas.
 
+## 2026-10-16 — ISBN en capturas compartidas: código de barras antes que OCR
+
+- **Clasificación:** MVP; mejora del flujo OCR compartido.
+- **Decisión:** intentar primero la lectura directa del EAN-13 con ML Kit sobre la imagen compartida, incluyendo un recorte ampliado de la franja inferior, y usar la extracción de ISBN desde OCR como respaldo.
+- **Motivo:** en contraportadas el OCR puede reconocer con más claridad la editorial que los dígitos pequeños del ISBN. El código de barras contiene una señal más específica para identificar la edición.
+- **Comportamiento:** un ISBN válido dispara el catálogo ya existente; la propuesta de Google Books/Open Library reemplaza la heurística OCR de título y sigue siendo editable antes de guardar.
+- **Privacidad:** la imagen y el texto permanecen en memoria/almacenamiento temporal privado; no se incorporan nuevos datos enviados al catálogo aparte del ISBN normalizado.
+- **Verificación:** compilación de APK, lint y compilación de tests instrumentados correctas; prueba instrumentada añadida para leer `9788466374972` desde el fixture de código de barras. El recorrido en Redmi 12 5G queda pendiente para validar la propuesta visible.
+
 ## 2026-10-16 — Autocompletado editable desde Google Books
 
 - **Clasificación:** MVP; integración de UI y consulta, sin guardado automático.
